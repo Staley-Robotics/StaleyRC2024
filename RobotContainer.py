@@ -20,9 +20,11 @@ class RobotContainer:
         """
         # Create Subsystems
         self.subsystem = subsystems.SampleSubsystem()
+        self.sweredrive = subsystems.SwerveDrive()
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
+        wpilib.SmartDashboard.putData( "SwerveDrive", self.sweredrive )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", commands.SampleCommand1() )

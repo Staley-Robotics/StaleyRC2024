@@ -1,6 +1,7 @@
 import ntcore
+import wpiutil
 
-class Gains(ntcore.Sendable):
+class Gains(wpiutil.Sendable):
     kP = 0.0
     kI = 0.0
     kD = 0.0
