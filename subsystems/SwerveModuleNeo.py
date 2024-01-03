@@ -25,6 +25,8 @@ from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
 from wpiutil import *
 
+# Self Made Classes
+from .SwerveModule import SwerveModule
 
 ### Constants
 # Module Physical Constants
@@ -58,7 +60,7 @@ angle_mmMaxAcceleration = 2 * angle_mmMaxVelocity
 angle_mmSCurveSmoothing = 8
 
 # Class: SwerveModule
-class SwerveModule:
+class SwerveModuleNeo(SwerveModule):
     motionMagic:bool = False
 
     driveMotor:CANSparkMax = None
