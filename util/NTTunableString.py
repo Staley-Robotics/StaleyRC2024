@@ -31,7 +31,7 @@ class NTTunableString:
             if persistent:
                 ntTbl.setPersistent( self.name )
         else:
-            self.value = str( ntTbl.getString( self.name ) )
+            self.value = str( ntTbl.getString( self.name, value ) )
         
         # Clear Persistent Flag if requested
         if not persistent:

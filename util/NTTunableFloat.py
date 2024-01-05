@@ -31,7 +31,7 @@ class NTTunableFloat:
             if persistent:
                 ntTbl.setPersistent( self.name )
         else:
-            self.value = float( ntTbl.getNumber( self.name ) )
+            self.value = float( ntTbl.getNumber( self.name, value ) )
         
         # Clear Persistent Flag if requested
         if not persistent:

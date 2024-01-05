@@ -31,7 +31,7 @@ class NTTunableBoolean:
             if persistent:
                 ntTbl.setPersistent( self.name )
         else:
-            self.value = bool( ntTbl.getBoolean( self.name ) )
+            self.value = bool( ntTbl.getBoolean( self.name, value ) )
         
         # Clear Persistent Flag if requested
         if not persistent:
