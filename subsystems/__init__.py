@@ -1,3 +1,4 @@
+from .CustomPigeon import *
 from .SampleSubsystem import *
 from .SwerveDrive import *
 from .SwerveDriveNeo import *
