@@ -27,8 +27,11 @@ class NTTunableBoolean:
         
         if ntTbl.setDefaultBoolean(self.name, value):
             self.value = value
+            # Set Persistent Flag if requested
+            if persistent:
+                ntTbl.setPersistent( self.name )
         else:
-            raise TypeError( f"{self.name} is not of type Boolean.  Please verify the appropriate NetworkTable Entry Type and try again." )
+            self.value = bool( ntTbl.getBoolean( self.name ) )
         
         # Clear Persistent Flag if requested
         if not persistent:

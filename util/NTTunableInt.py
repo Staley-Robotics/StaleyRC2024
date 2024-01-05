@@ -27,9 +27,12 @@ class NTTunableInt:
         
         if ntTbl.setDefaultNumber(self.name, value):
             self.value = int(value)
+            # Set Persistent Flag if requested
+            if persistent:
+                ntTbl.setPersistent( self.name )
         else:
-            raise TypeError( f"{self.name} is not of type Int.  Please verify the appropriate NetworkTable Entry Type and try again." )
-        
+            self.value = int( ntTbl.getNumber( self.name ) )
+
         # Clear Persistent Flag if requested
         if not persistent:
             ntTbl.clearPersistent( self.name )

@@ -27,8 +27,11 @@ class NTTunableFloat:
         
         if ntTbl.setDefaultNumber(self.name, value):
             self.value = float(value)
+            # Set Persistent Flag if requested
+            if persistent:
+                ntTbl.setPersistent( self.name )
         else:
-            raise TypeError( f"{self.name} is not of type Float.  Please verify the appropriate NetworkTable Entry Type and try again." )
+            self.value = float( ntTbl.getNumber( self.name ) )
         
         # Clear Persistent Flag if requested
         if not persistent:

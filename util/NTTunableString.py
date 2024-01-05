@@ -25,10 +25,13 @@ class NTTunableString:
         ntInst = NetworkTableInstance.getDefault()
         ntTbl = ntInst.getTable("Tunable")
         
-        if ntTbl.setDefaultNumber(self.name, value):
+        if ntTbl.setDefaultString(self.name, value):
             self.value = str(value)
+            # Set Persistent Flag if requested
+            if persistent:
+                ntTbl.setPersistent( self.name )
         else:
-            raise TypeError( f"{self.name} is not of type String.  Please verify the appropriate NetworkTable Entry Type and try again." )
+            self.value = str( ntTbl.getString( self.name ) )
         
         # Clear Persistent Flag if requested
         if not persistent:
