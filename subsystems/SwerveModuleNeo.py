@@ -3,7 +3,7 @@ Description: Swerve Module (West Coast Products - Swerve X)
 Version:  1
 Date:  2023-09-29
 
-Drive Motor Controllers:  TALON/FALCON FX
+Drive Motor Controllers:  REV NEO 
 Angle Motor Controllers:  TALON/FALCON FX
 Angle Sensors:  CAN CODERS
 
@@ -20,7 +20,9 @@ from commands2 import SubsystemBase
 from ctre import WPI_TalonFX, ControlMode, FeedbackDevice, RemoteFeedbackDevice, NeutralMode, TalonFXPIDSetConfiguration
 from ctre.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
 from rev import CANSparkMax, SparkMaxPIDController, SparkMaxRelativeEncoder
+from ntcore import NetworkTableInstance
 from wpilib import RobotBase, RobotState
+from wpimath import units
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
 from wpiutil import *
@@ -147,7 +149,47 @@ class SwerveModuleNeo(SwerveModule):
         self.referencePosition = Translation2d( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
+    def updateDrivePIDController(self):
+        """
+        """
+        pass
+
+    def updateAnglePIDController(self):
+        """
+        """
+        pass
+
+    def updateLogs(self, tableName):
+        """
+        Update Network Table Logging
+
+        :param tableName The NetworkTable path for logging
+        """
+        # Get Logging Table
+        tbl = NetworkTableInstance.getDefault().getTable(tableName)
+
+        # Drive Motor Data
+        tbl.putNumber( "drivePositionRad", self.driveMotorEncoder.getPosition() )
+        tbl.putNumber( "driveVelocityRadPerSec", self.driveMotorEncoder.getVelocity() )
+        tbl.putNumber( "driveAppliedVolts", self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage() )
+        tbl.putNumber( "driveCurrentAmps", self.driveMotor.getOutputCurrent() )
+        tbl.putNumber( "driveTempCelcius", self.driveMotor.getMotorTemperature() )
+
+        # Turn Motor Data
+        tbl.putNumber( "turnAbsolutePositionRad", self.angleSensor.getPosition() )
+        tbl.putNumber( "turnPositionRad", self.angleMotorEncoder.getPosition() )
+        tbl.putNumber( "turnVelocityRadPerSec", self.angleMotorEncoder.getVelocity() )
+        tbl.putNumber( "turnAppliedVolts", self.angleMotor.getAppliedOutput() * self.angleMotor.getBusVoltage() )
+        tbl.putNumber( "turnCurrentAmps", self.angleMotor.getOutputCurrent() )
+        tbl.putNumber( "turnTempCelcius", self.angleMotor.getMotorTemperature() )
+
     def setDesiredState(self, desiredState:SwerveModuleState):
+        """
+        Set the Desired State of this Module in Velocity and Degrees.  This method will optimize 
+        the direction / angle needed for fastest response
+
+        :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
+        """
         ### Calculate / Optimize
         currentAnglePosition = self.angleSensor.getPosition()
         currentAngleRotation = Rotation2d(0).fromDegrees(currentAnglePosition)
@@ -162,29 +204,38 @@ class SwerveModuleNeo(SwerveModule):
         velocity *= ( optimalState.angle - currentAngleRotation ).cos() # Scale Speed / Smooth rotation ??? Smart Motion?
 
         # Set Velocity
-        if self.motionMagic:
-            self.driveMotorPid.setReference( velocity, CANSparkMax.ControlType.kSmartVelocity, drive_kSlotIdx )
-        else:
-            self.driveMotorPid.setReference( velocity, CANSparkMax.ControlType.kVelocity, drive_kSlotIdx )
+        velocMode = CANSparkMax.ControlType.kVelocity if not self.velocSmart else CANSparkMax.ControlType.kSmartVelocity
+        self.driveMotorPid.setReference( velocity, velocMode, drive_kSlotIdx )
 
         # Set Angle
-        if self.motionMagic:
-            self.angleMotorPid.setReference( optimalState.angle.radians(), CANSparkMax.ControlType.kSmartMotion, angle_kSlotIdx )
-        else:
-            self.angleMotorPid.setReference( optimalState.angle.radians(), CANSparkMax.ControlType.kPosition, angle_kSlotIdx )
+        angleMode = CANSparkMax.ControlType.kPosition if not self.angleSmart else CANSparkMax.ControlType.kSmartMotion
+        self.angleMotorPid.setReference( optimalState.angle.radians(), angleMode, angle_kSlotIdx )
 
     def getReferencePosition(self) -> Translation2d:
+        """
+        Get the Reference Position of this Module on the SwerveDrive in (x,y) coordinates 
+        where x is forward and y is left
+
+        :returns Translation2d
+        """
         return self.referencePosition
        
     def getModuleState(self) -> SwerveModuleState:
+        """
+        Get the Current State of this Module in Meters Per Second and Rotation2d
+
+        :returns SwerveModuleState
+        """
         return self.moduleState
 
     def getModulePosition(self) -> SwerveModulePosition:
+        """
+        Get the Current Module Position in Meters Per Second and Rotation2d
+
+        :returns SwerveModulePosition object
+        """
         return SwerveModulePosition(
             distance=self.driveMotorEncoder.getPosition(),
             angle=Rotation2d( self.angleMotorEncoder.getPosition() )
         )
-    
-    def setMotionMagic(self, state:bool):
-        self.motionMagic = state
 

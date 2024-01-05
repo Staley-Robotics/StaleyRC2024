@@ -30,20 +30,7 @@ from ntcore import *
 from util import *
 from .SwerveDrive import SwerveDrive
 from .SwerveModuleNeo import SwerveModuleNeo
-
-### Constants
-# SwerveDrive Module Input Deadband
-gyroStartHeading = NTTunableFloat( "SwerveDrive/gyroStartHeading", -180.0 )
-
-# SwerveDrive Maximum Speeds
-maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
-maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-
-# Trajectory Maximums
-kMaxSpeedMetersPerSecond = 3
-kMaxAccelMetersPerSecondSq = 3
-kMaxAngularSpeedMetersPerSecond = NTTunableFloat( "SwerveDrive/kMaxAngularSpeed", 2 * math.pi )  # Code Based Rotation Maximum
-kMaxAngularAccelMetersPerSecondSq = NTTunableFloat( "SwerveDrive/kMaxAngularAccel", 4 * math.pi )
+from .CustomPigeon import CustomPigeon
 
 ### Class: SwerveDrive
 class SwerveDriveNeo(SwerveDrive):
@@ -64,11 +51,18 @@ class SwerveDriveNeo(SwerveDrive):
         self.robotName = "Robot"
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
+        # Get Tunable Properties
+        self.gyroStartHeading = NTTunableFloat( "SwerveDrive/gyroStartHeading", -180.0 )
+        self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
+        self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
+        self.kMaxAngularSpeedMetersPerSecond = NTTunableFloat( "SwerveDrive/kMaxAngularSpeed", 2 * math.pi )  # Code Based Rotation Maximum
+        self.kMaxAngularAccelMetersPerSecondSq = NTTunableFloat( "SwerveDrive/kMaxAngularAccel", 4 * math.pi )
+
+        # Logging
+        self.__logTbl__ = NetworkTableInstance.getDefault().getTable(f"{self.robotName}/SwerveDrive")
+
         # Gyro
-        self.gyro = WPI_Pigeon2( 61, "rio" )
-        self.gyro.reset()
-        self.gyro.setYaw( gyroStartHeading.get() )
-        if RobotBase.isSimulation(): self.gyro.getSimCollection().setRawHeading( gyroStartHeading.get() )
+        self.gyro = CustomPigeon( 61, "rio", self.gyroStartHeading.get() )
 
         # Swerve Modules
         self.moduleFL = SwerveModuleNeo("FrontLeft",  7, 8, 18,  0.25,  0.25,   31.289 ) #211.289)
@@ -101,42 +95,24 @@ class SwerveDriveNeo(SwerveDrive):
                 self.moduleBL.getModulePosition(),
                 self.moduleBR.getModulePosition()
             ],
-            Pose2d(Translation2d(2.10,4.0), Rotation2d().fromDegrees(gyroStartHeading.get()))
+            Pose2d(Translation2d(2.10,4.0), Rotation2d().fromDegrees(self.gyroStartHeading.get()))
         )
-
-        # Holonomic PID
-        xPid = PIDController( 1.0, 0, 0 )
-        xPid.setTolerance( 0.05 )
-        xPid.reset()
-
-        yPid = PIDController( 1.0, 0, 0 )
-        yPid.setTolerance( 0.05 )
-        yPid.reset()
-
-        tPidConstraints = TrapezoidProfileRadians.Constraints(
-            kMaxAngularSpeedMetersPerSecond.get(),
-            kMaxAngularAccelMetersPerSecondSq.get()
-        )
-        tPid = ProfiledPIDControllerRadians( 1, 0, 0, tPidConstraints )
-        tPid.enableContinuousInput( -math.pi, math.pi )
-        tPid.setTolerance( 0.00872 ) #436 )
-        tPid.reset( self.getRobotAngle().radians() )
-
-        self.holonomicPID = HolonomicDriveController(
-            xPid,
-            yPid,
-            tPid
-        )
-        
-        self.srl_vx = SlewRateLimiter( 12 )
-        self.srl_vy = SlewRateLimiter( 12 )
-        self.srl_vr = SlewRateLimiter( 12 )
 
         # Field on Shuffleboard
         SmartDashboard.putData("Field", Field2d())
 
     # Update Odometry Information on each loop
     def periodic(self):
+        """
+        SwerveDrive Periodic Loop
+        """
+        # Logging
+        self.gyro.updateLogs( f"{self.robotName}/SwerveDrive/Gyro" )
+        self.moduleFL.updateLogs( f"{self.robotName}/SwerveDrive/ModuleFL" )
+        self.moduleFR.updateLogs( f"{self.robotName}/SwerveDrive/ModuleFR" )
+        self.moduleBL.updateLogs( f"{self.robotName}/SwerveDrive/ModuleBL" )
+        self.moduleBR.updateLogs( f"{self.robotName}/SwerveDrive/ModuleBR" )
+
         # Odometry from Module Position Data
         pose = self.odometry.updateWithTime(
             Timer.getFPGATimestamp(),
@@ -163,9 +139,9 @@ class SwerveDriveNeo(SwerveDrive):
             poseY = 8.013 - poseY
             poseR = poseR - 180
  
-        SmartDashboard.putData(
+        SmartDashboard.putNumberArray(
             "Field/{self.robotName}",
-            Pose2d( poseX, poseY, poseR )
+            [ poseX, poseY, poseR ]
         )
 
     def simulationPeriodic(self) -> None:
