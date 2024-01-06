@@ -49,27 +49,27 @@ class SwerveModuleNeo(SwerveModule):
 
         # Drive Motor PID Values
         self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
-        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/kP", 0.04, self.updateDrivePIDController )
-        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/kI", 0.0, self.updateDrivePIDController )
-        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/kD", 1.0, self.updateDrivePIDController )
-        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/kF", 0.065, self.updateDrivePIDController )
-        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/IZone", 0.0, self.updateDrivePIDController )
-        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/Error", 0.0, self.updateDrivePIDController )
-        self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/kSlotIdx", 0, self.updateDrivePIDController )
-        self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/smartVelocity", 20480, self.updateDrivePIDController )
-        self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
+        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.04, self.updateDrivePIDController )
+        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
+        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 1.0, self.updateDrivePIDController )
+        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.065, self.updateDrivePIDController )
+        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
+        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
+        self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
+        self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
+        self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
 
         # Angle Motor PID Values
         self.angleSmart = NTTunableBoolean( "SwerveModule/Angle/smartMotion", False )
-        self.angle_kP = NTTunableFloat( "SwerveModule/Angle/kP", 0.5, self.updateDrivePIDController )
-        self.angle_kI = NTTunableFloat( "SwerveModule/Angle/kI", 0, self.updateDrivePIDController )
-        self.angle_kD = NTTunableFloat( "SwerveModule/Angle/kD", 0, self.updateDrivePIDController )
-        self.angle_kF = NTTunableFloat( "SwerveModule/Angle/kF", 0, self.updateDrivePIDController )
-        self.angle_kIZone = NTTunableFloat( "SwerveModule/Angle/IZone", 0.0, self.updateDrivePIDController )
-        self.angle_kError = NTTunableFloat( "SwerveModule/Angle/Error", 0.0, self.updateDrivePIDController )
-        self.angle_kSlotIdx = NTTunableInt( "SwerveModule/Angle/kSlotIdx", 0, self.updateDrivePIDController )
-        self.angle_mmMaxVelocity = NTTunableInt( "SwerveModule/Angle/smartVelocity", 2048, self.updateDrivePIDController )
-        self.angle_mmMaxAcceleration = NTTunableInt( "SwerveModule/Angle/smartAccel", 2 * self.angle_mmMaxVelocity.get(), self.updateDrivePIDController )
+        self.angle_kP = NTTunableFloat( "SwerveModule/Angle/PID/kP", 0.5, self.updateDrivePIDController )
+        self.angle_kI = NTTunableFloat( "SwerveModule/Angle/PID/kI", 0, self.updateDrivePIDController )
+        self.angle_kD = NTTunableFloat( "SwerveModule/Angle/PID/kD", 0, self.updateDrivePIDController )
+        self.angle_kF = NTTunableFloat( "SwerveModule/Angle/PID/kF", 0, self.updateDrivePIDController )
+        self.angle_kIZone = NTTunableFloat( "SwerveModule/Angle/PID/IZone", 0.0, self.updateDrivePIDController )
+        self.angle_kError = NTTunableFloat( "SwerveModule/Angle/PID/Error", 0.0, self.updateDrivePIDController )
+        self.angle_kSlotIdx = NTTunableInt( "SwerveModule/Angle/PID/kSlotIdx", 0, self.updateDrivePIDController )
+        self.angle_mmMaxVelocity = NTTunableInt( "SwerveModule/Angle/PID/smartVelocity", 2048, self.updateDrivePIDController )
+        self.angle_mmMaxAcceleration = NTTunableInt( "SwerveModule/Angle/PID/smartAccel", 2 * self.angle_mmMaxVelocity.get(), self.updateDrivePIDController )
 
         ### Angle Sensor
         self.angleSensor = WPI_CANCoder( sensorId, "canivore1")
@@ -121,14 +121,12 @@ class SwerveModuleNeo(SwerveModule):
         self.referencePosition = Translation2d( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateLogs(self, tableName):
+    def updateSysOutputs(self):
         """
         Update Network Table Logging
-
-        :param tableName The NetworkTable path for logging
         """
         # Get Logging Table
-        tbl = NetworkTableInstance.getDefault().getTable(tableName)
+        tbl = NetworkTableInstance.getDefault().getTable( f"SysOutputs/SwerveDrive/Module{self.name}" )
 
         # Drive Motor Data
         tbl.putNumber( "drivePositionRad", self.driveMotorEncoder.getPosition() )

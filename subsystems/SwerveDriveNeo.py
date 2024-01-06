@@ -17,9 +17,9 @@ import math
 
 # FRC Component Imports
 from ctre.sensors import WPI_Pigeon2
-from wpilib import SmartDashboard, Timer, DriverStation, RobotBase, Field2d
+from wpilib import SmartDashboard, Timer, DriverStation, RobotBase, Field2d, shuffleboard
 from wpimath.controller import HolonomicDriveController, PIDController, ProfiledPIDControllerRadians
-from wpimath.geometry import Translation2d, Rotation2d, Pose2d
+from wpimath.geometry import Translation2d, Rotation2d, Pose2d, Transform2d
 from wpimath.kinematics import SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.filter import SlewRateLimiter
@@ -35,10 +35,6 @@ from .CustomPigeon import CustomPigeon
 ### Class: SwerveDrive
 class SwerveDriveNeo(SwerveDrive):
     __ntTbl__ = NetworkTableInstance.getDefault().getTable("SwerveDrive")
-    fieldRelative:SwerveDrive.BooleanProperty = SwerveDrive.BooleanProperty("fieldRelative", True)
-    halfSpeed:SwerveDrive.BooleanProperty = SwerveDrive.BooleanProperty("halfSpeed", False)
-    motionMagic:SwerveDrive.BooleanProperty = SwerveDrive.BooleanProperty("motionMagic", False)
-    holonomicPID:HolonomicDriveController = None
 
     # Initialization
     def __init__(self):
@@ -52,11 +48,14 @@ class SwerveDriveNeo(SwerveDrive):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
+        self.isCharacterizing = NTTunableBoolean( "Characterizing/Enabled", False )
+        self.characterizationVolts = NTTunableFloat( "Characterizing/SwerveDriveVolts", 0.0 )
+
+        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
+
         self.gyroStartHeading = NTTunableFloat( "SwerveDrive/gyroStartHeading", -180.0 )
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-        self.kMaxAngularSpeedMetersPerSecond = NTTunableFloat( "SwerveDrive/kMaxAngularSpeed", 2 * math.pi )  # Code Based Rotation Maximum
-        self.kMaxAngularAccelMetersPerSecondSq = NTTunableFloat( "SwerveDrive/kMaxAngularAccel", 4 * math.pi )
 
         # Logging
         self.__logTbl__ = NetworkTableInstance.getDefault().getTable(f"{self.robotName}/SwerveDrive")
@@ -65,10 +64,10 @@ class SwerveDriveNeo(SwerveDrive):
         self.gyro = CustomPigeon( 61, "rio", self.gyroStartHeading.get() )
 
         # Swerve Modules
-        self.moduleFL = SwerveModuleNeo("FrontLeft",  7, 8, 18,  0.25,  0.25,   31.289 ) #211.289)
-        self.moduleFR = SwerveModuleNeo("FrontRight", 5, 6, 16,  0.25, -0.25,  -54.932 ) #125.068) #  35.684)
-        self.moduleBL = SwerveModuleNeo("BackLeft",   3, 4, 14, -0.25,  0.25,   43.945 ) #223.945)
-        self.moduleBR = SwerveModuleNeo("BackRight",  1, 2, 12, -0.25, -0.25, -114.346 )  #65.654)
+        self.moduleFL = SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,   31.289 ) #211.289)
+        self.moduleFR = SwerveModuleNeo("FR", 5, 6, 16,  0.25, -0.25,  -54.932 ) #125.068) #  35.684)
+        self.moduleBL = SwerveModuleNeo("BL", 3, 4, 14, -0.25,  0.25,   43.945 ) #223.945)
+        self.moduleBR = SwerveModuleNeo("BR", 1, 2, 12, -0.25, -0.25, -114.346 )  #65.654)
 
         # Subsystem Dashboards
         self.addChild( "Gyro", self.gyro )
@@ -98,8 +97,11 @@ class SwerveDriveNeo(SwerveDrive):
             Pose2d(Translation2d(2.10,4.0), Rotation2d().fromDegrees(self.gyroStartHeading.get()))
         )
 
+        a = Pose2d().log( Pose2d(1,1,0) )
+        a.dx
         # Field on Shuffleboard
-        SmartDashboard.putData("Field", Field2d())
+        self.field = Field2d()
+        SmartDashboard.putData("Field", self.field)
 
     # Update Odometry Information on each loop
     def periodic(self):
@@ -107,11 +109,27 @@ class SwerveDriveNeo(SwerveDrive):
         SwerveDrive Periodic Loop
         """
         # Logging
-        self.gyro.updateLogs( f"{self.robotName}/SwerveDrive/Gyro" )
-        self.moduleFL.updateLogs( f"{self.robotName}/SwerveDrive/ModuleFL" )
-        self.moduleFR.updateLogs( f"{self.robotName}/SwerveDrive/ModuleFR" )
-        self.moduleBL.updateLogs( f"{self.robotName}/SwerveDrive/ModuleBL" )
-        self.moduleBR.updateLogs( f"{self.robotName}/SwerveDrive/ModuleBR" )
+        self.gyro.updateSysOutputs()
+        self.moduleFL.updateSysOutputs()
+        self.moduleFR.updateSysOutputs()
+        self.moduleBL.updateSysOutputs()
+        self.moduleBR.updateSysOutputs()
+
+        # Run Modules
+        if DriverStation.isDisabled():
+            self.stop()
+
+            # Log / Clear Setpoints
+        elif self.isCharacterizing.get():
+            self.moduleFL.driveMotor.set( self.characterizationVolts.get() )
+            self.moduleFR.driveMotor.set( self.characterizationVolts.get() )
+            self.moduleBL.driveMotor.set( self.characterizationVolts.get() )
+            self.moduleBR.driveMotor.set( self.characterizationVolts.get() )
+
+            # Log / Clear Setpoints
+        else:
+            # Calcuate Module Setpoints
+            pass
 
         # Odometry from Module Position Data
         pose = self.odometry.updateWithTime(
@@ -139,8 +157,14 @@ class SwerveDriveNeo(SwerveDrive):
             poseY = 8.013 - poseY
             poseR = poseR - 180
  
+        # self.field.setRobotPose(
+        #     Pose2d(
+        #         Translation2d( poseX, poseY),
+        #         Rotation2d().fromDegrees(poseR)
+        #     )
+        # )
         SmartDashboard.putNumberArray(
-            "Field/{self.robotName}",
+            f"Field/{self.robotName}",
             [ poseX, poseY, poseR ]
         )
 
@@ -153,29 +177,9 @@ class SwerveDriveNeo(SwerveDrive):
         self.runChassisSpeeds( ChassisSpeeds(0,0,0) )
 
 
-
-    # Returns Halfspeed Mode Status
-    def isHalfspeed(self):
-        return self.halfSpeed.get()
-
     # Returns Field Relative Status
     def isFieldRelative(self):
         return self.fieldRelative.get()
-
-    # Enable / Disable Motion Magic
-    def setMotionMagic(self) -> None:
-        mmValue = self.motionMagic.get()
-        self.moduleFL.setMotionMagic( mmValue )
-        self.moduleFR.setMotionMagic( mmValue )
-        self.moduleBL.setMotionMagic( mmValue )
-        self.moduleBR.setMotionMagic( mmValue )
-
-
-
-    #### Get 
-    # PID Controller
-    def getHolonomicPIDController(self) -> HolonomicDriveController:
-        return self.holonomicPID
 
     # Kinematics
     def getKinematics(self) -> SwerveDrive4Kinematics:
@@ -193,6 +197,9 @@ class SwerveDriveNeo(SwerveDrive):
     def getRobotAngle(self) -> Rotation2d:
         return self.gyro.getRotation2d()
 
+    def getRotationVelocity(self) -> float:
+        return 0.0
+
     # Get ChassisSpeeds
     def getChassisSpeeds(self) -> ChassisSpeeds:
         return self.kinematics.toChassisSpeeds(
@@ -208,13 +215,9 @@ class SwerveDriveNeo(SwerveDrive):
     
     ### Run SwerveDrive Functions
     def runPercentageInputs(self, x:float = 0.0, y:float = 0.0, r:float = 0.0) -> None:
-        veloc_x = x * maxVelocity.get()
-        veloc_y = y * maxVelocity.get()
-        veloc_r = r * maxAngularVelocity.get()
-
-        veloc_x = self.srl_vx.calculate( veloc_x )
-        veloc_y = self.srl_vy.calculate( veloc_y )
-        veloc_r = self.srl_vr.calculate( veloc_r )
+        veloc_x = x * self.maxVelocity.get()
+        veloc_y = y * self.maxVelocity.get()
+        veloc_r = r * self.maxAngularVelocity.get()
 
         if self.fieldRelative.get():
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -230,11 +233,6 @@ class SwerveDriveNeo(SwerveDrive):
                 omega = veloc_r
             )
 
-        self.holonomicPID.getThetaController().reset(
-            self.gyro.getRotation2d().radians(),
-            veloc_r
-        )
-
         # Send ChassisSpeeds
         self.runChassisSpeeds(speeds)
 
@@ -248,7 +246,7 @@ class SwerveDriveNeo(SwerveDrive):
     # Run SwerveDrive using SwerveModuleStates
     def runSwerveModuleStates(self, states:typing.List[SwerveModuleState]) -> None:
         # Update Desired State for each Swerve Module
-        modStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, maxVelocity.get())
+        modStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.maxVelocity.get())
         self.moduleFL.setDesiredState(modStates[0])
         self.moduleFR.setDesiredState(modStates[1])
         self.moduleBL.setDesiredState(modStates[2])

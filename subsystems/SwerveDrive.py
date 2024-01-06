@@ -71,6 +71,10 @@ class SwerveDrive(SubsystemBase):
     def getRobotAngle(self) -> Rotation2d:
         return None
 
+    # Get Rotational Velocity
+    def getRotationVelocity(self) -> float:
+        return None
+
     # Get ChassisSpeeds
     def getChassisSpeeds(self) -> ChassisSpeeds:
         return None

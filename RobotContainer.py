@@ -46,6 +46,16 @@ class RobotContainer:
         #self.subsystem.setDefaultCommand(
         #    commands.SampleCommand1()
         #)
+        self.drivetrain.setDefaultCommand(
+            commands.DriveByStick(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX,
+                self.m_driver1.getRightY,
+                self.m_driver1.getRightX,
+                lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
+            )
+        )
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
