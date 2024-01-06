@@ -20,6 +20,7 @@ class RobotContainer:
         """
         # Create Subsystems
         self.subsystem = subsystems.SampleSubsystem()
+        self.drivetrain = subsystems.SwerveDriveNeo()
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
