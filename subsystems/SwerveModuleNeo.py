@@ -18,7 +18,6 @@ import math
 # FRC Component Imports
 from ctre.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
 from rev import * #CANSparkMax, SparkMaxPIDController, SparkMaxAlternateEncoder, SparkMaxAbsoluteEncoder, AbsoluteEncoder, RelativeEncoder
-import rev
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
@@ -198,16 +197,13 @@ class SwerveModuleNeo(SwerveModule):
         self.angleMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
         self.angleMotorPid.setSmartMotionAllowedClosedLoopError( self.angle_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
-    def setDesiredState(self, desiredState:SwerveModuleState):
+    def setDesiredState(self, desiredState:SwerveModuleState) -> SwerveModuleState:
         """
         Set the Desired State of this Module in Velocity and Degrees.  This method will optimize 
         the direction / angle needed for fastest response
 
         :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
         """
-        NetworkTableInstance.getDefault().getTable("Logging").putNumber( f"DesiredState/Module{self.name}/speed", desiredState.speed )
-        NetworkTableInstance.getDefault().getTable("Logging").putNumber( f"DesiredState/Module{self.name}/angle", desiredState.angle.degrees() )
-        
         ### Calculate / Optimize
         currentAnglePosition = self.angleSensor.getPosition()
         currentAngleRotation = Rotation2d(0).fromDegrees(currentAnglePosition)
@@ -216,10 +212,6 @@ class SwerveModuleNeo(SwerveModule):
             currentAngleRotation
         )
         self.moduleState = optimalState
-
-        NetworkTableInstance.getDefault().getTable("Logging").putNumber( f"OptimalState/Module{self.name}/speed", optimalState.speed )
-        NetworkTableInstance.getDefault().getTable("Logging").putNumber( f"OptimalState/Module{self.name}/angle", optimalState.angle.degrees() )
-
 
         # Velocity Smoothing
         velocity = optimalState.speed
@@ -232,6 +224,8 @@ class SwerveModuleNeo(SwerveModule):
         # Set Angle
         angleMode = CANSparkMax.ControlType.kPosition #if not self.angleSmart.get() else CANSparkMax.ControlType.kSmartMotion
         self.angleMotorPid.setReference( optimalState.angle.degrees(), angleMode, self.angle_kSlotIdx.get() )
+
+        return optimalState
 
     def getReferencePosition(self) -> Translation2d:
         """
