@@ -39,9 +39,9 @@ class DriveByStick(CommandBase):
         self.ctlFineHolonomic = NTTunableFloat( "DriveByStick/Control/Fine/Holonomic", 0.4 )
         self.ctlFineRotation = NTTunableFloat( "DriveByStick/Control/Fine/Rotation", 0.4 )
 
-        self.ctlFullVelocity = NTTunableFloat( "DriveByStick/Control/Full/Velocity", 1.0 )
-        self.ctlFullHolonomic = NTTunableFloat( "DriveByStick/Control/Full/Holonomic", 1.0 )
-        self.ctlFullRotation = NTTunableFloat( "DriveByStick/Control/Full/Rotation", 1.0 )
+        self.ctlFullVelocity = NTTunableFloat( "DriveByStick/Control/Full/Velocity", 0.8 )
+        self.ctlFullHolonomic = NTTunableFloat( "DriveByStick/Control/Full/Holonomic", 0.8 )
+        self.ctlFullRotation = NTTunableFloat( "DriveByStick/Control/Full/Rotation", 0.8 )
 
         self.theta_kP = NTTunableFloat( "DriveByStick/Theta/kP", 0.0, self.updateThetaPIDController )
         self.theta_kI = NTTunableFloat( "DriveByStick/Theta/kI", 0.0, self.updateThetaPIDController )
@@ -138,9 +138,9 @@ class DriveByStick(CommandBase):
         r = self.srl_rO.calculate( r )
 
         # Calculate Fine Tuned Controls
-        magV = self.ctlFullVelocity.get() if self.finetuneEnabled.get() else self.ctlFineVelocity.get()
-        magH = self.ctlFullHolonomic.get() if self.finetuneEnabled.get() else self.ctlFineHolonomic.get()
-        magR = self.ctlFullRotation.get() if self.finetuneEnabled.get() else self.ctlFineRotation.get()           
+        magV = self.ctlFullVelocity.get() if not self.finetuneEnabled.get() else self.ctlFineVelocity.get()
+        magH = self.ctlFullHolonomic.get() if not self.finetuneEnabled.get() else self.ctlFineHolonomic.get()
+        magR = self.ctlFullRotation.get() if not self.finetuneEnabled.get() else self.ctlFineRotation.get()           
         x *= magV
         y *= magV
         r *= magR

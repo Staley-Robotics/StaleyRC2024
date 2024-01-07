@@ -61,13 +61,13 @@ class SwerveDriveNeo(SwerveDrive):
         self.__logTbl__ = NetworkTableInstance.getDefault().getTable(f"{self.robotName}/SwerveDrive")
 
         # Gyro
-        self.gyro = CustomPigeon( 61, "rio", self.gyroStartHeading.get() )
+        self.gyro = CustomPigeon( 10, "rio", self.gyroStartHeading.get() )
 
         # Swerve Modules
-        self.moduleFL = SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,   31.289 ) #211.289)
-        self.moduleFR = SwerveModuleNeo("FR", 5, 6, 16,  0.25, -0.25,  -54.932 ) #125.068) #  35.684)
-        self.moduleBL = SwerveModuleNeo("BL", 3, 4, 14, -0.25,  0.25,   43.945 ) #223.945)
-        self.moduleBR = SwerveModuleNeo("BR", 1, 2, 12, -0.25, -0.25, -114.346 )  #65.654)
+        self.moduleFL = SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ) #211.289)
+        self.moduleFR = SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ) #125.068) #  35.684)
+        self.moduleBL = SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ) #223.945)
+        self.moduleBR = SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
 
         # Subsystem Dashboards
         self.addChild( "Gyro", self.gyro )
@@ -240,6 +240,10 @@ class SwerveDriveNeo(SwerveDrive):
     def runChassisSpeeds(self, speeds:ChassisSpeeds, convertFieldRelative:bool = False) -> None:
         if convertFieldRelative: speeds = ChassisSpeeds.fromFieldRelativeSpeeds( speeds, self.getRobotAngle() ) # Needed for Trajectory State not being field relative
         rotationCenter = Translation2d(0, 0)
+        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( 
+            "ChassisSpeeds",
+            [ speeds.vx, speeds.vy, speeds.omega ]
+        )
         modStates = self.kinematics.toSwerveModuleStates(speeds, rotationCenter) # Convert to SwerveModuleState
         self.runSwerveModuleStates(list(modStates))
 
