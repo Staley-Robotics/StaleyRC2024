@@ -45,7 +45,3 @@ class MyRobot(wpilib.TimedRobot):
     def _simulationInit(self): pass
     def _simulationPeriodic(self): pass
     def _simluationExit(self): pass
-
-
-if __name__ == '__main__':
-    wpilib.run(MyRobot)
