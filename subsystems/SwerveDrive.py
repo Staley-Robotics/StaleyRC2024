@@ -9,7 +9,7 @@ Date:  2024-01-03
 import typing
 
 # FRC Component Imports
-from commands2 import SubsystemBase
+from commands2 import Subsystem
 from wpilib import SmartDashboard
 from wpimath.controller import HolonomicDriveController
 from wpimath.geometry import Rotation2d, Pose2d
@@ -17,7 +17,7 @@ from wpimath.kinematics import SwerveDrive4Kinematics, ChassisSpeeds, SwerveModu
 from wpimath.estimator import SwerveDrive4PoseEstimator
 
 ### Class: SwerveDrive
-class SwerveDrive(SubsystemBase):
+class SwerveDrive(Subsystem):
     class BooleanProperty():
         _name:str = ""
         _value:bool = False

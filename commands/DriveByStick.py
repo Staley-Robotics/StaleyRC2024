@@ -4,7 +4,7 @@ import typing
 import math
 
 # FRC Component Imports
-from commands2 import CommandBase
+from commands2 import Command
 from wpimath import applyDeadband
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.geometry import Rotation2d
@@ -17,7 +17,7 @@ from subsystems.SwerveDrive import SwerveDrive
 from util import *
 
 # Default Drive Command Class
-class DriveByStick(CommandBase):
+class DriveByStick(Command):
     def __init__( self,
                   swerveDrive:SwerveDrive,
                   velocityX:typing.Callable[[], float],

@@ -3,19 +3,19 @@ import math
 import typing
 
 # Import FRC
-from commands2 import CommandBase
+from commands2 import Command
 from wpilib import Timer
 from wpimath.kinematics import SwerveDrive4Kinematics, SwerveModuleState
 from wpimath.controller import PIDController, ProfiledPIDControllerRadians, HolonomicDriveController
 from wpimath.geometry import Translation2d
 from wpimath.trajectory import Trajectory, TrajectoryConfig, TrajectoryGenerator, TrapezoidProfileRadians
-from pathplannerlib import PathConstraints, PathPlanner, PathPlannerTrajectory, PathPoint
+#from pathplannerlib import PathConstraints, PathPlanner, PathPlannerTrajectory, PathPoint
 
 # Import Subsystems and Commands
 from subsystems import *
 
 
-class DriveForTime(CommandBase):
+class DriveForTime(Command):
     swerveDrive: SwerveDrive = None
     __timer__: Timer = Timer()
 

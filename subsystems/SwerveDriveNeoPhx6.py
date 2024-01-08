@@ -25,7 +25,7 @@ from ntcore import *
 # Our Imports
 from util import *
 from .SwerveDrive import SwerveDrive
-from .SwerveModuleNeo import SwerveModuleNeo
+from .SwerveModuleNeoPhx6 import SwerveModuleNeoPhx6
 from .CustomPigeon import CustomPigeon
 
 ### Class: SwerveDrive
@@ -60,10 +60,10 @@ class SwerveDriveNeo(SwerveDrive):
 
         # Swerve Modules
         self.modules = [
-            SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-            SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-            SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-            SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+            SwerveModuleNeoPhx6("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
+            SwerveModuleNeoPhx6("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
+            SwerveModuleNeoPhx6("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
+            SwerveModuleNeoPhx6("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
         ]
 
         # Subsystem Dashboards

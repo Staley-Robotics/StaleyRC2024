@@ -1,5 +1,5 @@
-from ctre import ErrorCode
-from ctre.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
+from phoenix5 import ErrorCode
+from phoenix5.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath import units

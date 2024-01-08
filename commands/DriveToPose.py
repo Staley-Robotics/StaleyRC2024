@@ -2,18 +2,18 @@
 import math
 
 # Import FRC
-from commands2 import CommandBase
+from commands2 import Command
 from wpilib import Timer
 from wpimath.kinematics import SwerveDrive4Kinematics, SwerveModuleState
 from wpimath.controller import PIDController, ProfiledPIDControllerRadians, HolonomicDriveController
 from wpimath.geometry import Translation2d
 from wpimath.trajectory import Trajectory, TrajectoryConfig, TrajectoryGenerator, TrapezoidProfileRadians
-from pathplannerlib import PathConstraints, PathPlanner, PathPlannerTrajectory, PathPoint
+#from pathplannerlib import PathConstraints, PathPlanner, PathPlannerTrajectory, PathPoint
 
 # Import Subsystems and Commands
 from subsystems import *
 
-class DriveToPose(CommandBase):
+class DriveToPose(Command):
     _m_controller: HolonomicDriveController = None
     swerveDrive: SwerveDrive = None
     

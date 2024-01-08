@@ -47,5 +47,5 @@ class MyRobot(wpilib.TimedRobot):
     def _simluationExit(self): pass
 
 
-if __name__ == '__main__':
-    wpilib.run(MyRobot)
+#if __name__ == '__main__':
+#    wpilib.run(MyRobot)

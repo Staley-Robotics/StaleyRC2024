@@ -16,10 +16,14 @@ Angle:  Closed Loop (SparkMAX Integrated)
 import math
 
 # FRC Component Imports
-from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
+#from ctre.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
+from phoenix6 import StatusCode
+from phoenix6.configs import CANcoderConfiguration, cancoder_configs
+from phoenix6.hardware import CANcoder
 from rev import * #CANSparkMax, SparkMaxPIDController, SparkMaxAlternateEncoder, SparkMaxAbsoluteEncoder, AbsoluteEncoder, RelativeEncoder
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
+from wpimath import units
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
 
@@ -28,10 +32,11 @@ from .SwerveModule import SwerveModule
 from util import *
 
 # Class: SwerveModule
-class SwerveModuleNeo(SwerveModule):
+class SwerveModuleNeoPhx6(SwerveModule):
     driveMotor:CANSparkMax = None
     angleMotor:CANSparkMax = None
-    angleSensor:WPI_CANCoder = None
+    #angleSensor:WPI_CANCoder = None
+    angleSensor:CANcoder = None
 
     referencePosition:Translation2d = None
     moduleState:SwerveModuleState = None
@@ -71,12 +76,22 @@ class SwerveModuleNeo(SwerveModule):
         self.angle_mmMaxAcceleration = NTTunableInt( "SwerveModule/Angle/PID/smartAccel", 2 * self.angle_mmMaxVelocity.get(), self.updateAnglePIDController )
 
         ### Angle Sensor
-        self.angleSensor = WPI_CANCoder( sensorId ) #, "canivore1")
-        self.angleSensor.configFactoryDefault()
-        self.angleSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
-        self.angleSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
-        self.angleSensor.configSensorDirection(False)
-        if not RobotBase.isSimulation(): self.angleSensor.setPosition(self.angleSensor.getAbsolutePosition() - angleOffset)
+        #self.angleSensor = WPI_CANCoder( sensorId ) #, "canivore1")
+        #self.angleSensor.configFactoryDefault()
+        #self.angleSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
+        #self.angleSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
+        #self.angleSensor.configSensorDirection(False)
+        #if not RobotBase.isSimulation(): self.angleSensor.setPosition(self.angleSensor.getAbsolutePosition() - angleOffset)
+
+        ### Angle Sensor (Phoenix6)
+        cfg = CANcoderConfiguration()
+        cfg.magnet_sensor.absolute_sensor_range = cancoder_configs.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
+        cfg.magnet_sensor.sensor_direction = cancoder_configs.SensorDirectionValue.COUNTER_CLOCKWISE_POSITIVE 
+        self.angleSensor = CANcoder( sensorId, "rio" )
+        self.angleSensor.configurator.apply(cfg)
+        if not RobotBase.isSimulation():
+            self.angleSensor.set_position( self.angleSensor.get_absolute_position().value_as_double - units.degreesToRotations(angleOffset) )
+        
 
         ### Angle Motor
         self.angleMotor = CANSparkMax( angleId, CANSparkMax.MotorType.kBrushless )    
@@ -128,17 +143,17 @@ class SwerveModuleNeo(SwerveModule):
         tbl = NetworkTableInstance.getDefault().getTable( f"SysOutputs/SwerveDrive/Module{self.name}" )
 
         # Drive Motor Data
-        tbl.putNumber( "drivePositionRad", self.driveMotorEncoder.getPosition() )
-        tbl.putNumber( "driveVelocityRadPerSec", self.driveMotorEncoder.getVelocity() )
+        tbl.putNumber( "drivePositionMeters", self.driveMotorEncoder.getPosition() )
+        tbl.putNumber( "driveVelocityMetersPerSec", self.driveMotorEncoder.getVelocity() )
         tbl.putNumber( "driveAppliedVolts", self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage() )
         tbl.putNumber( "driveCurrentAmps", self.driveMotor.getOutputCurrent() )
         tbl.putNumber( "driveTempCelcius", self.driveMotor.getMotorTemperature() )
 
         # Turn Motor Data
-        tbl.putNumber( "turnCanCoder-Relative", self.angleSensor.getPosition() )
-        tbl.putNumber( "turnCanCoder-Absolute", self.angleSensor.getAbsolutePosition() )
-        tbl.putNumber( "turnPositionRad", self.angleMotorEncoder.getPosition() )
-        tbl.putNumber( "turnVelocityRadPerSec", self.angleMotorEncoder.getVelocity() )
+        tbl.putNumber( "turnCanCoder-Relative", units.rotationsToDegrees( self.angleSensor.get_position().value_as_double ) )
+        tbl.putNumber( "turnCanCoder-Absolute", units.rotationsToDegrees( self.angleSensor.get_absolute_position().value_as_double ) )
+        tbl.putNumber( "turnPositionDegrees", self.angleMotorEncoder.getPosition() )
+        tbl.putNumber( "turnVelocityDegreesPerSec", self.angleMotorEncoder.getVelocity() )
         tbl.putNumber( "turnAppliedVolts", self.angleMotor.getAppliedOutput() * self.angleMotor.getBusVoltage() )
         tbl.putNumber( "turnCurrentAmps", self.angleMotor.getOutputCurrent() )
         tbl.putNumber( "turnTempCelcius", self.angleMotor.getMotorTemperature() )
@@ -157,7 +172,7 @@ class SwerveModuleNeo(SwerveModule):
         angleToDegrees = self.angleGearRatio.get() * 360
         self.angleMotorEncoder.setPositionConversionFactor( angleToDegrees ) # Radians
         self.angleMotorEncoder.setVelocityConversionFactor( angleToDegrees / 60 ) # Radians per Second
-        self.angleMotorEncoder.setPosition( self.angleSensor.getPosition() )
+        self.angleMotorEncoder.setPosition( units.rotationsToDegrees( self.angleSensor.get_position().value_as_double ) )
 
     def updateDrivePIDController(self):
         """
@@ -205,7 +220,7 @@ class SwerveModuleNeo(SwerveModule):
         :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
         """
         ### Calculate / Optimize
-        currentAnglePosition = self.angleSensor.getPosition()
+        currentAnglePosition = units.rotationsToDegrees( self.angleSensor.get_position().value_as_double )
         currentAngleRotation = Rotation2d(0).fromDegrees(currentAnglePosition)
         optimalState:SwerveModuleState = SwerveModuleState.optimize(
             desiredState,

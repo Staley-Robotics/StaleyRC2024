@@ -2,7 +2,7 @@
 import math
 
 # Import FRC
-from commands2 import CommandBase
+from commands2 import Command
 from wpimath.kinematics import SwerveModuleState
 
 # Import Subsystems and Commands
@@ -11,7 +11,7 @@ from subsystems import *
 # Constants
 
 
-class DriveLockdown(CommandBase):
+class DriveLockdown(Command):
     def __init__(self, swerveDrive:SwerveDrive):
         super().__init__()
         self.setName( "DriveLockdown" )

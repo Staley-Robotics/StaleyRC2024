@@ -1,6 +1,6 @@
 import commands2
 
-class SampleSubsystem(commands2.SubsystemBase):
+class SampleSubsystem(commands2.Subsystem):
     def __init__(self):
         super().__init__()
 
