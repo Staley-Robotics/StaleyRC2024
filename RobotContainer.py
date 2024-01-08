@@ -36,11 +36,11 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        #self.m_driver1.A().whileTrue( commands.SampleCommand1() )
+        #self.m_driver1.a().whileTrue( commands.SampleCommand1() )
 
         # Configure Driver 2 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        #self.m_driver1.A().whileTrue( sequences.SampleSequence() )
+        #self.m_driver1.a().whileTrue( sequences.SampleSequence() )
 
         # Configure Default Commands
         #self.subsystem.setDefaultCommand(
