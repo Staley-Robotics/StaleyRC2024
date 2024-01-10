@@ -25,6 +25,6 @@ robotpy-pathplannerlib==2024.1.1
 robotpy-rev==2024.2.0
 
 ### CTRE
-robotpy-ctre==2024.0.0b4 #phoenix5
-phoenix6==24.0.0b7
+robotpy-ctre==2024.1.0 #phoenix5
+phoenix6==24.1.0
 
