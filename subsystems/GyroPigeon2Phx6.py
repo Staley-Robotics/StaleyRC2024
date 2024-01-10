@@ -1,5 +1,13 @@
+"""
+Description: Pigeon2 Extended Class on Phoenix6 Firmware
+Version:  1
+Date:  2024-01-09
+"""
+
+# Python Built-In Imports
 import typing
 
+# FRC imports
 from phoenix6 import StatusCode
 from phoenix6.hardware import Pigeon2
 from phoenix6.configs import Pigeon2Configuration
@@ -8,6 +16,7 @@ from wpilib import RobotBase
 from wpimath import units
 from wpimath.geometry import Rotation2d
 
+# Team Imports
 from .Gyro import Gyro
 
 class GyroPigeon2Phx6(Pigeon2, Gyro):
@@ -46,12 +55,9 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
         self.get_gravity_vector_y().set_update_frequency( 100 )
         self.get_gravity_vector_z().set_update_frequency( 100 )
 
+        # Reset the Yaw
         self.set_yaw( startYaw )
         
-        # Update the Sim Collection (if running in Simulator)
-        #if RobotBase.isSimulation():
-        #    self.getSimCollection().setRawHeading( startYaw )
-
     def updateOutputs(self):
         """
         Update Network Table Logging
@@ -70,15 +76,35 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
         tbl.putNumber( "yawVelocityRadPerSec", units.degreesToRadians( xyzDps[2] ) )
 
     def getYaw(self) -> float:
+        """
+        Get Yaw
+
+        :returns float in rotations?
+        """
         return self.get_yaw().value_as_double
 
     def getPitch(self) -> float:
+        """
+        Get Pitch
+
+        :returns float in rotations?
+        """
         return self.get_pitch().value_as_double
     
     def getRoll(self) -> float:
+        """
+        Get Roll
+
+        :returns float in rotations?
+        """
         return self.get_roll().value_as_double
     
     def getYawPitchRoll(self):
+        """
+        Get the Yaw, Pitch, and Roll
+
+        :returns [GyroError, [y,p,r]] in rotations?
+        """
         ypr = [
             self.getYaw(),
             self.getPitch(),
@@ -88,6 +114,11 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
         return [ err, ypr ]
     
     def getRawGyro(self):
+        """
+        Get angular velocity of the X, Y, and Z axises
+
+        :returns [GyroError, [x,y,z]] in rotations per second
+        """
         xyz = [
             self.get_angular_velocity_x_device().value_as_double,
             self.get_angular_velocity_y_device().value_as_double,
@@ -96,5 +127,13 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
         err = self.get_angular_velocity_x_device().status
         return [ err, xyz ]
     
-    def getRotation2d(self):
+    def getRotation2d(self) -> Rotation2d:
+        """
+        Returns the heading of the robot as a frc#Rotation2d.
+        The angle increases as the Pigeon 2 turns counterclockwise when looked at from the top. This follows the NWU axis convention.
+        
+        The angle is continuous; that is, it will continue from 360 to 361 degrees. This allows for algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from 360 to 0 on the second time around.
+
+        :returns: The current heading of the robot as a frc#Rotation2d
+        """
         return Rotation2d().fromDegrees( self.getYaw() )

@@ -28,6 +28,11 @@ from .Gyro import Gyro
 
 ### Class: SwerveDrive
 class SwerveDrive(Subsystem):
+    """
+    SwerveDrive Subsystem Class used to operate a 4 Wheel SwerveDrive Chassis
+    """
+
+
     __ntTbl__ = NetworkTableInstance.getDefault().getTable("SwerveDrive")
 
     # Initialization
@@ -37,6 +42,9 @@ class SwerveDrive(Subsystem):
                                         SwerveModule,
                                         SwerveModule ],
                   gyro:Gyro=Gyro() ):
+        """
+        Initialization of a SwerveDrive
+        """
         # Subsystem Setup
         super().__init__()
         self.setName( "SwerveDrive" )
@@ -151,35 +159,73 @@ class SwerveDrive(Subsystem):
         )
 
     def simulationPeriodic(self) -> None:
+        """
+        SwerveDrive Simulation Periodic Loop
+        """
         pass
 
     ### Drive Based Functions
     # Returns Field Relative Status
-    def isFieldRelative(self):
+    def isFieldRelative(self) -> bool:
+        """
+        Get the Field Relative Drive State of this SwerveDrive
+
+        :returns: boolean
+        """
         return self.fieldRelative.get()
 
     # Kinematics
     def getKinematics(self) -> SwerveDrive4Kinematics:
+        """
+        Get the Kinematics configuration of this SwerveDrive
+
+        :returns: SwerveDrive4Kinematics
+        """
         return self.kinematics
        
     # Get Odometry Object
     def getOdometry(self) -> SwerveDrive4PoseEstimator:
+        """
+        Get The Current Odometry (fused with Vision Data) of this SwerveDrive
+
+        :returns: SwerveDrive4PoseEstimator
+        """
         return self.odometry
 
     # Get Pose
     def getPose(self) -> Pose2d:
+        """
+        Get the Current Pose from the Odometry data of this SwerveDrive
+        
+        :returns: Pose2d
+        """
         return self.getOdometry().getEstimatedPosition()
     
     # Get Heading of Rotation
     def getRobotAngle(self) -> Rotation2d:
+        """
+        Get the Current Rotation based on the gyroscope of this SwerveDrive 
+
+        :returns: Rotation2d
+        """
         return self.gyro.getRotation2d()
 
     # Get Angular Velocity
     def getRotationVelocity(self) -> float:
+        """
+        Get the Angular Velocity of this SwerveDrive
+        
+        :returns: float in radians per second
+        """
         return self.getChassisSpeeds().omega
-
+    
     # Get ChassisSpeeds
     def getChassisSpeeds(self) -> ChassisSpeeds:
+        """
+        Get the Current Chassis Speeds based on the Wheel Measurements
+        
+        :returns: ChassisSpeeds in meters per second velocity in x and y direction and rotations per
+        """
         return self.getKinematics().toChassisSpeeds( self.getModuleStates() )
     
     # Get Module States
@@ -187,21 +233,38 @@ class SwerveDrive(Subsystem):
                                                SwerveModuleState,
                                                SwerveModuleState,
                                                SwerveModuleState ]:
+        """
+        Returns all of the SwerveModuleStates of the SwerveModules on this SwerveDrive
+
+        :returns: Tuple of SwerveModuleStates (velocity, rotation)
+        """
         return tuple( modules.getModuleState() for modules in self.modules )
 
     # Get Module Positions
+
     def getModulePositions(self) -> typing.Tuple[ SwerveModulePosition,
                                                   SwerveModulePosition,
                                                   SwerveModulePosition,
                                                   SwerveModulePosition ]:
+        """
+        Returns all of the SwerveModulePositions of the SwerveModules on this SwerveDrive
+
+        :returns: Tuple of SwerveModulePosition (distance, rotation)
+        """
         return tuple( modules.getModulePosition() for modules in self.modules )
     
     # Stop Drivetrain
     def stop(self): # -> CommandBase:
+        """
+        Stops this SwerveDrive
+        """
         self.runChassisSpeeds( ChassisSpeeds(0,0,0) )
         
     ### Run SwerveDrive Functions
     def runPercentageInputs(self, x:float = 0.0, y:float = 0.0, r:float = 0.0) -> None:
+        """
+        Runs this SwerveDrive in x,y velocities and r rotations based on the maximum velocity characterized
+        """
         veloc_x = x * self.maxVelocity.get()
         veloc_y = y * self.maxVelocity.get()
         veloc_r = r * self.maxAngularVelocity.get()
@@ -225,6 +288,9 @@ class SwerveDrive(Subsystem):
 
     # Run SwerveDrive using ChassisSpeeds
     def runChassisSpeeds(self, speeds:ChassisSpeeds, convertFieldRelative:bool = False) -> None:
+        """
+        Runs this SwerveDrive based on the provided ChassisSpeed
+        """
         if convertFieldRelative: speeds = ChassisSpeeds.fromFieldRelativeSpeeds( speeds, self.getRobotAngle() ) # Needed for Trajectory State not being field relative
         rotationCenter = Translation2d(0, 0)
         NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( 
@@ -240,6 +306,9 @@ class SwerveDrive(Subsystem):
                                                          SwerveModuleState,
                                                          SwerveModuleState ]) -> None:
         """
+        Runs this SwerveDrive based on provided SwerveModuleState.
+
+        This method will optomize the SwerveModuleState prior to use to minimize the turning to less than 90 degrees
         """
         desiredValues = list()
         optimizedValues = list()

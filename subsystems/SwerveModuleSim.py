@@ -1,7 +1,7 @@
 """
-Description: Swerve Module Container Class
+Description: Swerve Module Simulated NEO Class
 Version:  1
-Date:  2024-01-03
+Date:  2024-01-09
 """
 
 ### Imports
@@ -17,6 +17,7 @@ from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.system.plant import DCMotor
 from wpimath import units, applyDeadband
 
+# Our Imports
 from .SwerveModule import SwerveModule
 from util import *
 
@@ -24,13 +25,20 @@ loopTime = 0.02
 
 # Class: SwerveModule
 class SwerveModuleSim(SwerveModule):
+    """
+    Custom SwerveModuleSim used to simulation the NEO motor without a live robot
+    """
 
-    def __init__(self, subsystemName:str, posX:float, posY:float): #, angleOffset:float):
+    def __init__(self, subsystemName:str, posX:float, posY:float): #, turnOffset:float):
+        """
+        Initialization
+        """
+        ### Module Name
         self.name = subsystemName
 
         # Wheel Constraints
         self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
-        self.angleGearRatio = NTTunableFloat( "SwerveModule/Angle/GearRatio", 1 / (150/7), self.updateAngleEncoderConversions ) # 150/7:1
+        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
         self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
 
         # Drive Motor PID Values
@@ -47,21 +55,21 @@ class SwerveModuleSim(SwerveModule):
         self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
         self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
 
-        # Angle Motor PID Values
-        self.angleSmart = NTTunableBoolean( "SwerveModule/Angle/smartMotion", False )
-        self.angle_kP = NTTunableFloat( "SwerveModule/Angle/PID/kP", 10, self.updateAnglePIDController ) #0.5
-        self.angle_kI = NTTunableFloat( "SwerveModule/Angle/PID/kI", 0, self.updateAnglePIDController )
-        self.angle_kD = NTTunableFloat( "SwerveModule/Angle/PID/kD", 0, self.updateAnglePIDController )
-        self.angle_kF = NTTunableFloat( "SwerveModule/Angle/PID/kF", 0, self.updateAnglePIDController )
-        self.angle_kIZone = NTTunableFloat( "SwerveModule/Angle/PID/IZone", 0.0, self.updateAnglePIDController )
-        self.angle_kError = NTTunableFloat( "SwerveModule/Angle/PID/Error", 0.0, self.updateAnglePIDController )
-        self.angle_kSlotIdx = NTTunableInt( "SwerveModule/Angle/PID/kSlotIdx", 0, self.updateAnglePIDController )
-        self.angle_mmMaxVelocity = NTTunableInt( "SwerveModule/Angle/PID/smartVelocity", 2048, self.updateAnglePIDController )
-        self.angle_mmMaxAcceleration = NTTunableInt( "SwerveModule/Angle/PID/smartAccel", 2 * self.angle_mmMaxVelocity.get(), self.updateAnglePIDController )
+        # Turn Motor PID Values
+        self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
+        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 10, self.updateTurnPIDController ) #0.5
+        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
+        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
+        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
+        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController )
+        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController )
+        self.turn_kSlotIdx = NTTunableInt( "SwerveModule/Turn/PID/kSlotIdx", 0, self.updateTurnPIDController )
+        self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
+        self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
         # Create Motors
         self.driveSim = FlywheelSim( DCMotor.NEO(2), 1 / self.driveGearRatio.get(), 0.025 )
-        self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.angleGearRatio.get(), 0.004 )
+        self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
 
         # Set Drive Motor Sensor Data 
         self.driveRelativePosition = 0.0
@@ -75,7 +83,7 @@ class SwerveModuleSim(SwerveModule):
 
         # Update PID Controllers
         self.updateDrivePIDController()
-        self.updateAnglePIDController()
+        self.updateTurnPIDController()
 
         ### Swerve Module Information
         self.setReferencePosition( posX, posY )
@@ -115,25 +123,30 @@ class SwerveModuleSim(SwerveModule):
 
 
     def updateDriveEncoderConversions(self): return None
-    def updateAngleEncoderConversions(self): return None
+    def updateTurnEncoderConversions(self): return None
 
     def updateDrivePIDController(self):
         """
+        Update the PID Controller for the Drive Motor
         """
         # Drive Integrated PID Controller
         self.drivePID = PIDController( self.drive_kP.get(), self.drive_kI.get(), self.drive_kD.get(), loopTime )
         self.drivePID.setIZone( self.drive_kIZone.get() )
         self.driveFF = SimpleMotorFeedforwardMeters( self.drive_kS.get(), self.drive_kV.get() )
 
-    def updateAnglePIDController(self):
+    def updateTurnPIDController(self):
         """
+        Update the PID Controller for the Turn Motor
         """
-        # Angle Integrated PID Controller
-        self.turnPID = PIDController( self.angle_kP.get(), self.angle_kI.get(), self.angle_kD.get(), loopTime )
-        self.turnPID.setIZone( self.angle_kIZone.get() )
+        # Turn Integrated PID Controller
+        self.turnPID = PIDController( self.turn_kP.get(), self.turn_kI.get(), self.turn_kD.get(), loopTime )
+        self.turnPID.setIZone( self.turn_kIZone.get() )
         self.turnPID.enableContinuousInput( -math.pi, math.pi )
 
     def setDriveVelocity(self, velocity:float = 0.0) -> None:
+        """
+        Set the current drive velocity in meters per second
+        """
         velocityRadPerSec = velocity / self.wheelRadius.get()
         calcPid = self.drivePID.calculate( self.driveSim.getAngularVelocity(), velocityRadPerSec ) 
         calcFf = self.driveFF.calculate( velocityRadPerSec )
@@ -143,6 +156,9 @@ class SwerveModuleSim(SwerveModule):
         self.driveSim.setInputVoltage( self.driveAppliedVolts )
 
     def setTurnPosition(self, rotation:Rotation2d) -> None:
+        """
+        Set the current Turning Motor position based on Rotation
+        """
         self.turnAppliedVolts = self.turnPID.calculate( self.turnRelativePositionRad, rotation.radians() )
         self.turnAppliedVolts = min( max( self.turnAppliedVolts, -12.0 ), 12.0 )
         self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.005 )

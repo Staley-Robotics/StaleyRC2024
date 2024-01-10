@@ -1,9 +1,17 @@
+"""
+Description: Pigeon2 Extended Class
+Version:  1
+Date:  2024-01-09
+"""
+
+# FRC Imports
 from phoenix5 import ErrorCode
 from phoenix5.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath import units
 
+# Our Imports
 from .Gyro import Gyro
 
 class GyroPigeon2(WPI_Pigeon2, Gyro):

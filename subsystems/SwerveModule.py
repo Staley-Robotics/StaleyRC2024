@@ -11,11 +11,18 @@ from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 
 # Class: SwerveModule
 class SwerveModule:
+    """
+    Custom SwerveModule Abstract Class used to extend a SwerveModule with our logging capabilities
+    """
+
     referencePosition:Translation2d = Translation2d(0,0)
     moduleState:SwerveModuleState = SwerveModuleState( 0, Rotation2d() )
     modulePosition:SwerveModulePosition = SwerveModulePosition( 0, Rotation2d() )
 
     def updateOutputs(self):
+        """
+        Update Network Table Logging
+        """
         raise NotImplementedError( "SwerveModule.updateOutputs() must created in child class." )
 
     def setDesiredState(self, desiredState:SwerveModuleState, optimize:bool=False):
@@ -39,9 +46,15 @@ class SwerveModule:
         self.setTurnPosition( desiredState.angle ) # Set Turn Position
     
     def setDriveVelocity(self, velocity:float = 0.0) -> None:
+        """
+        Set the current drive velocity in meters per second
+        """
         raise NotImplementedError( "SwerveModule.setDriveVelocity() must created in child class." )
     
     def setTurnPosition(self, rotation:Rotation2d = Rotation2d()) -> None:
+        """
+        Set the current Turning Motor position based on Rotation
+        """
         raise NotImplementedError( "SwerveModule.setTurnPosition() must be created in child class." )
         
     def setReferencePosition(self, posX:float = 0.0, posY:float = 0.0) -> None:

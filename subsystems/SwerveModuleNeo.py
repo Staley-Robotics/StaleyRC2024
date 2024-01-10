@@ -1,14 +1,14 @@
 """
 Description: Swerve Module (West Coast Products - Swerve X)
 Version:  1
-Date:  2024-01-05
+Date:  2024-01-09
 
 Drive Motor Controllers:  REV NEO 
-Angle Motor Controllers:  REV NEO
-Angle Sensors:  CAN CODERS
+Turn Motor Controllers:  REV NEO
+Turn Sensors:  CAN CODERS
 
 Velocity: Closed Loop (SparkMAX Integrated)
-Angle:  Closed Loop (SparkMAX Integrated)
+Turn:  Closed Loop (SparkMAX Integrated)
 """
 
 ### Imports
@@ -29,14 +29,23 @@ from util import *
 
 # Class: SwerveModule
 class SwerveModuleNeo(SwerveModule):
+    """
+    Custom SwerveModuleNeo using NEO drive and turn motors on a live robot.
+
+    CTRE CANCoders are used for Absolute position on the turn motor.
+    """
+
     driveMotor:CANSparkMax = None
-    angleMotor:CANSparkMax = None
-    angleSensor:WPI_CANCoder = None
+    turnMotor:CANSparkMax = None
+    turnSensor:WPI_CANCoder = None
 
     referencePosition:Translation2d = None
     moduleState:SwerveModuleState = None
 
-    def __init__(self, subsystemName, driveId, angleId, sensorId, posX, posY, angleOffset):
+    def __init__(self, subsystemName, driveId, turnId, sensorId, posX, posY, turnOffset):
+        """
+        Initialization
+        """
         ### Module Name
         self.name = subsystemName
 
@@ -44,7 +53,7 @@ class SwerveModuleNeo(SwerveModule):
         # Encoder Conversions
         self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
         self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
-        self.angleGearRatio = NTTunableFloat( "SwerveModule/Angle/GearRatio", 1 / (150/7), self.updateAngleEncoderConversions ) # 150/7:1
+        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
 
         # Drive Motor PID Values
         self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
@@ -58,46 +67,46 @@ class SwerveModuleNeo(SwerveModule):
         self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
         self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
 
-        # Angle Motor PID Values
-        self.angleSmart = NTTunableBoolean( "SwerveModule/Angle/smartMotion", False )
-        self.angle_kP = NTTunableFloat( "SwerveModule/Angle/PID/kP", 0, self.updateAnglePIDController ) #0.5
-        self.angle_kI = NTTunableFloat( "SwerveModule/Angle/PID/kI", 0, self.updateAnglePIDController )
-        self.angle_kD = NTTunableFloat( "SwerveModule/Angle/PID/kD", 0, self.updateAnglePIDController )
-        self.angle_kF = NTTunableFloat( "SwerveModule/Angle/PID/kF", 0, self.updateAnglePIDController )
-        self.angle_kIZone = NTTunableFloat( "SwerveModule/Angle/PID/IZone", 0.0, self.updateAnglePIDController )
-        self.angle_kError = NTTunableFloat( "SwerveModule/Angle/PID/Error", 0.0, self.updateAnglePIDController )
-        self.angle_kSlotIdx = NTTunableInt( "SwerveModule/Angle/PID/kSlotIdx", 0, self.updateAnglePIDController )
-        self.angle_mmMaxVelocity = NTTunableInt( "SwerveModule/Angle/PID/smartVelocity", 2048, self.updateAnglePIDController )
-        self.angle_mmMaxAcceleration = NTTunableInt( "SwerveModule/Angle/PID/smartAccel", 2 * self.angle_mmMaxVelocity.get(), self.updateAnglePIDController )
+        # Turn Motor PID Values
+        self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
+        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0, self.updateTurnPIDController ) #0.5
+        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
+        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
+        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
+        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController )
+        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController )
+        self.turn_kSlotIdx = NTTunableInt( "SwerveModule/Turn/PID/kSlotIdx", 0, self.updateTurnPIDController )
+        self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
+        self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
-        ### Angle Sensor
-        self.angleSensor = WPI_CANCoder( sensorId ) #, "canivore1")
-        self.angleSensor.configFactoryDefault()
-        self.angleSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
-        self.angleSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
-        self.angleSensor.configSensorDirection(False)
-        if not RobotBase.isSimulation(): self.angleSensor.setPosition(self.angleSensor.getAbsolutePosition() - angleOffset)
+        ### Turn Sensor
+        self.turnSensor = WPI_CANCoder( sensorId ) #, "canivore1")
+        self.turnSensor.configFactoryDefault()
+        self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
+        self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
+        self.turnSensor.configSensorDirection(False)
+        if not RobotBase.isSimulation(): self.turnSensor.setPosition(self.turnSensor.getAbsolutePosition() - turnOffset)
 
-        ### Angle Motor
-        self.angleMotor = CANSparkMax( angleId, CANSparkMax.MotorType.kBrushless )    
-        self.angleMotor.restoreFactoryDefaults() # Revert to Factory Defaults
-        self.angleMotor.setInverted( True )  # WPI_TalonFX.setInverted
-        self.angleMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )  # WPI_TalonFX.setNeutralMode
+        ### Turn Motor
+        self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )    
+        self.turnMotor.restoreFactoryDefaults() # Revert to Factory Defaults
+        self.turnMotor.setInverted( True )  # WPI_TalonFX.setInverted
+        self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )  # WPI_TalonFX.setNeutralMode
         # WPI_TalonFX.configNeutralDeadband(0.001)  - No equivilant (must be done via CAN or USB)
         
-        self.angleMotorEncoder = self.angleMotor.getEncoder() # WPI_TalonFX.configRemoteFeedbackFilter()
-        #self.angleMotorEncoder.setInverted(True) # WPI_TalonFX.setSensorPhase()
-        self.updateAngleEncoderConversions()
+        self.turnMotorEncoder = self.turnMotor.getEncoder() # WPI_TalonFX.configRemoteFeedbackFilter()
+        #self.turnMotorEncoder.setInverted(True) # WPI_TalonFX.setSensorPhase()
+        self.updateTurnEncoderConversions()
         
-        self.angleMotorPid = self.angleMotor.getPIDController()
-        self.angleMotorPid.setFeedbackDevice( self.angleMotorEncoder ) # WPI_TalonFX.configSelectedFeedbackSensor()  ### Should this be the CAN Coder?
-        self.angleMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
-        self.angleMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
-        self.angleMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
-        self.updateAnglePIDController()     
+        self.turnMotorPid = self.turnMotor.getPIDController()
+        self.turnMotorPid.setFeedbackDevice( self.turnMotorEncoder ) # WPI_TalonFX.configSelectedFeedbackSensor()  ### Should this be the CAN Coder?
+        self.turnMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
+        self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
+        self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
+        self.updateTurnPIDController()     
 
-        # Save Angle Motor Config
-        self.angleMotor.burnFlash()
+        # Save Turn Motor Config
+        self.turnMotor.burnFlash()
 
         ### Drive Motor
         self.driveMotor = CANSparkMax( driveId, CANSparkMax.MotorType.kBrushless )
@@ -135,32 +144,35 @@ class SwerveModuleNeo(SwerveModule):
         tbl.putNumber( "driveTempCelcius", self.driveMotor.getMotorTemperature() )
 
         # Turn Motor Data
-        tbl.putNumber( "turnCanCoder-Relative", self.angleSensor.getPosition() )
-        tbl.putNumber( "turnCanCoder-Absolute", self.angleSensor.getAbsolutePosition() )
-        tbl.putNumber( "turnPositionRad", self.angleMotorEncoder.getPosition() )
-        tbl.putNumber( "turnVelocityRadPerSec", self.angleMotorEncoder.getVelocity() )
-        tbl.putNumber( "turnAppliedVolts", self.angleMotor.getAppliedOutput() * self.angleMotor.getBusVoltage() )
-        tbl.putNumber( "turnCurrentAmps", self.angleMotor.getOutputCurrent() )
-        tbl.putNumber( "turnTempCelcius", self.angleMotor.getMotorTemperature() )
+        tbl.putNumber( "turnCanCoder-Relative", self.turnSensor.getPosition() )
+        tbl.putNumber( "turnCanCoder-Absolute", self.turnSensor.getAbsolutePosition() )
+        tbl.putNumber( "turnPositionRad", self.turnMotorEncoder.getPosition() )
+        tbl.putNumber( "turnVelocityRadPerSec", self.turnMotorEncoder.getVelocity() )
+        tbl.putNumber( "turnAppliedVolts", self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage() )
+        tbl.putNumber( "turnCurrentAmps", self.turnMotor.getOutputCurrent() )
+        tbl.putNumber( "turnTempCelcius", self.turnMotor.getMotorTemperature() )
 
     def updateDriveEncoderConversions(self):
         """
+        Update the Onboard Position and Velocity Conversions with the NEO Drive Motor
         """
         driveToMeters = self.driveGearRatio.get() * 2 * math.pi * self.wheelRadius.get()
         self.driveMotorEncoder.setPositionConversionFactor( driveToMeters ) # Meters
         self.driveMotorEncoder.setVelocityConversionFactor( driveToMeters / 60 ) # Meters per Second
 
-    def updateAngleEncoderConversions(self):
+    def updateTurnEncoderConversions(self):
         """
+        Update the Onboard Position and Velocity Conversions with the NEO Turn Motor
         """
-        angleToRadians = self.angleGearRatio.get() * 2 * math.pi
-        angleToDegrees = self.angleGearRatio.get() * 360
-        self.angleMotorEncoder.setPositionConversionFactor( angleToDegrees ) # Radians
-        self.angleMotorEncoder.setVelocityConversionFactor( angleToDegrees / 60 ) # Radians per Second
-        self.angleMotorEncoder.setPosition( self.angleSensor.getPosition() )
+        turnToRadians = self.turnGearRatio.get() * 2 * math.pi
+        turnToDegrees = self.turnGearRatio.get() * 360
+        self.turnMotorEncoder.setPositionConversionFactor( turnToDegrees ) # Radians
+        self.turnMotorEncoder.setVelocityConversionFactor( turnToDegrees / 60 ) # Radians per Second
+        self.turnMotorEncoder.setPosition( self.turnSensor.getPosition() )
 
     def updateDrivePIDController(self):
         """
+        Update the PID Controller for the Drive Motor
         """
         # Get Slot Index
         slotIdx = self.drive_kSlotIdx.get()
@@ -178,63 +190,50 @@ class SwerveModuleNeo(SwerveModule):
         self.driveMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
         self.driveMotorPid.setSmartMotionAllowedClosedLoopError( self.drive_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
-    def updateAnglePIDController(self):
+    def updateTurnPIDController(self):
         """
+        Update the PID Controller for the Turn Motor
         """
         # Get Slot Index
-        slotIdx = self.angle_kSlotIdx.get()
+        slotIdx = self.turn_kSlotIdx.get()
 
-        # Angle Integrated PID Controller
-        self.angleMotorPid.setP( self.angle_kP.get(), slotIdx ) # TalonFX.config_kP()
-        self.angleMotorPid.setI( self.angle_kI.get(), slotIdx ) # TalonFX.config_kI()
-        self.angleMotorPid.setIZone( self.angle_kIZone.get(), slotIdx ) # TalonFX.config_IntegralZone()
-        self.angleMotorPid.setD( self.angle_kD.get(), slotIdx ) # TalonFX.config_kD()
-        self.angleMotorPid.setFF( self.angle_kF.get(), slotIdx ) # TalonFX.config_kF()
+        # Turn Integrated PID Controller
+        self.turnMotorPid.setP( self.turn_kP.get(), slotIdx ) # TalonFX.config_kP()
+        self.turnMotorPid.setI( self.turn_kI.get(), slotIdx ) # TalonFX.config_kI()
+        self.turnMotorPid.setIZone( self.turn_kIZone.get(), slotIdx ) # TalonFX.config_IntegralZone()
+        self.turnMotorPid.setD( self.turn_kD.get(), slotIdx ) # TalonFX.config_kD()
+        self.turnMotorPid.setFF( self.turn_kF.get(), slotIdx ) # TalonFX.config_kF()
 
-        # Angle Integrated PID - Smart Motion Properties
-        self.angleMotorPid.setSmartMotionMaxVelocity( self.angle_mmMaxVelocity.get(), slotIdx ) # TalonFX.configMotionCruiseVelocity()
-        self.angleMotorPid.setSmartMotionMaxAccel( self.angle_mmMaxAcceleration.get(), slotIdx ) # TalonFX.configMotionAcceleration
-        self.angleMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
-        self.angleMotorPid.setSmartMotionAllowedClosedLoopError( self.angle_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
-
-    # def setDesiredState(self, desiredState:SwerveModuleState) -> SwerveModuleState:
-    #     """
-    #     Set the Desired State of this Module in Velocity and Degrees.  This method will optimize 
-    #     the direction / angle needed for fastest response
-
-    #     :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
-    #     """
-    #     ### Calculate / Optimize
-    #     currentAnglePosition = self.angleSensor.getPosition()
-    #     currentAngleRotation = Rotation2d(0).fromDegrees(currentAnglePosition)
-    #     optimalState:SwerveModuleState = SwerveModuleState.optimize(
-    #         desiredState,
-    #         currentAngleRotation
-    #     )
-    #     self.moduleState = optimalState
-
-    #     # Velocity Smoothing
-    #     velocity = optimalState.speed
-    #     #velocity *= ( optimalState.angle - currentAngleRotation ).cos() # Scale Speed / Smooth rotation ??? Smart Motion?
+        # Turn Integrated PID - Smart Motion Properties
+        self.turnMotorPid.setSmartMotionMaxVelocity( self.turn_mmMaxVelocity.get(), slotIdx ) # TalonFX.configMotionCruiseVelocity()
+        self.turnMotorPid.setSmartMotionMaxAccel( self.turn_mmMaxAcceleration.get(), slotIdx ) # TalonFX.configMotionAcceleration
+        self.turnMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
+        self.turnMotorPid.setSmartMotionAllowedClosedLoopError( self.turn_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
     def setDriveVelocity(self, velocity: float = 0) -> None:
+        """
+        Set the current drive velocity in meters per second
+        """
         # Set Velocity
         velocMode = CANSparkMax.ControlType.kVelocity #if not self.driveSmart.get() else CANSparkMax.ControlType.kSmartVelocity
         self.driveMotorPid.setReference( velocity, velocMode, self.drive_kSlotIdx.get() )
 
     def setTurnPosition(self, rotation:Rotation2d = Rotation2d) -> None:
+        """
+        Set the current Turning Motor position based on Rotation
+        """
         # Set Angle
-        angleMode = CANSparkMax.ControlType.kPosition #if not self.angleSmart.get() else CANSparkMax.ControlType.kSmartMotion
-        self.angleMotorPid.setReference( rotation.degrees(), angleMode, self.angle_kSlotIdx.get() )
+        turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
+        self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )
 
     def getModulePosition(self) -> SwerveModulePosition:
         """
         Get the Current Module Position in Meters Per Second and Rotation2d
 
-        :returns SwerveModulePosition object
+        :returns: SwerveModulePosition object
         """
         return SwerveModulePosition(
             distance=self.driveMotorEncoder.getPosition(),
-            angle=Rotation2d( self.angleMotorEncoder.getPosition() )
+            turn=Rotation2d( self.turnMotorEncoder.getPosition() )
         )
 
