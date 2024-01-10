@@ -4,7 +4,9 @@ from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath import units
 
-class CustomPigeon(WPI_Pigeon2):
+from .Gyro import Gyro
+
+class GyroPigeon2(WPI_Pigeon2, Gyro):
     """
     Custom Pigeon Class extends WPI_Pigeon2 with logging capabilities
     """
@@ -31,7 +33,7 @@ class CustomPigeon(WPI_Pigeon2):
         if RobotBase.isSimulation():
             self.getSimCollection().setRawHeading( startYaw )
 
-    def updateSysOutputs(self):
+    def updateOutputs(self):
         """
         Update Network Table Logging
         """

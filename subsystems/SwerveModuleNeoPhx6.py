@@ -132,10 +132,10 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.driveMotor.burnFlash()
 
         ### Swerve Module Information
-        self.referencePosition = Translation2d( posX, posY )
+        self.setReferencePosition( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateSysOutputs(self):
+    def updateOutputs(self):
         """
         Update Network Table Logging
         """
@@ -212,53 +212,16 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.angleMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
         self.angleMotorPid.setSmartMotionAllowedClosedLoopError( self.angle_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
-    def setDesiredState(self, desiredState:SwerveModuleState) -> SwerveModuleState:
-        """
-        Set the Desired State of this Module in Velocity and Degrees.  This method will optimize 
-        the direction / angle needed for fastest response
-
-        :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
-        """
-        ### Calculate / Optimize
-        currentAnglePosition = units.rotationsToDegrees( self.angleSensor.get_position().value_as_double )
-        currentAngleRotation = Rotation2d(0).fromDegrees(currentAnglePosition)
-        optimalState:SwerveModuleState = SwerveModuleState.optimize(
-            desiredState,
-            currentAngleRotation
-        )
-        self.moduleState = optimalState
-
-        # Velocity Smoothing
-        velocity = optimalState.speed
-        #velocity *= ( optimalState.angle - currentAngleRotation ).cos() # Scale Speed / Smooth rotation ??? Smart Motion?
-
+    def setDriveVelocity(self, velocity:float = 0.0) -> None:
         # Set Velocity
         velocMode = CANSparkMax.ControlType.kVelocity #if not self.driveSmart.get() else CANSparkMax.ControlType.kSmartVelocity
         self.driveMotorPid.setReference( velocity, velocMode, self.drive_kSlotIdx.get() )
 
+    def setTurnPosition(self, rotation:Rotation2d) -> None:
         # Set Angle
         angleMode = CANSparkMax.ControlType.kPosition #if not self.angleSmart.get() else CANSparkMax.ControlType.kSmartMotion
-        self.angleMotorPid.setReference( optimalState.angle.degrees(), angleMode, self.angle_kSlotIdx.get() )
-
-        return optimalState
-
-    def getReferencePosition(self) -> Translation2d:
-        """
-        Get the Reference Position of this Module on the SwerveDrive in (x,y) coordinates 
-        where x is forward and y is left
-
-        :returns Translation2d
-        """
-        return self.referencePosition
-       
-    def getModuleState(self) -> SwerveModuleState:
-        """
-        Get the Current State of this Module in Meters Per Second and Rotation2d
-
-        :returns SwerveModuleState
-        """
-        return self.moduleState
-
+        self.angleMotorPid.setReference( rotation.degrees(), angleMode, self.angle_kSlotIdx.get() )
+      
     def getModulePosition(self) -> SwerveModulePosition:
         """
         Get the Current Module Position in Meters Per Second and Rotation2d

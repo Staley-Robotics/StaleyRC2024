@@ -8,7 +8,9 @@ from wpilib import RobotBase
 from wpimath import units
 from wpimath.geometry import Rotation2d
 
-class CustomPigeonPhx6(Pigeon2):
+from .Gyro import Gyro
+
+class GyroPigeon2Phx6(Pigeon2, Gyro):
     """
     Custom Pigeon Class extends Pigeon2 with logging capabilities
     """
@@ -50,7 +52,7 @@ class CustomPigeonPhx6(Pigeon2):
         #if RobotBase.isSimulation():
         #    self.getSimCollection().setRawHeading( startYaw )
 
-    def updateSysOutputs(self):
+    def updateOutputs(self):
         """
         Update Network Table Logging
         """

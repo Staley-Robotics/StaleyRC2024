@@ -13,6 +13,9 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
+    drivetrain:subsystems.SwerveDrive = None
+    phoenix6:bool = False
+    testing:bool = False
 
     def __init__(self):
         """
@@ -20,7 +23,37 @@ class RobotContainer:
         """
         # Create Subsystems
         self.subsystem = subsystems.SampleSubsystem()
-        self.drivetrain = subsystems.SwerveDriveNeo()
+        
+        if wpilib.RobotBase.isSimulation() and not self.testing:
+            self.drivetrain = subsystems.SwerveDrive(
+                [
+                    subsystems.SwerveModuleSim("FL",  0.25,  0.25 ), 
+                    subsystems.SwerveModuleSim("FR",  0.25, -0.25 ), 
+                    subsystems.SwerveModuleSim("BL", -0.25,  0.25 ),
+                    subsystems.SwerveModuleSim("BR", -0.25, -0.25 ) 
+                ],
+                subsystems.GyroPigeon2( 10, "rio", 0 )
+            )
+        elif self.phoenix6:
+            self.drivetrain = subsystems.SwerveDrive(
+                [
+                    subsystems.SwerveModuleNeoPhx6("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
+                    subsystems.SwerveModuleNeoPhx6("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
+                    subsystems.SwerveModuleNeoPhx6("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
+                    subsystems.SwerveModuleNeoPhx6("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+                ],
+                subsystems.GyroPigeon2Phx6( 10, "rio", 0 )
+            )
+        else:
+            self.drivetrain = subsystems.SwerveDrive(
+                [
+                    subsystems.SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
+                    subsystems.SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
+                    subsystems.SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
+                    subsystems.SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+                ],
+                subsystems.GyroPigeon2( 10, "rio", 0 )
+            )
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
