@@ -26,7 +26,7 @@ class RobotContainer:
         
         # DriveTrain
         modules = []
-        gyro = GyroPigeon2( 10, "rio", 0 ) #Gyro()
+        gyro = None
         if wpilib.RobotBase.isSimulation() and not self.testing:
             modules = [
                 SwerveModuleSim("FL",  0.25,  0.25 ), 
@@ -34,7 +34,7 @@ class RobotContainer:
                 SwerveModuleSim("BL", -0.25,  0.25 ),
                 SwerveModuleSim("BR", -0.25, -0.25 ) 
             ]
-            #gyro = GyroPigeon2( 10, "rio", 0 )
+            gyro = GyroPigeon2( 10, "rio", 0 )
         elif self.phoenix6:
             modules = [
                 SwerveModuleNeoPhx6("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
@@ -78,11 +78,12 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        #self.m_driver1.a().whileTrue( commands.SampleCommand1() )
+        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
+        self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
 
         # Configure Driver 2 Button Mappings
-        self.m_driver1 = commands2.button.CommandXboxController(0)
-        #self.m_driver1.a().whileTrue( sequences.SampleSequence() )
+        #self.m_driver2 = commands2.button.CommandXboxController(1)
+        #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
 
         # Configure Default Commands
         #self.subsystem.setDefaultCommand(
