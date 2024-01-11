@@ -49,16 +49,11 @@ class SwerveDrive(Subsystem):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
+        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
         self.isCharacterizing = NTTunableBoolean( "Characterizing/Enabled", False )
         self.characterizationVolts = NTTunableFloat( "Characterizing/SwerveDriveVolts", 0.0 )
-
-        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
-
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-
-        # Logging
-        self.__logTbl__ = NetworkTableInstance.getDefault().getTable(f"{self.robotName}/SwerveDrive")
 
         # Gyro and Modules
         self.modules = modules
@@ -81,15 +76,14 @@ class SwerveDrive(Subsystem):
         )
 
         # NT Publishing
-        self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
-        self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Current", ChassisSpeeds ).publish()
-        self.ntChassisSpeedsNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Next", ChassisSpeeds ).publish()
-
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState"):        
             self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
             self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
             self.ntSwerveModuleStatesCurrent.close()
 
+        self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
+        self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Current", ChassisSpeeds ).publish()
+        self.ntChassisSpeedsNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Next", ChassisSpeeds ).publish()
         self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Current", SwerveModuleState ).publish( PubSubOptions() )
         self.ntSwerveModuleStatesNext = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Next", SwerveModuleState ).publish()
 
@@ -120,13 +114,13 @@ class SwerveDrive(Subsystem):
             self.getModulePositions()
         )
 
-        # Logging Current Chassis and SwerveModule States Speeds
+        # Logging: RobotPose, ChassisSpeeds, SwerveModuleStates Speeds
+        self.ntRobotPose2d.set( pose )
         self.ntChassisSpeedsCurrent.set( self.getChassisSpeeds() )
         self.ntChassisSpeedsNext.set( self.getChassisSpeedsSetpoint() )
         self.ntSwerveModuleStatesCurrent.set( self.getModuleStates() )
         self.ntSwerveModuleStatesNext.set( self.getModuleSetpoints() )
-        self.ntRobotPose2d.set( pose )
-        
+           
     def simulationPeriodic(self) -> None:
         """
         SwerveDrive Simulation Periodic Loop
