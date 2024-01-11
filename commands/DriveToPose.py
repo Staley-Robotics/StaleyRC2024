@@ -27,19 +27,20 @@ class DriveToPose(Command):
     def initialize(self):
         ### PID Controllers
         self._m_controller = HolonomicDriveController(
-            PIDController( 200, 0, 0 ),
-            PIDController( 200, 0, 0 ),
+            PIDController( 3.7, 0, 0 ),
+            PIDController( 3.7, 0, 0 ),
             ProfiledPIDControllerRadians(
                 1, 0, 0,
                 TrapezoidProfileRadians.Constraints(
-                    self.swerveDrive.maxVelocity.get(),
-                    self.swerveDrive.maxAngularVelocity.get()
+                    self.swerveDrive.maxAngularVelocity.get(),
+                    self.swerveDrive.maxAngularVelocity.get() * 2
                 )
             )
         )
-        self._m_controller.setTolerance( Pose2d( Translation2d( 0.1, 0.1 ), Rotation2d(0.01) ) )
+        self._m_controller.setTolerance( Pose2d( Translation2d( 0.05, 0.05 ), Rotation2d(0.01) ) )
         self._m_controller.getXController().reset()
         self._m_controller.getYController().reset()
+        self._m_controller.getThetaController().enableContinuousInput( -math.pi, math.pi )
         self._m_controller.getThetaController().reset( self.swerveDrive.getRobotAngle().radians() )
 
         #self._m_controller = self.swerveDrive.getHolonomicPIDController()
@@ -53,7 +54,7 @@ class DriveToPose(Command):
         #self._m_tPid.reset( self.swerveDrive.getRobotAngle().radians() )
 
     def execute(self):
-        startPose = self.swerveDrive.getPose()
+        currentPose = self.swerveDrive.getPose()
         targetPose = self.getTargetPose()
 
         #x = self._m_xPid.calculate( startPose.X(), targetPose.X() )
@@ -70,9 +71,9 @@ class DriveToPose(Command):
         # Chassis Speed Run
         #speeds = ChassisSpeeds.fromFieldRelativeSpeeds( x, y, r, self.swerveDrive.getRobotAngle() )
 
-        heading = targetPose.relativeTo( startPose ).rotation()
-        cSpeeds = self._m_controller.calculate( startPose, targetPose, self.swerveDrive.maxVelocity.get(), Rotation2d(0) ) #heading )
-        self.swerveDrive.runChassisSpeeds( cSpeeds )
+        heading = targetPose.relativeTo( currentPose ).rotation()
+        cSpeeds = self._m_controller.calculate( currentPose, targetPose, 0, heading ) #heading )
+        self.swerveDrive.runChassisSpeeds( cSpeeds, False )
 
     def end(self, interrupted:bool) -> None:
         #self.swerveDrive.stop()
