@@ -1,5 +1,5 @@
 """
-Description: Limelight Subsystem
+Description: Limelight Camera
 Version:  1
 Date:  2024-01-10
 
@@ -14,27 +14,26 @@ import typing
 # FRC Component Imports
 from commands2 import Subsystem
 from wpilib import Timer, DriverStation
-from wpimath.geometry import Rotation2d, Pose2d
+from wpimath.geometry import Rotation2d, Pose2d, Pose3d, Translation3d, Rotation3d
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from ntcore import *
 
 # Our Imports
-
+from .VisionCamera import VisionCamera
 ### Constants
 
 ### Class: SwerveDrive
-class Limelight(Subsystem):
+class VisionCameraLimelight(VisionCamera):
     """
     Limelight Subsystem
     """
-    def __init__(self, name:str, odometryFunction:typing.Callable[[], SwerveDrive4PoseEstimator]):
+    def __init__(self, name:str):
         """
         Initialization
         """
         super().__init__()
         self.name = name
         self.table:NetworkTable = NetworkTableInstance.getDefault().getTable( name )
-        self.getOdometry = odometryFunction
         
         # Push Configuration to Limelight Here
         ### No code yet
@@ -42,28 +41,24 @@ class Limelight(Subsystem):
         # tId Subscriber
         self.tidSubscriber:IntegerSubscriber = self.table.getIntegerTopic("tid").subscribe(
             -1,
-            PubSubOptions.keepDuplicates(True),
-            PubSubOptions.sendAll(True)
+            PubSubOptions( keepDuplicates = True, sendAll = True )
         )
 
         # Raw Bot Pose Data Subscriber
         self.poseRedSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose").subscribe(
-            float[0.0],
-            PubSubOptions.keepDuplicates(True),
-            PubSubOptions.sendAll(True)
+            [],
+            PubSubOptions( keepDuplicates = True, sendAll = True )
         )
 
         # Red Pose Data Subscriber
         self.poseRedSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose_wpired").subscribe(
-            float[0.0],
-            PubSubOptions.keepDuplicates(True),
-            PubSubOptions.sendAll(True)
+            [],
+            PubSubOptions( keepDuplicates = True, sendAll = True )
         )
         # Blue Pose Data Subscriber
         self.poseBlueSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose_wpiblue").subscribe(
-            float[0.0],
-            PubSubOptions.keepDuplicates(True),
-            PubSubOptions.sendAll(True)
+            [],
+            PubSubOptions( keepDuplicates = True, sendAll = True )
         )
 
         # Frames Per Second Subscriber
@@ -73,43 +68,7 @@ class Limelight(Subsystem):
         self.disconnectedTimer = Timer()
         self.disconnectedTimer.start()
 
-    def periodic(self):
-        """
-        Periodic Loop Updates
-        """
-        
-        # # Check for Valid Limelight Data
-        # aprilTag = self.table.getNumber("tid",-1) 
-        # if int(aprilTag) == -1: return
-        
-        # # Check for Alliance Settings, Get Bot Pose Data from Limelight
-        # match DriverStation.getAlliance():
-        #     case DriverStation.Alliance.kRed:
-        #         botPose = self.table.getNumberArray("botpose_wpired", None)
-        #     case DriverStation.Alliance.kBlue:
-        #         botPose = self.table.getNumberArray("botpose_wpiblue", None)
-        #     case _:
-        #         return None
-
-        # # Translate Bot Pose Data to Pose2d
-        # if botPose == None: return
-        # llx = botPose[0]
-        # lly = botPose[1]
-        # llz = botPose[5]
-        # llt = botPose[6]
-        # llPose = Pose2d(llx, lly, Rotation2d(0).fromDegrees(llz))
-
-
-        # # Get Time Offset Information
-        # llOffset = Timer.getFPGATimestamp() - (llt/1000)
-        
-        # # Update Odometry
-        # self.getOdometry().addVisionMeasurement(
-        #     llPose,
-        #     llOffset
-        # )
-
-        ### New Code using all Subscriber Table Data (more accurate?)
+    def updateOutputs(self):
         frameList = []
         tstampList = []
 
@@ -130,32 +89,24 @@ class Limelight(Subsystem):
             frameList.append(frame)
             tstampList.append(tstamp)
             
-            # Update Odometry with Vision Measurements
-            self.getOdometry().addVisionMeasurement(
-                Pose2d(frame[0], frame[1], Rotation2d(0).fromDegrees(frame[5])),
-                tstamp - (frame[6]/1000)
-            )
-
-        # Logging
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray(
+        # Logging Raw Frame Data
+        NetworkTableInstance.getDefault().getTable("Limelight").putNumberArray(
             f"{self.name}/frame",
             frameList
         )  
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray(
+        NetworkTableInstance.getDefault().getTable("Limelight").putNumberArray(
             f"{self.name}/frameTimestamp",
             tstampList
         )  
 
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray(
+        NetworkTableInstance.getDefault().getTable("Limelight").putNumber(
             f"{self.name}/fps",
-            self.fpsSubscriber.get()
+            self.fpsSubscriber.get( -1 )
         ) 
-            
+       
         # Disconnected Alerting!
         if tidLength > 0:
             self.disconnectedTimer.reset()
 
         if self.disconnectedTimer.hasElapsed( 0.5 ):
             print( f"Limelight {self.name} - Disconnected!")
-
-              
