@@ -230,7 +230,19 @@ class SwerveModuleNeoPhx6(SwerveModule):
         # Set Turn
         turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
         self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )
-      
+
+    def getModuleState(self) -> SwerveModuleState:
+        """
+        Get the Current Module Position in Meters Per Second and Rotation2d
+
+        :returns SwerveModulePosition object
+        """
+        return SwerveModuleState(
+            speed=self.driveMotorEncoder.getVelocity(),
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+        )
+
+
     def getModulePosition(self) -> SwerveModulePosition:
         """
         Get the Current Module Position in Meters Per Second and Rotation2d
@@ -239,6 +251,6 @@ class SwerveModuleNeoPhx6(SwerveModule):
         """
         return SwerveModulePosition(
             distance=self.driveMotorEncoder.getPosition(),
-            turn=Rotation2d( self.turnMotorEncoder.getPosition() )
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
         )
 
