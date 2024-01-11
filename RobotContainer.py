@@ -22,6 +22,7 @@ class RobotContainer:
         """
         # Create Subsystems
         self.subsystem = SampleSubsystem()
+        self.pdp = PDP()
         
         # DriveTrain
         modules = []
