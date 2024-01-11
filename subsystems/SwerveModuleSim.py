@@ -43,12 +43,12 @@ class SwerveModuleSim(SwerveModule):
 
         # Drive Motor PID Values
         self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
-        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.05, self.updateDrivePIDController ) #0.04
+        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.8, self.updateDrivePIDController ) #0.04
         self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
         self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController ) #1.0
         self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.0, self.updateDrivePIDController ) #0.065
-        self.drive_kS = NTTunableFloat( "SwerveModule/Drive/FF/kS", 0.0, self.updateDrivePIDController )
-        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/FF/kV", 0.0, self.updateDrivePIDController )
+        self.drive_kS = NTTunableFloat( "SwerveModule/Drive/FF/kS", 0.04, self.updateDrivePIDController )
+        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/FF/kV", 0.1275, self.updateDrivePIDController )
         self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
         self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
         self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
@@ -151,6 +151,7 @@ class SwerveModuleSim(SwerveModule):
         calcPid = self.drivePID.calculate( self.driveSim.getAngularVelocity(), velocityRadPerSec ) 
         calcFf = self.driveFF.calculate( velocityRadPerSec )
         self.driveAppliedVolts = calcPid + calcFf
+        #print( f"Velocity: {velocity} Measurement: {self.driveSim.getAngularVelocity()} Setpoint: {velocityRadPerSec} PID: {calcPid} FF: {calcFf}")
         self.driveAppliedVolts = min( max( self.driveAppliedVolts, -12.0 ), 12.0 )
         self.driveAppliedVolts = applyDeadband( self.driveAppliedVolts, 0.04 )
         self.driveSim.setInputVoltage( self.driveAppliedVolts )
@@ -164,6 +165,18 @@ class SwerveModuleSim(SwerveModule):
         self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.005 )
         self.turnSim.setInputVoltage( self.turnAppliedVolts )
 
+    def getModuleState(self) -> SwerveModuleState:
+        """
+        Get the Current State of this Module in Meters per Second and Rotation2d
+
+        :returns: SwerveModulePosition
+        """
+        self.moduleState = SwerveModuleState(
+            self.driveSim.getAngularVelocity() * self.wheelRadius.get(),
+            Rotation2d( self.turnRelativePositionRad )
+        )
+        return self.moduleState
+
     def getModulePosition(self) -> SwerveModulePosition:
         """
         Get the Current Position of this Module in Meters and Rotation2d
@@ -171,7 +184,7 @@ class SwerveModuleSim(SwerveModule):
         :returns SwerveModuleState
         """
         self.modulePosition = SwerveModulePosition(
-            units.radiansToRotations( self.driveRelativePosition ) * self.driveGearRatio.get() / self.wheelRadius.get(),
+            self.driveRelativePosition * self.wheelRadius.get(),
             Rotation2d( self.turnRelativePositionRad )
         )
         return self.modulePosition #super().getModulePosition()

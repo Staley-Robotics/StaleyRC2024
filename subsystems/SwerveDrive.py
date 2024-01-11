@@ -89,6 +89,20 @@ class SwerveDrive(Subsystem):
         self.field = Field2d()
         SmartDashboard.putData("Field", self.field)
 
+        # NT Publishing
+        self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
+        self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Current", ChassisSpeeds ).publish()
+        self.ntChassisSpeedsNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Next", ChassisSpeeds ).publish()
+
+        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState"):        
+            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
+            self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
+            self.ntSwerveModuleStatesCurrent.close()
+
+        self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Current", SwerveModuleState ).publish( PubSubOptions() )
+        self.ntSwerveModuleStatesNext = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Next", SwerveModuleState ).publish()
+        self.ntSwerveModuleStatesNextOptimized = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/NextOptimized", SwerveModuleState ).publish()
+
     # Update Odometry Information on each loop
     def periodic(self):
         """
@@ -109,29 +123,18 @@ class SwerveDrive(Subsystem):
         else:
             pass
 
-        # Logging Current Chassis Speeds
-        cSpeed = self.getChassisSpeeds()
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( 
-            "ChassisSpeeds/Current",
-            [ cSpeed.vx, cSpeed.vy, cSpeed.omega ]
-        )
-
-        # Logging Measures SwerveModuleStates
-        measuredState = list()
-        for state in self.getModuleStates():
-            measuredState.append( state.angle.radians() )
-            measuredState.append( state.speed )
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray(
-            "SwerveModuleStates/Current",
-            measuredState
-        )        
-
+        
         # Odometry from Module Position Data
         pose = self.getOdometry().updateWithTime(
             Timer.getFPGATimestamp(),
             self.gyro.getRotation2d(),
             self.getModulePositions()
         )
+
+        # Logging Current Chassis Speeds
+        self.ntChassisSpeedsCurrent.set( self.getChassisSpeeds() )
+        self.ntSwerveModuleStatesCurrent.set( self.getModuleStates() )
+        self.ntRobotPose2d.set( pose )
         
         # Update Data on Dashboard
         poseX = round( pose.X(), 3 )
@@ -292,12 +295,8 @@ class SwerveDrive(Subsystem):
         Runs this SwerveDrive based on the provided ChassisSpeed
         """
         if convertFieldRelative: speeds = ChassisSpeeds.fromFieldRelativeSpeeds( speeds, self.getRobotAngle() ) # Needed for Trajectory State not being field relative
-        rotationCenter = Translation2d(0, 0)
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( 
-            "ChassisSpeeds/Next",
-            [ speeds.vx, speeds.vy, speeds.omega ]
-        )
-        modStates = self.getKinematics().toSwerveModuleStates(speeds, rotationCenter) # Convert to SwerveModuleState
+        self.ntChassisSpeedsNext.set( speeds )
+        modStates = self.getKinematics().toSwerveModuleStates(speeds, Translation2d(0, 0)) # Convert to SwerveModuleState
         self.runSwerveModuleStates( modStates )
 
     # Run SwerveDrive using SwerveModuleStates
@@ -310,30 +309,15 @@ class SwerveDrive(Subsystem):
 
         This method will optomize the SwerveModuleState prior to use to minimize the turning to less than 90 degrees
         """
-        desiredValues = list()
-        optimizedValues = list()
-
         # Update Desired State for each Swerve Module
-        modStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.maxVelocity.get())
+        optStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.maxVelocity.get())
         for x in range(len(self.modules)):
-            # Calculate Optimal State
             optimalState:SwerveModuleState = SwerveModuleState.optimize(
-                modStates[x],
+                optStates[x],
                 self.modules[x].getModulePosition().angle
             )
-
-            # Set Values
             self.modules[x].setDesiredState( optimalState )
 
-            # Desired Values
-            desiredValues.append( modStates[x].angle.radians() )
-            desiredValues.append( modStates[x].speed )
-            
-            # Optimized Values
-            
-            optimizedValues.append( optimalState.angle.radians() )
-            optimizedValues.append( optimalState.speed )
-            
         # Logging
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( f"SwerveModuleStates/NextDesired", desiredValues )
-        NetworkTableInstance.getDefault().getTable("Logging").putNumberArray( f"SwerveModuleStates/NextOptimized", optimizedValues )
+        self.ntSwerveModuleStatesNext.set( states )
+        self.ntSwerveModuleStatesNextOptimized.set( optStates )

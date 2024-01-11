@@ -51,8 +51,8 @@ class SwerveModuleNeo(SwerveModule):
 
         ### Tunable Variables
         # Encoder Conversions
-        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
         self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
+        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
         self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
 
         # Drive Motor PID Values
@@ -226,6 +226,17 @@ class SwerveModuleNeo(SwerveModule):
         turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
         self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )
 
+    def getModuleState(self) -> SwerveModuleState:
+        """
+        Get the Current Module State in Meters Per Second and Rotation2d
+
+        :returns: SwerveModuleState object
+        """
+        return SwerveModuleState(
+            speedMetersPerSecond=self.driveMotorEncoder.getVelocity(),
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+        )
+    
     def getModulePosition(self) -> SwerveModulePosition:
         """
         Get the Current Module Position in Meters Per Second and Rotation2d
@@ -234,6 +245,6 @@ class SwerveModuleNeo(SwerveModule):
         """
         return SwerveModulePosition(
             distance=self.driveMotorEncoder.getPosition(),
-            turn=Rotation2d( self.turnMotorEncoder.getPosition() )
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
         )
 
