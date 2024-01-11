@@ -152,6 +152,15 @@ class SwerveModuleNeo(SwerveModule):
         tbl.putNumber( "turnCurrentAmps", self.turnMotor.getOutputCurrent() )
         tbl.putNumber( "turnTempCelcius", self.turnMotor.getMotorTemperature() )
 
+        self.moduleStateMeasured = SwerveModuleState(
+            speedMetersPerSecond=self.driveMotorEncoder.getVelocity(),
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+        )
+        self.modulePosition =  SwerveModulePosition(
+            distance=self.driveMotorEncoder.getPosition(),
+            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+        )
+
     def updateDriveEncoderConversions(self):
         """
         Update the Onboard Position and Velocity Conversions with the NEO Drive Motor
@@ -225,26 +234,3 @@ class SwerveModuleNeo(SwerveModule):
         # Set Angle
         turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
         self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )
-
-    def getModuleState(self) -> SwerveModuleState:
-        """
-        Get the Current Module State in Meters Per Second and Rotation2d
-
-        :returns: SwerveModuleState object
-        """
-        return SwerveModuleState(
-            speedMetersPerSecond=self.driveMotorEncoder.getVelocity(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
-        )
-    
-    def getModulePosition(self) -> SwerveModulePosition:
-        """
-        Get the Current Module Position in Meters Per Second and Rotation2d
-
-        :returns: SwerveModulePosition object
-        """
-        return SwerveModulePosition(
-            distance=self.driveMotorEncoder.getPosition(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
-        )
-

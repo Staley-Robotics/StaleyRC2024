@@ -121,6 +121,15 @@ class SwerveModuleSim(SwerveModule):
         tbl.putNumber( "turnCurrentAmps", abs( self.turnSim.getCurrentDraw() ) )
         tbl.putNumber( "turnTempCelcius", 0.0 )
 
+        self.moduleState = SwerveModuleState(
+            self.driveSim.getAngularVelocity() * self.wheelRadius.get(),
+            Rotation2d( self.turnRelativePositionRad )
+        )
+
+        self.modulePosition = SwerveModulePosition(
+            self.driveRelativePosition * self.wheelRadius.get(),
+            Rotation2d( self.turnRelativePositionRad )
+        )
 
     def updateDriveEncoderConversions(self): return None
     def updateTurnEncoderConversions(self): return None
@@ -164,29 +173,3 @@ class SwerveModuleSim(SwerveModule):
         self.turnAppliedVolts = min( max( self.turnAppliedVolts, -12.0 ), 12.0 )
         self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.005 )
         self.turnSim.setInputVoltage( self.turnAppliedVolts )
-
-    def getModuleState(self) -> SwerveModuleState:
-        """
-        Get the Current State of this Module in Meters per Second and Rotation2d
-
-        :returns: SwerveModulePosition
-        """
-        self.moduleState = SwerveModuleState(
-            self.driveSim.getAngularVelocity() * self.wheelRadius.get(),
-            Rotation2d( self.turnRelativePositionRad )
-        )
-        return self.moduleState
-
-    def getModulePosition(self) -> SwerveModulePosition:
-        """
-        Get the Current Position of this Module in Meters and Rotation2d
-
-        :returns SwerveModuleState
-        """
-        self.modulePosition = SwerveModulePosition(
-            self.driveRelativePosition * self.wheelRadius.get(),
-            Rotation2d( self.turnRelativePositionRad )
-        )
-        return self.modulePosition #super().getModulePosition()
-
-
