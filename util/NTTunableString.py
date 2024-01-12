@@ -49,6 +49,14 @@ class NTTunableString:
         """
         return str(self.value)
     
+    def set(self, value:str) -> None:
+        """
+        """
+        ntInst = NetworkTableInstance.getDefault()
+        ntTbl = ntInst.getTable("Tunable")
+        if ntTbl.putString( self.name, value ):
+            self.value = value
+
     def update(self, event:Event) -> None:
         """
         """

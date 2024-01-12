@@ -48,6 +48,14 @@ class NTTunableBoolean:
         """
         """
         return bool(self.value)
+
+    def set(self, value:bool) -> None:
+        """
+        """
+        ntInst = NetworkTableInstance.getDefault()
+        ntTbl = ntInst.getTable("Tunable")
+        if ntTbl.putBoolean( self.name, value ):
+            self.value = value
     
     def update(self, event:Event) -> None:
         """

@@ -48,7 +48,15 @@ class NTTunableInt:
         """
         """
         return int(self.value)
-    
+
+    def set(self, value:int) -> None:
+        """
+        """
+        ntInst = NetworkTableInstance.getDefault()
+        ntTbl = ntInst.getTable("Tunable")
+        if ntTbl.putNumber( self.name, value ):
+            self.value = value
+
     def update(self, event:Event) -> None:
         """
         """
