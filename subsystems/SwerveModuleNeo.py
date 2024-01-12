@@ -129,28 +129,26 @@ class SwerveModuleNeo(SwerveModule):
         self.referencePosition = Translation2d( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateOutputs(self):
+    def updateInputs(self, inputs:SwerveModule.SwerveModuleInputs):
         """
-        Update Network Table Logging
+        Update SwerveModuleInputs Values for Logging Purposes
+        :param inputs: SwerveModuleInputs objects that need to be updated
         """
-        # Get Logging Table
-        tbl = NetworkTableInstance.getDefault().getTable( f"SysOutputs/SwerveDrive/Module{self.name}" )
-
         # Drive Motor Data
-        tbl.putNumber( "drivePositionRad", self.driveMotorEncoder.getPosition() )
-        tbl.putNumber( "driveVelocityRadPerSec", self.driveMotorEncoder.getVelocity() )
-        tbl.putNumber( "driveAppliedVolts", self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage() )
-        tbl.putNumber( "driveCurrentAmps", self.driveMotor.getOutputCurrent() )
-        tbl.putNumber( "driveTempCelcius", self.driveMotor.getMotorTemperature() )
+        inputs.drivePositionRad = self.driveMotorEncoder.getPosition()
+        inputs.driveVelocityRadPerSec = self.driveMotorEncoder.getVelocity()
+        inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
+        inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
+        inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
 
         # Turn Motor Data
-        tbl.putNumber( "turnCanCoder-Relative", self.turnSensor.getPosition() )
-        tbl.putNumber( "turnCanCoder-Absolute", self.turnSensor.getAbsolutePosition() )
-        tbl.putNumber( "turnPositionRad", self.turnMotorEncoder.getPosition() )
-        tbl.putNumber( "turnVelocityRadPerSec", self.turnMotorEncoder.getVelocity() )
-        tbl.putNumber( "turnAppliedVolts", self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage() )
-        tbl.putNumber( "turnCurrentAmps", self.turnMotor.getOutputCurrent() )
-        tbl.putNumber( "turnTempCelcius", self.turnMotor.getMotorTemperature() )
+        inputs.turnCanCoderRelative = self.turnSensor.getPosition()
+        inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
+        inputs.turnPositionRad = self.turnMotorEncoder.getPosition()
+        inputs.turnVelocityRadPerSec = self.turnMotorEncoder.getVelocity()
+        inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
+        inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
+        inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
 
         self.moduleStateMeasured = SwerveModuleState(
             speedMetersPerSecond=self.driveMotorEncoder.getVelocity(),

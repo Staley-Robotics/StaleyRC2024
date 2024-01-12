@@ -5,9 +5,13 @@ Date:  2024-01-09
 """
 
 ### Imports
+# Python Builtin
+import dataclasses
+
 # FRC Component Imports
 from wpimath.geometry import Translation2d, Rotation2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
+import wpiutil.wpistruct
 
 # Class: SwerveModule
 class SwerveModule:
@@ -15,16 +19,38 @@ class SwerveModule:
     Custom SwerveModule Abstract Class used to extend a SwerveModule with our logging capabilities
     """
 
+    @wpiutil.wpistruct.make_wpistruct(name="SwerveModuleInputs")
+    @dataclasses.dataclass
+    class SwerveModuleInputs:
+        """
+        A WPIStruct Object that contains all SwerveModule Data.
+        This is intended to simplify logging of this data.
+        """
+        drivePositionRad: float = 0
+        driveVelocityRadPerSec: float = 0
+        driveAppliedVolts: float = 0
+        driveCurrentAmps: float = 0
+        driveTempCelcius: float = 0
+
+        turnCanCoderRelative: float = 0
+        turnCanCoderAbsolute: float = 0
+        turnPositionRad: float = 0
+        turnVelocityRadPerSec: float = 0
+        turnAppliedVolts: float = 0
+        turnCurrentAmps: float = 0
+        turnTempCelcius: float = 0
+
     referencePosition:Translation2d = Translation2d(0,0)
     modulePosition:SwerveModulePosition = SwerveModulePosition( 0, Rotation2d() )
     moduleState:SwerveModuleState = SwerveModuleState( 0, Rotation2d() )
     moduleSetpoint:SwerveModuleState = SwerveModuleState( 0, Rotation2d() )
     
-    def updateOutputs(self):
+    def updateInputs(self, inputs:SwerveModuleInputs):
         """
-        Update Network Table Logging
+        Update SwerveModuleInputs Values for Logging Purposes
+        :param inputs: SwerveModuleInputs objects that need to be updated
         """
-        raise NotImplementedError( "SwerveModule.updateOutputs() must created in child class." )
+        pass
 
     def run(self):
         """

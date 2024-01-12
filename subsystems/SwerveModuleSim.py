@@ -89,37 +89,33 @@ class SwerveModuleSim(SwerveModule):
         self.setReferencePosition( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateOutputs(self):
+    def updateInputs(self, inputs:SwerveModule.SwerveModuleInputs):
         """
-        Update Network Table Logging
+        Update SwerveModuleInputs Values for Logging Purposes
+        :param inputs: SwerveModuleInputs objects that need to be updated
         """
         self.driveSim.update( loopTime )
         self.turnSim.update( loopTime )
-
-        # Get Logging Table
-        tbl = NetworkTableInstance.getDefault().getTable( f"SysOutputs/SwerveDrive/Module{self.name}" )
 
         self.driveRelativePosition += self.driveSim.getAngularVelocity() * loopTime
         self.turnRelativePositionRad += self.turnSim.getAngularVelocity() * loopTime
         self.turnRelativePositionDeg += units.radiansToDegrees( self.turnSim.getAngularVelocity() * loopTime )
 
         # Drive Motor Data
-        tbl.putNumber( "drivePositionRad", self.driveRelativePosition )
-        tbl.putNumber( "driveVelocityRadPerSec", self.driveSim.getAngularVelocity() )
-        tbl.putNumber( "driveAppliedVolts", self.driveAppliedVolts )
-        tbl.putNumber( "driveCurrentAmps", abs( self.driveSim.getCurrentDraw() ) )
-        tbl.putNumber( "driveTempCelcius", 0.0 )
+        inputs.drivePositionRad = self.driveRelativePosition
+        inputs.driveVelocityRadPerSec = self.driveSim.getAngularVelocity()
+        inputs.driveAppliedVolts = self.driveAppliedVolts
+        inputs.driveCurrentAmps = abs( self.driveSim.getCurrentDraw() )
+        inputs.driveTempCelcius = 0.0
 
         # Turn Motor Data
-        tbl.putNumber( "turnCanCoder-Relative", 0.0 )
-        tbl.putNumber( "turnCanCoder-Absolute", self.turnAbsolutePosition )
-        tbl.putNumber( "turnPositionRad", self.turnRelativePositionRad )
-        tbl.putNumber( "turnVelocityRadPerSec", self.turnSim.getAngularVelocity() )
-        tbl.putNumber( "turnPositionDeg", self.turnRelativePositionDeg )
-        tbl.putNumber( "turnVelocityDegPerSec", units.radiansToDegrees( self.turnSim.getAngularVelocity() ) )
-        tbl.putNumber( "turnAppliedVolts", self.turnAppliedVolts )
-        tbl.putNumber( "turnCurrentAmps", abs( self.turnSim.getCurrentDraw() ) )
-        tbl.putNumber( "turnTempCelcius", 0.0 )
+        inputs.turnCanCoderRelative = 0.0
+        inputs.turnCanCoderAbsolute = self.turnAbsolutePosition
+        inputs.turnPositionRad = self.turnRelativePositionRad
+        inputs.turnVelocityRadPerSec = self.turnSim.getAngularVelocity()
+        inputs.turnAppliedVolts = self.turnAppliedVolts
+        inputs.turnCurrentAmps = abs( self.turnSim.getCurrentDraw() )
+        inputs.turnTempCelcius = 0.0
 
         self.moduleState = SwerveModuleState(
             self.driveSim.getAngularVelocity() * self.wheelRadius.get(),

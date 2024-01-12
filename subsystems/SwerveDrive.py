@@ -56,8 +56,13 @@ class SwerveDrive(Subsystem):
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
 
         # Gyro and Modules
-        self.modules = modules
         self.gyro = gyro
+        self.modules = modules
+
+        self.gyroInputs = self.gyro.GyroInputs()
+        self.moduleInputs = []
+        for mod in self.modules:
+            self.moduleInputs.append( mod.SwerveModuleInputs() )
 
         # Kinematics
         self.kinematics = SwerveDrive4Kinematics(
@@ -76,10 +81,17 @@ class SwerveDrive(Subsystem):
         )
 
         # NT Publishing
-        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState"):        
+        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
             self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
             self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
             self.ntSwerveModuleStatesCurrent.close()
+        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleInputs" ):        
+            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleInputs", SwerveModule.SwerveModuleInputs ).publish( PubSubOptions() )
+            self.ntSwerveModuleStatesCurrent.set( SwerveModule.SwerveModuleInputs() ) 
+            self.ntSwerveModuleStatesCurrent.close()
+
+        self.ntGyroInputs = NetworkTableInstance.getDefault().getStructTopic( "/SwerveDrive/Gyro", Gyro.GyroInputs ).publish()
+        self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModule.SwerveModuleInputs ).publish()
 
         self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
         self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Current", ChassisSpeeds ).publish()
@@ -92,9 +104,12 @@ class SwerveDrive(Subsystem):
         SwerveDrive Periodic Loop
         """
         # Logging
-        self.gyro.updateOutputs()
-        for module in self.modules:
-            module.updateOutputs()
+        self.gyro.updateInputs( self.gyroInputs )
+        for x in range(len(self.modules)):
+            self.modules[x].updateInputs( self.moduleInputs[x] )
+        
+        self.ntGyroInputs.set( self.gyroInputs )
+        self.ntModuleInputs.set( self.moduleInputs )
 
         # Run Modules
         if DriverStation.isDisabled():

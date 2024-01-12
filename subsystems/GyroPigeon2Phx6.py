@@ -57,23 +57,22 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
 
         # Reset the Yaw
         self.set_yaw( startYaw )
-        
-    def updateOutputs(self):
+
+    def updateInputs(self, inputs:Gyro.GyroInputs):
         """
-        Update Network Table Logging
+        Update GyroInputs Values for Logging Purposes
+        :param inputs: GyroInputs objects that need to be updated
         """
         yprDegrees = self.getYawPitchRoll()[1]
         xyzDps = self.getRawGyro()[1]
-        
 
-        tbl = NetworkTableInstance.getDefault().getTable( "SysOutputs/SwerveDrive/Gyro" )
-        tbl.putBoolean( "connected", xyzDps[0] == StatusCode.OK )
-        tbl.putNumber( "rollPositionRad", units.degreesToRadians( yprDegrees[1] ) )
-        tbl.putNumber( "pitchPositionRad", units.degreesToRadians( -yprDegrees[2] ) )
-        tbl.putNumber( "yawPositionRad", units.degreesToRadians( yprDegrees[0] ) )
-        tbl.putNumber( "rollVelocityRadPerSec", units.degreesToRadians( xyzDps[1] ) )
-        tbl.putNumber( "pitchVelocityRadPerSec", units.degreesToRadians( -xyzDps[0] ) )
-        tbl.putNumber( "yawVelocityRadPerSec", units.degreesToRadians( xyzDps[2] ) )
+        inputs.connected = xyzDps[0] == StatusCode.OK
+        inputs.rollPositionRad = units.degreesToRadians( yprDegrees[1] )
+        inputs.pitchPositionRad = units.degreesToRadians( -yprDegrees[2] )
+        inputs.yawPositionRad = units.degreesToRadians( yprDegrees[0] )
+        inputs.rollVelocityRadPerSec = units.degreesToRadians( xyzDps[1] )
+        inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
+        inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
 
     def getYaw(self) -> float:
         """

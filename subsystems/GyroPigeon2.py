@@ -41,18 +41,18 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         if RobotBase.isSimulation():
             self.getSimCollection().setRawHeading( startYaw )
 
-    def updateOutputs(self):
+    def updateInputs(self, inputs:Gyro.GyroInputs):
         """
-        Update Network Table Logging
+        Update GyroInputs Values for Logging Purposes
+        :param inputs: GyroInputs objects that need to be updated
         """
         yprDegrees = self.getYawPitchRoll()[1]
         xyzDps = self.getRawGyro()[1]
 
-        tbl = NetworkTableInstance.getDefault().getTable( "SysOutputs/SwerveDrive/Gyro" )
-        tbl.putBoolean( "connected", self.getLastError() == ErrorCode.OK )
-        tbl.putNumber( "rollPositionRad", units.degreesToRadians( yprDegrees[1] ) )
-        tbl.putNumber( "pitchPositionRad", units.degreesToRadians( -yprDegrees[2] ) )
-        tbl.putNumber( "yawPositionRad", units.degreesToRadians( yprDegrees[0] ) )
-        tbl.putNumber( "rollVelocityRadPerSec", units.degreesToRadians( xyzDps[1] ) )
-        tbl.putNumber( "pitchVelocityRadPerSec", units.degreesToRadians( -xyzDps[0] ) )
-        tbl.putNumber( "yawVelocityRadPerSec", units.degreesToRadians( xyzDps[2] ) )
+        inputs.connected = self.getLastError() == ErrorCode.OK
+        inputs.rollPositionRad = units.degreesToRadians( yprDegrees[1] )
+        inputs.pitchPositionRad = units.degreesToRadians( -yprDegrees[2] )
+        inputs.yawPositionRad = units.degreesToRadians( yprDegrees[0] )
+        inputs.rollVelocityRadPerSec = units.degreesToRadians( xyzDps[1] )
+        inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
+        inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
