@@ -16,9 +16,11 @@ import math
 # FRC Component Imports
 from commands2 import Subsystem
 from wpilib import SmartDashboard, Timer, DriverStation, RobotBase, Field2d
+from wpimath.controller import PIDController, ProfiledPIDControllerRadians, HolonomicDriveController
+from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.kinematics import SwerveDrive4Kinematics, ChassisSpeeds, SwerveModulePosition, SwerveModuleState
-from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.trajectory import TrapezoidProfileRadians
 from ntcore import *
 
 # Our Imports
@@ -41,7 +43,6 @@ class SwerveDrive(Subsystem):
         Initialization of a SwerveDrive
         """
         # Subsystem Setup
-        super().__init__()
         self.setName( "SwerveDrive" )
 
         # Robot Name
@@ -49,11 +50,24 @@ class SwerveDrive(Subsystem):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
-        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
         self.isCharacterizing = NTTunableBoolean( "Characterizing/Enabled", False )
         self.characterizationVolts = NTTunableFloat( "Characterizing/SwerveDriveVolts", 0.0 )
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
+
+        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
+
+        self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController )
+        self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController )
+        self.pidX_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kD", 0, self.updateHolonomicDriveController )
+        self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController )
+        self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController )
+        self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController )
+        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController )
+        self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController )
+        self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController )
+        self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController )
+        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController )
 
         # Gyro and Modules
         self.gyro = gyro
@@ -79,6 +93,10 @@ class SwerveDrive(Subsystem):
             self.getModulePositions(),
             Pose2d(Translation2d(0,0), Rotation2d())
         )
+
+        # PID Controllers for Drive Motion
+        self.hPid:HolonomicDriveController = None
+        self.updateHolonomicDriveController()
 
         # NT Publishing
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
@@ -165,6 +183,67 @@ class SwerveDrive(Subsystem):
         :returns: SwerveDrive4PoseEstimator
         """
         return self.odometry
+
+    def updateHolonomicDriveController(self) -> None:
+        """
+        Update the HolonomicDriveController configuration for this SwerveDrive
+
+        :returns: HolonomicDriveController
+        """
+        x = PIDController(
+            self.pidX_kP.get(),
+            self.pidX_kI.get(),
+            self.pidX_kD.get()
+        )
+        y = PIDController(
+            self.pidY_kP.get(),
+            self.pidY_kI.get(),
+            self.pidY_kD.get()
+        )
+        theta = ProfiledPIDControllerRadians(
+            self.pidT_kP.get(),
+            self.pidT_kI.get(),
+            self.pidT_kD.get(),
+            TrapezoidProfileRadians.Constraints(
+                self.maxAngularVelocity.get(),
+                self.maxAngularVelocity.get() * 2
+            )
+        )
+        theta.enableContinuousInput( -math.pi, math.pi )
+        theta.reset( self.getRobotAngle().radians(), self.getRotationVelocity() )
+
+        self.hPid = HolonomicDriveController( x, y, theta )
+        self.hPid.setTolerance(
+            Pose2d(
+                Translation2d( 
+                    self.pidH_tDistance.get(),
+                    self.pidH_tDistance.get()
+                ),
+                Rotation2d( self.pidH_tRotation.get() )
+            )
+        )
+
+        self.resetHolonomicDriveController()
+
+    def resetHolonomicDriveController(self) -> None:
+        """
+        Reset the HolonomicDriveController for this SwerveDrive
+        """
+        self.hPid.getXController().reset()
+        self.hPid.getYController().reset()
+        self.hPid.getThetaController().reset(
+            self.getRobotAngle().radians(),
+            self.getRotationVelocity()
+        )
+
+    def getHolonomicDriveController(self) -> HolonomicDriveController:
+        """
+        Get the HolonomicDriveController for this SwerveDrive
+
+        :returns: HolonomicDriveController
+        """
+        #self.resetHolonomicDriveController()
+        return self.hPid
 
     def getPose(self) -> Pose2d:
         """

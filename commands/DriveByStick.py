@@ -43,12 +43,6 @@ class DriveByStick(Command):
         self.ctlFullHolonomic = NTTunableFloat( "DriveByStick/Control/Full/Holonomic", 0.8 )
         self.ctlFullRotation = NTTunableFloat( "DriveByStick/Control/Full/Rotation", 0.8 )
 
-        self.theta_kP = NTTunableFloat( "DriveByStick/Theta/kP", 0.0, self.updateThetaPIDController )
-        self.theta_kI = NTTunableFloat( "DriveByStick/Theta/kI", 0.0, self.updateThetaPIDController )
-        self.theta_kD = NTTunableFloat( "DriveByStick/Theta/kD", 0.0, self.updateThetaPIDController )
-        self.theta_kV = NTTunableFloat( "DriveByStick/Theta/kV", 0.0, self.updateThetaPIDController )
-        self.theta_kA = NTTunableFloat( "DriveByStick/Theta/kA", 0.0, self.updateThetaPIDController )
-
         self.srlV = NTTunableFloat( "DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
         self.srlH = NTTunableFloat( "DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
         self.srlR = NTTunableFloat( "DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
@@ -66,18 +60,6 @@ class DriveByStick(Command):
         self.updateSlewRateLimiterHolonomic()
         self.updateSlewRateLimiterRotation()
 
-        # Theta PID Controller
-        self.tPid = ProfiledPIDControllerRadians(
-            self.theta_kP.get(),
-            self.theta_kI.get(),
-            self.theta_kD.get(),
-            TrapezoidProfileRadians.Constraints(
-                self.theta_kV.get(),
-                self.theta_kA.get()
-            )
-        )
-        self.updateThetaPIDController()
-
     def updateSlewRateLimiterVelocity(self):
         self.srl_vX = SlewRateLimiter( self.srlV.get() )
         self.srl_vY = SlewRateLimiter( self.srlV.get() )
@@ -89,24 +71,8 @@ class DriveByStick(Command):
     def updateSlewRateLimiterRotation(self):
         self.srl_rO = SlewRateLimiter( self.srlR.get() )
 
-    def updateThetaPIDController(self):
-        self.tPid.setPID( self.theta_kP.get(), self.theta_kI.get(), self.theta_kD.get() )
-        self.tPid.setConstraints(
-            TrapezoidProfileRadians.Constraints(
-                self.theta_kV.get(),
-                self.theta_kA.get()
-            )
-        )
-        self.resetThetaPIDController()
-
-    def resetThetaPIDController(self) -> None:
-        self.tPid.reset(
-            self.drive.getRobotAngle().radians(),
-            self.drive.getRotationVelocity()
-        )
-
     def initialize(self) -> None:
-        self.resetThetaPIDController()
+        self.tPid = self.drive.getHolonomicDriveController().getThetaController()
 
     def execute(self) -> None:
         # Get Input Values
@@ -147,15 +113,14 @@ class DriveByStick(Command):
 
         # Calculate Rotation via Holonomic or Buttons
         if abs(hX) > 0.1 or abs(hY) > 0.1:
-            #pid = self.tPid
             mag = math.sqrt( hX*hX + hY*hY ) * magH
             robotAngle:float = self.drive.getRobotAngle().radians()
             goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
             r = min( max( r, -1.0 ), 1.0 )
-        elif abs(r) > 0.1:
-            self.resetThetaPIDController()
+        elif abs(r) > 0.05:
+            self.drive.resetHolonomicDriveController()
 
         # Send ChassisSpeeds
         self.drive.runPercentageInputs(x, y, r)
