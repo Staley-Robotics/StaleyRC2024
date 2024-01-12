@@ -20,6 +20,7 @@ robotpy-halsim-ds-socket==2024.1.1.1
 robotpy-halsim-ws==2024.1.1.1
 #robotpy-navx==2024.1.0
 robotpy-pathplannerlib==2024.1.1
+#robotpy-playingwithfusion==2024.0.0
 
 ### Rev Robotics
 robotpy-rev==2024.2.0
