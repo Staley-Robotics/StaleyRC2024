@@ -32,20 +32,20 @@ class DriveByStick(Command):
         self.addRequirements( swerveDrive )
 
         # Tunables
-        self.deadband = NTTunableFloat( "DriveByStick/Deadband", 0.04 )
+        self.deadband = NTTunableFloat( "/CmdConfig/DriveByStick/Deadband", 0.04 )
 
-        self.finetuneEnabled = NTTunableBoolean( "DriveByStick/Control/FineEnabled", False )
-        self.ctlFineVelocity = NTTunableFloat( "DriveByStick/Control/Fine/Velocity", 0.4 )
-        self.ctlFineHolonomic = NTTunableFloat( "DriveByStick/Control/Fine/Holonomic", 0.4 )
-        self.ctlFineRotation = NTTunableFloat( "DriveByStick/Control/Fine/Rotation", 0.4 )
+        self.finetuneEnabled = NTTunableBoolean( "/CmdConfig/DriveByStick/Control/FineEnabled", False )
+        self.ctlFineVelocity = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Velocity", 0.4 )
+        self.ctlFineHolonomic = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Holonomic", 0.4 )
+        self.ctlFineRotation = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Rotation", 0.4 )
 
-        self.ctlFullVelocity = NTTunableFloat( "DriveByStick/Control/Full/Velocity", 0.8 )
-        self.ctlFullHolonomic = NTTunableFloat( "DriveByStick/Control/Full/Holonomic", 0.8 )
-        self.ctlFullRotation = NTTunableFloat( "DriveByStick/Control/Full/Rotation", 0.8 )
+        self.ctlFullVelocity = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Velocity", 0.8 )
+        self.ctlFullHolonomic = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Holonomic", 0.8 )
+        self.ctlFullRotation = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Rotation", 0.8 )
 
-        self.srlV = NTTunableFloat( "DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
-        self.srlH = NTTunableFloat( "DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
-        self.srlR = NTTunableFloat( "DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
+        self.srlV = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
+        self.srlH = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
+        self.srlR = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
 
         # This Command Global Properties
         self.drive = swerveDrive

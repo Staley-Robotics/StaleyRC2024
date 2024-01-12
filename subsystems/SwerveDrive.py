@@ -50,11 +50,13 @@ class SwerveDrive(Subsystem):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
-        self.isCharacterizing = NTTunableBoolean( "Characterizing/Enabled", False )
-        self.characterizationVolts = NTTunableFloat( "Characterizing/SwerveDriveVolts", 0.0 )
+        self.isCharacterizing = NTTunableBoolean( "/Characterizing/Enabled", False, persistent = True )
+        self.charMaxVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxVelocity", 3.70, persistent = True )
+        self.charMaxAngularVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxAngularVelocity", 2 * math.pi, persistent = True )
+        self.charMOI = NTTunableFloat( "/Characterizing/SwerveDrive/moi", 0.250, persistent = True )
+        
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-
         self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
 
         self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController )
