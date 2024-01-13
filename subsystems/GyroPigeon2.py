@@ -3,6 +3,8 @@ Description: Pigeon2 Extended Class
 Version:  1
 Date:  2024-01-09
 """
+# Built-In Imports
+import typing
 
 # FRC Imports
 from phoenix5 import ErrorCode
@@ -34,7 +36,7 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         # Configure Default / Start Settings
         self.configFactoryDefault()
         self.zeroGyroBiasNow()
-        self.setYaw(startYaw)
+        self.setYaw( startYaw )
         self.setStatusFramePeriod(PigeonIMU_StatusFrame.PigeonIMU_BiasedStatus_2_Gyro, 20)
 
         # Update the Sim Collection (if running in Simulator)
@@ -56,3 +58,19 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         inputs.rollVelocityRadPerSec = units.degreesToRadians( xyzDps[1] )
         inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
         inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
+
+    def simulationPeriodic(self, velocity:typing.Callable[[],None]) -> None:
+        """
+        Run a periodic loop during Simulations
+        :param velocity: A callable method to get the current Velocity in Radians Per Second
+        """
+        velocRadPerSec = velocity()
+        velocDegPerSec = units.radiansToDegrees( velocRadPerSec )
+        velocDegPer20ms = velocDegPerSec * 0.02 # Rio Loop Cycle
+        self.getSimCollection().addHeading( velocDegPer20ms )
+        newYaw = self.getYaw()
+        if newYaw < 0: 
+            self.getSimCollection().setRawHeading( newYaw + 360 )
+        elif newYaw >= 360.0: 
+            self.getSimCollection().setRawHeading( newYaw - 360 )
+

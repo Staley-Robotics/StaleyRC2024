@@ -6,6 +6,7 @@ Date:  2024-01-09
 
 # Built-In Python Imports
 import dataclasses
+import typing
 
 # FRC Imports
 from ntcore import *
@@ -44,6 +45,13 @@ class Gyro:
         inputs.rollVelocityRadPerSec = 0.0
         inputs.pitchVelocityRadPerSec = 0.0
         inputs.yawVelocityRadPerSec = 0.0
+
+    def simulationPeriodic(self, velocity:typing.Callable[[],None]):
+        """
+        Run a periodic loop during Simulations
+        :param velocity: A callable method to get the current Velocity in Radians Per Second
+        """
+        pass
 
     def getRotation2d(self) -> Rotation2d:
         """Returns the heading of the robot as a frc#Rotation2d.

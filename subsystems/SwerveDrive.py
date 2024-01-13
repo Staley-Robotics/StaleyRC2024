@@ -21,12 +21,14 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.kinematics import SwerveDrive4Kinematics, ChassisSpeeds, SwerveModulePosition, SwerveModuleState
 from wpimath.trajectory import TrapezoidProfileRadians
+from wpimath import units
 from ntcore import *
 
 # Our Imports
 from util import *
 from .SwerveModule import SwerveModule
 from .Gyro import Gyro
+from .GyroPigeon2 import GyroPigeon2
 
 class SwerveDrive(Subsystem):
     """
@@ -162,7 +164,7 @@ class SwerveDrive(Subsystem):
         """
         SwerveDrive Simulation Periodic Loop
         """
-        pass
+        self.gyro.simulationPeriodic( self.getRotationVelocity )
 
     def isFieldRelative(self) -> bool:
         """

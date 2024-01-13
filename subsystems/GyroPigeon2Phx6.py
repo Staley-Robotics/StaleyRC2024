@@ -73,6 +73,13 @@ class GyroPigeon2Phx6(Pigeon2, Gyro):
         inputs.rollVelocityRadPerSec = units.degreesToRadians( xyzDps[1] )
         inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
         inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
+    
+    # def simulationPeriodic(self, velocity:typing.Callable[[],None]) -> None:
+    #     """
+    #     Run a periodic loop during Simulations
+    #     :param velocity: A callable method to get the current Velocity in Radians Per Second
+    #     """
+    #     pass
 
     def getYaw(self) -> float:
         """
