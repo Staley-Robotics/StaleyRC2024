@@ -50,10 +50,12 @@ class SwerveDrive(Subsystem):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
-        self.isCharacterizing = NTTunableBoolean( "/Characterizing/Enabled", False, persistent = True )
-        self.charMaxVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxVelocity", 3.70, persistent = True )
-        self.charMaxAngularVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxAngularVelocity", 2 * math.pi, persistent = True )
-        self.charMOI = NTTunableFloat( "/Characterizing/SwerveDrive/moi", 0.250, persistent = True )
+        self.isCharacterizing = NTTunableBoolean( "/Characterizing/Enabled", False )
+        self.charMaxVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxVelocity", 0.0 )
+        self.charMaxAngularVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxAngularVelocity", 0.0 )
+        self.charMOI = NTTunableFloat( "/Characterizing/SwerveDrive/moi", 0.0 )
+
+        self.offline = NTTunableBoolean( "/OfflineOverride/SwerveDrive", False )
         
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
@@ -132,7 +134,7 @@ class SwerveDrive(Subsystem):
         self.ntModuleInputs.set( self.moduleInputs )
 
         # Run Modules
-        if DriverStation.isDisabled():
+        if DriverStation.isDisabled() or self.offline.get():
             self.stop()
         elif self.isCharacterizing.get():
             #for module in self.modules:

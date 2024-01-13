@@ -128,8 +128,6 @@ class SwerveModule:
 
         # 
         self.moduleSetpoint = desiredState # Save SwerveModuleState Globally
-        self.setDriveVelocity( desiredState.speed ) # Set Drive Velocity
-        self.setTurnPosition( desiredState.angle ) # Set Turn Position
 
     def getModuleState(self) -> SwerveModuleState:
         """
