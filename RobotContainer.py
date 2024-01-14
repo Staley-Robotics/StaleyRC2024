@@ -2,6 +2,7 @@ import commands2
 import commands2.button
 import commands2.cmd
 import wpilib
+from wpilib.interfaces import GenericHID
 
 from subsystems import *
 from commands import *
@@ -20,6 +21,11 @@ class RobotContainer:
         """
         Initialization
         """
+        # Tunable Variables
+        self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
+        self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
+        self.rumble = NTTunableBoolean( "/Config/Game/EndGameNotifications/rumble", False )
+
         # Create Subsystems
         self.subsystem = SampleSubsystem()
         self.pdp = PDP()
@@ -65,7 +71,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", commands.SampleCommand1() )
+        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -82,10 +88,11 @@ class RobotContainer:
         #self.m_driver2 = commands2.button.CommandXboxController(1)
         #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
 
+        # End Game Notifications
+        self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
+        self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
+
         # Configure Default Commands
-        #self.subsystem.setDefaultCommand(
-        #    commands.SampleCommand1()
-        #)
         self.drivetrain.setDefaultCommand(
             commands.DriveByStick(
                 self.drivetrain,
@@ -102,4 +109,50 @@ class RobotContainer:
         :returns: the autonomous command that has been selected from the ShuffleBoard
         """
         return self.m_chooser.getSelected()
+    
+    def setEndgameNotification( self,
+                                getAlertTime:typing.Callable[[],float],
+                                rumbleTime:float = 1.0,
+                                pulseCount:int = 1,
+                                pulseDelay:float = 0.5 ) -> None:
+        """
+        Creates a Customizable End Game Notification and adds is to the Command Scheduler
+        
+        :param getAlertTime: A lambda function that requests the amount of time (in seconds)
+        remaining in the match when the notification occurs
+        :param rumbleTime: The amount of time (in seconds) the rumble occurs
+        :param pulseCount: The number of times (pulses) the notification occurs
+        :param pulseDelay: The amount of time (in seconds) to delay between notification pulses
+        """
+        # Create Rumble Patterns
+        rumbleSequence = commands2.cmd.sequence()
+        for i in range(pulseCount):
+            # Start Rumble
+            rumbleSequence = rumbleSequence.andThen(
+                commands2.cmd.run(
+                    lambda: (
+                        self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
+                        #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
+                        self.rumble.set( True ) # Visualization on Dashboard
+                    )
+                ).withTimeout( rumbleTime )
+            )
+            # Stop Rumble
+            rumbleSequence = rumbleSequence.andThen(
+                commands2.cmd.run(
+                    lambda: (
+                        self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
+                        #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
+                        self.rumble.set( False ) # Visualization on Dashboard
+                    )
+                ).withTimeout( pulseDelay )
+            )
+
+        # Bind Rumble Triggers to 
+        commands2.Trigger(
+            lambda: ( DriverStation.isTeleopEnabled() 
+                and DriverStation.getMatchTime() > 0.0 
+                and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )
+            )
+        ).onTrue( rumbleSequence )
     
