@@ -17,7 +17,9 @@ class MyRobot(wpilib.TimedRobot):
         #)
 
     def robotPeriodic(self):
+        wpilib.setCurrentThreadPriority(True, 99)
         commands2.CommandScheduler.getInstance().run()
+        wpilib.setCurrentThreadPriority(True, 10)
 
     def autonomousInit(self):
         self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
