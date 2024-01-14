@@ -31,82 +31,51 @@ class VisionCameraLimelight(VisionCamera):
         """
         Initialization
         """
-        super().__init__()
         self.name = name
         self.table:NetworkTable = NetworkTableInstance.getDefault().getTable( name )
         
         # Push Configuration to Limelight Here
         ### No code yet
 
-        # tId Subscriber
-        self.tidSubscriber:IntegerSubscriber = self.table.getIntegerTopic("tid").subscribe(
-            -1,
-            PubSubOptions( keepDuplicates = True, sendAll = True )
-        )
-
-        # Raw Bot Pose Data Subscriber
-        self.poseRedSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose").subscribe(
-            [],
-            PubSubOptions( keepDuplicates = True, sendAll = True )
-        )
-
-        # Red Pose Data Subscriber
-        self.poseRedSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose_wpired").subscribe(
-            [],
-            PubSubOptions( keepDuplicates = True, sendAll = True )
-        )
-        # Blue Pose Data Subscriber
-        self.poseBlueSubscriber:DoubleArraySubscriber = self.table.getDoubleArrayTopic("botpose_wpiblue").subscribe(
-            [],
-            PubSubOptions( keepDuplicates = True, sendAll = True )
-        )
-
-        # Frames Per Second Subscriber
-        self.fpsSubscriber = self.table.getDoubleTopic("fps").subscribe(0)
-
         # Timer for Disconnected Status
         self.disconnectedTimer = Timer()
         self.disconnectedTimer.start()
 
-    def updateOutputs(self):
-        frameList = []
-        tstampList = []
+    def updateInputs(self, inputs:VisionCamera.VisionCameraInputs):
+        """
+        Update Input Logs
+        """
+        tid:int = int( self.table.getNumber("tid", -2) )
 
-        # Get Queues
-        sub:DoubleArraySubscriber = self.poseRedSubscriber if DriverStation.getAlliance() == DriverStation.Alliance.kRed else self.poseBlueSubscriber
-        subQueue = sub.readQueue()
-        tidQueue = self.tidSubscriber.readQueue()
-        tidLength = len(tidQueue)
-
-        # Process Queues
-        for x in range(tidLength):
-            # If Invalid Value, Skip
-            if tidQueue[x].value == -1: continue
-
-            # Get BotPose Data
-            frame = subQueue[x].value
-            tstamp = subQueue[x].time / 1000000.0
-            frameList.append(frame)
-            tstampList.append(tstamp)
-            
-        # Logging Raw Frame Data
-        NetworkTableInstance.getDefault().getTable("Limelight").putNumberArray(
-            f"{self.name}/frame",
-            frameList
-        )  
-        NetworkTableInstance.getDefault().getTable("Limelight").putNumberArray(
-            f"{self.name}/frameTimestamp",
-            tstampList
-        )  
-
-        NetworkTableInstance.getDefault().getTable("Limelight").putNumber(
-            f"{self.name}/fps",
-            self.fpsSubscriber.get( -1 )
-        ) 
-       
         # Disconnected Alerting!
-        if tidLength > 0:
+        if tid != -2:
             self.disconnectedTimer.reset()
+            inputs.connected = True
 
-        if self.disconnectedTimer.hasElapsed( 0.5 ):
-            print( f"Limelight {self.name} - Disconnected!")
+        if self.disconnectedTimer.hasElapsed( 1.0 ):
+            inputs.connected = False
+
+    def run(self):
+        tid = int( self.table.getNumber("tid", -1) )
+
+        if tid != -1:
+            # Mark HasData True
+            self.hasData = True
+            # Red Pose Data            
+            redPose = self.table.getNumberArray("botpose_wpired", [])
+            if len(redPose) == 7:
+                self.redRobotPose2d = Pose2d( redPose[0], redPose[1], Rotation2d().fromDegrees(redPose[5]) )
+                self.redRobotPose3d = Pose3d( Translation3d(redPose[0], redPose[1], redPose[2]), Rotation3d(redPose[3], redPose[4], redPose[5]) )
+                self.latencySecs = ((redPose[6])/1000)
+            # Blue Pose Data
+            bluePose = self.table.getNumberArray("botpose_wpiblue", [])
+            if len(bluePose) == 7:
+                self.blueRobotPose2d = Pose2d( bluePose[0], bluePose[1], Rotation2d().fromDegrees(bluePose[5]) )
+                self.blueRobotPose3d = Pose3d( Translation3d(bluePose[0], bluePose[1], bluePose[2]), Rotation3d(bluePose[3], bluePose[4], bluePose[5]) )
+                self.latencySecs = ((bluePose[6])/1000)
+            # Tag Poses
+            self.tagPoses = []
+        else:
+            # Mark HasData False
+            self.hasData = False
+

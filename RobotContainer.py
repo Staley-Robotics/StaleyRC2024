@@ -54,14 +54,10 @@ class RobotContainer:
         self.drivetrain:SwerveDrive = SwerveDrive( modules, gyro )
 
         # Vision
-        cameras:typing.Tuple[VisionCamera] = []
-        if wpilib.RobotBase.isSimulation() and not self.testing:
-            pass
-        else:
-            cameras = [
-                VisionCameraLimelight( "limelight-one" ),
-                VisionCameraLimelight( "limelight-two" )
-            ]
+        cameras:typing.Tuple[VisionCamera] = [
+            VisionCameraLimelight( "limelight-one" ),
+            VisionCameraLimelight( "limelight-two" )
+        ]
         self.vision = Vision( cameras, self.drivetrain.getOdometry )
         
         # Add Subsystems to SmartDashboard

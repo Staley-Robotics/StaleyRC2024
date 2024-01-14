@@ -3,53 +3,51 @@ Description: Vision Camera Container Class
 Version:  1
 Date:  2024-01-10
 """
-
+# Build In Imports
 import typing
+import dataclasses
+
+# FRC Imports
 from ntcore import NetworkTable
-#from wpimath.geometry import Pose2d, Pose3d
+from wpimath.geometry import Pose2d, Pose3d
+import wpiutil.wpistruct
 
 class VisionCamera:
     """
     VisionCamera Container Class
     """
 
-    timestamps:typing.Tuple[float] = []
-    frames:typing.List[typing.List] = []
-    demoFrame:typing.Tuple[float] = []
-    fps:float = 0.0
-
-    def updateOutputs(self):
+    @wpiutil.wpistruct.make_wpistruct(name="VisionCameraInputs")
+    @dataclasses.dataclass
+    class VisionCameraInputs:
         """
-        Update Output Logs
+        A WPIStruct Object that contains all SwerveModule Data.
+        This is intended to simplify logging of this data.
+        """
+        connected:bool = False
+        #timestamps:typing.ClassVar[list[int]] = []
+        #frames:typing.ClassVar[list[int]] = []
+        #demoFrame:typing.ClassVar[list[int]] = []
+        #fps:float = 0.0
+
+    name:str = "VisionCamera"
+
+    hasData:bool = False
+    latencySecs:float = 0.0
+    blueRobotPose2d:Pose2d = Pose2d()
+    blueRobotPose3d:Pose3d = Pose3d()
+    redRobotPose2d:Pose2d = Pose2d()
+    redRobotPose3d:Pose3d = Pose3d()
+    tagPoses:typing.Tuple[Pose2d] = []
+
+    def updateInputs(self, inputs:VisionCameraInputs):
+        """
+        Update Input Logs
         """
         pass
 
-    def toLog(self, table:NetworkTable):
+    def run(self):
         """
-        Put Data Onto Network Tables
+        Runtime Method for the Camera
         """
-        table.putNumberArray("Timestamps", self.timestamps)
-        table.putNumber("FrameCount", len(self.frames))
-        for i in range(len(self.frames)):
-            table.putNumberArray(f"Frame/{i}", self.frames[i])
-        table.putNumberArray("DemoFrame", self.demoFrame)
-        table.putNumber("Fps", self.fps)
-
-    def fromLog(self, table:NetworkTable):
-        """
-        Get Data From Network Tables
-        """
-        self.timestamps = table.getNumberArray("Timestamps", [])
-        frameCount:int = int(table.getNumber("FrameCount", 0))
-        self.frames:typing.List[typing.List] = []
-        for i in range(frameCount):
-            self.frames.append( table.getNumberArray(f"Frame/{i}", []) )
-        self.demoFrame = table.getNumberArray("DemoFrame", [])
-        self.fps = table.getNumber("Fps", 0)
-
-    # def getPose2d(self) -> Pose2d:
-    #     return self.lastPose2d
-    # def getPose3d(self) -> Pose3d:
-    #     return self.lastPose3d
-    # def getTagPoses(self) -> typing.Tuple[Pose2d]:
-    #     return self.lastLatency
+        pass
