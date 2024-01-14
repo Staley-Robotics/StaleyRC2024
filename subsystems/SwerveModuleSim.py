@@ -102,8 +102,10 @@ class SwerveModuleSim(SwerveModule):
         self.turnRelativePositionDeg += units.radiansToDegrees( self.turnSim.getAngularVelocity() * loopTime )
 
         # Drive Motor Data
-        inputs.drivePositionRad = self.driveRelativePosition
-        inputs.driveVelocityRadPerSec = self.driveSim.getAngularVelocity()
+        inputs.driveRadPosition = self.driveRelativePosition
+        inputs.driveRadPerSecVelocity = self.driveSim.getAngularVelocity()
+        inputs.driveMtrsPosition =  self.driveRelativePosition * self.wheelRadius.get()
+        inputs.driveMtrsPerSecVelocity = self.driveSim.getAngularVelocity() * self.wheelRadius.get()
         inputs.driveAppliedVolts = self.driveAppliedVolts
         inputs.driveCurrentAmps = abs( self.driveSim.getCurrentDraw() )
         inputs.driveTempCelcius = 0.0
@@ -111,8 +113,10 @@ class SwerveModuleSim(SwerveModule):
         # Turn Motor Data
         inputs.turnCanCoderRelative = 0.0
         inputs.turnCanCoderAbsolute = self.turnAbsolutePosition
-        inputs.turnPositionRad = self.turnRelativePositionRad
-        inputs.turnVelocityRadPerSec = self.turnSim.getAngularVelocity()
+        inputs.turnRadPosition = self.turnRelativePositionRad
+        inputs.turnDegPerSecVelocity = units.radiansToDegrees( self.turnSim.getAngularVelocity() )
+        inputs.turnDegPosition = units.radiansToDegrees( self.turnRelativePositionRad )
+        inputs.turnRadPerSecVelocity = self.turnSim.getAngularVelocity()
         inputs.turnAppliedVolts = self.turnAppliedVolts
         inputs.turnCurrentAmps = abs( self.turnSim.getCurrentDraw() )
         inputs.turnTempCelcius = 0.0
@@ -156,7 +160,6 @@ class SwerveModuleSim(SwerveModule):
         calcPid = self.drivePID.calculate( self.driveSim.getAngularVelocity(), velocityRadPerSec ) 
         calcFf = self.driveFF.calculate( velocityRadPerSec )
         self.driveAppliedVolts = calcPid + calcFf
-        #print( f"Velocity: {velocity} Measurement: {self.driveSim.getAngularVelocity()} Setpoint: {velocityRadPerSec} PID: {calcPid} FF: {calcFf}")
         self.driveAppliedVolts = min( max( self.driveAppliedVolts, -12.0 ), 12.0 )
         self.driveAppliedVolts = applyDeadband( self.driveAppliedVolts, 0.04 )
         self.driveSim.setInputVoltage( self.driveAppliedVolts )

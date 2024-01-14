@@ -135,8 +135,10 @@ class SwerveModuleNeo(SwerveModule):
         :param inputs: SwerveModuleInputs objects that need to be updated
         """
         # Drive Motor Data
-        inputs.drivePositionRad = self.driveMotorEncoder.getPosition()
-        inputs.driveVelocityRadPerSec = self.driveMotorEncoder.getVelocity()
+        inputs.driveRadPosition = self.driveMotorEncoder.getPosition()
+        inputs.driveRadPerSecVelocity = self.driveMotorEncoder.getVelocity()
+        inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
+        inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
         inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
         inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
@@ -144,8 +146,10 @@ class SwerveModuleNeo(SwerveModule):
         # Turn Motor Data
         inputs.turnCanCoderRelative = self.turnSensor.getPosition()
         inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
-        inputs.turnPositionRad = self.turnMotorEncoder.getPosition()
-        inputs.turnVelocityRadPerSec = self.turnMotorEncoder.getVelocity()
+        inputs.turnRadPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnRadPerSecVelocity = self.turnMotorEncoder.getVelocity()
+        inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
         inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()

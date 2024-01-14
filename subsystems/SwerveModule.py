@@ -5,11 +5,11 @@ Date:  2024-01-09
 """
 
 ### Imports
-# Python Builtin
+import typing
 import dataclasses
 
 # FRC Component Imports
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 import wpiutil.wpistruct
 
@@ -26,16 +26,20 @@ class SwerveModule:
         A WPIStruct Object that contains all SwerveModule Data.
         This is intended to simplify logging of this data.
         """
-        drivePositionRad: float = 0
-        driveVelocityRadPerSec: float = 0
+        driveRadPosition: float = 0
+        driveRadPerSecVelocity: float = 0
+        driveMtrsPosition: float = 0
+        driveMtrsPerSecVelocity: float = 0
         driveAppliedVolts: float = 0
         driveCurrentAmps: float = 0
         driveTempCelcius: float = 0
 
         turnCanCoderRelative: float = 0
         turnCanCoderAbsolute: float = 0
-        turnPositionRad: float = 0
-        turnVelocityRadPerSec: float = 0
+        turnRadPosition: float = 0
+        turnRadPerSecVelocity: float = 0
+        turnDegPosition: float = 0
+        turnDegPerSecVelocity: float = 0
         turnAppliedVolts: float = 0
         turnCurrentAmps: float = 0
         turnTempCelcius: float = 0
@@ -75,7 +79,6 @@ class SwerveModule:
             )
             desiredState = optimalState
 
-        # 
         self.moduleState = desiredState # Save SwerveModuleState Globally
         self.setDriveVelocity( desiredState.speed ) # Set Drive Velocity
         self.setTurnPosition( desiredState.angle ) # Set Turn Position
