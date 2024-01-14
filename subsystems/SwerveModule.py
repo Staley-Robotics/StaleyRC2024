@@ -63,38 +63,16 @@ class SwerveModule:
         self.setDriveVelocity( self.getModuleSetpoint().speed ) # Set Drive Velocity
         self.setTurnPosition( self.getModuleSetpoint().angle ) # Set Turn Position
 
-    # Replace this with setModuleState
-    def setDesiredState(self, desiredState:SwerveModuleState, optimize:bool=False):
+    def runCharacterization(self, volts:float = 0.0, asRotation:bool = False):
         """
-        Set the Desired State of this Module in Velocity and Degrees.  This method will optimize 
-        the direction / angle needed for fastest response
-
-        :param desiredState is a SwerveModuleState in Meters Per Second and Rotation2d
+        Runs SwerveModule Characterization Function
         """
-        ### Calculate / Optimize
-        if optimize:
-            optimalState:SwerveModuleState = SwerveModuleState.optimize(
-                desiredState,
-                self.getModuleState().angle
-            )
-            desiredState = optimalState
-
-        self.moduleState = desiredState # Save SwerveModuleState Globally
-        self.setDriveVelocity( desiredState.speed ) # Set Drive Velocity
-        self.setTurnPosition( desiredState.angle ) # Set Turn Position
+        rotation = Rotation2d(0)
+        if asRotation:
+            rotation = self.getReferencePosition().angle().rotateBy( Rotation2d().fromDegrees(90) )
+        self.setDriveVoltage( volts ) # Set Drive Velocity
+        self.setTurnPosition( rotation ) # Set Turn Position
     
-    def setDriveVelocity(self, velocity:float = 0.0) -> None:
-        """
-        Set the current drive velocity in meters per second
-        """
-        raise NotImplementedError( "SwerveModule.setDriveVelocity() must created in child class." )
-    
-    def setTurnPosition(self, rotation:Rotation2d = Rotation2d()) -> None:
-        """
-        Set the current Turning Motor position based on Rotation
-        """
-        raise NotImplementedError( "SwerveModule.setTurnPosition() must be created in child class." )
-        
     def setReferencePosition(self, posX:float = 0.0, posY:float = 0.0) -> None:
         """
         Get the Reference Position of this Module on the SwerveDrive in (x,y) coordinates 
@@ -123,13 +101,10 @@ class SwerveModule:
         """
         ### Calculate / Optimize
         if optimize:
-            optimalState:SwerveModuleState = SwerveModuleState.optimize(
+            desiredState:SwerveModuleState = SwerveModuleState.optimize(
                 desiredState,
                 self.getModuleState().angle
             )
-            desiredState = optimalState
-
-        # 
         self.moduleSetpoint = desiredState # Save SwerveModuleState Globally
 
     def getModuleState(self) -> SwerveModuleState:
@@ -156,3 +131,28 @@ class SwerveModule:
         """
         return self.modulePosition
 
+    """
+    Functions that must be written with any classes that extend this SwerveModule class
+    """
+    def setDriveVoltage(self, volts:float = 0.0) -> None:
+        """
+        Set the current drive velocity in meters per second
+        """
+        raise NotImplementedError( "SwerveModule.setDriveVelocity() must created in child class." )
+
+    def setDriveVelocity(self, velocity:float = 0.0) -> None:
+        """
+        Set the current drive velocity in meters per second
+
+        :param velocity: velocity (meters per second)
+        """
+        raise NotImplementedError( "SwerveModule.setDriveVelocity() must created in child class." )
+    
+    def setTurnPosition(self, rotation:Rotation2d = Rotation2d()) -> None:
+        """
+        Set the current Turning Motor position based on Rotation
+
+        :param rotation: rotation (Rotation2d)
+        """
+        raise NotImplementedError( "SwerveModule.setTurnPosition() must be created in child class." )
+        

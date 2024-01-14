@@ -76,7 +76,8 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        self.m_chooser.addOption("2 - Autonomous Command", SampleAuto1() )
+        self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
+        self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
         
         # Configure Driver 1 Button Mappings

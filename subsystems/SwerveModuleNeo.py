@@ -221,9 +221,19 @@ class SwerveModuleNeo(SwerveModule):
         self.turnMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
         self.turnMotorPid.setSmartMotionAllowedClosedLoopError( self.turn_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
+    def setDriveVoltage(self, volts:float = 0.0) -> None:
+        """
+        Set the current drive motor voltage in volts
+
+        :param volts: motor voltage (range -12.0 -> 12.0)
+        """
+        self.driveMotor.setVoltage( volts )
+
     def setDriveVelocity(self, velocity: float = 0) -> None:
         """
         Set the current drive velocity in meters per second
+
+        :param velocity: velocity (meters per second)
         """
         # Set Velocity
         velocMode = CANSparkMax.ControlType.kVelocity #if not self.driveSmart.get() else CANSparkMax.ControlType.kSmartVelocity
@@ -232,6 +242,8 @@ class SwerveModuleNeo(SwerveModule):
     def setTurnPosition(self, rotation:Rotation2d = Rotation2d) -> None:
         """
         Set the current Turning Motor position based on Rotation
+
+        :param rotation: rotation (Rotation2d)
         """
         # Set Angle
         turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion

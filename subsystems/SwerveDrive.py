@@ -52,11 +52,13 @@ class SwerveDrive(Subsystem):
         if not RobotBase.isReal(): self.robotName = "SimRobot"
 
         # Get Tunable Properties
-        self.isCharacterizing = NTTunableBoolean( "/Characterizing/Enabled", False )
-        self.charMaxVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxVelocity", 0.0 )
-        self.charMaxAngularVelocity = NTTunableFloat( "/Characterizing/SwerveDrive/maxAngularVelocity", 0.0 )
-        self.charMOI = NTTunableFloat( "/Characterizing/SwerveDrive/moi", 0.0 )
-
+        self.isCharacterizing = NTTunableBoolean( "/Characterize/Enabled", False )
+        self.charMOI = NTTunableFloat( "/Characterize/SwerveDrive/moiVolts", 0.0 )
+        self.charMaxVelocity = NTTunableFloat( "/Characterize/SwerveDrive/maxVelocity", 0.0 )
+        self.charMaxAngularVelocity = NTTunableFloat( "/Characterize/SwerveDrive/maxAngularVelocity", 0.0 )
+        self.charSettingsVolts = NTTunableFloat( "/Characterize/SwerveDrive/MySettings/volts", 0.0 )
+        self.charSettingsRotation = NTTunableBoolean( "/Characterize/SwerveDrive/MySettings/rotation", False )
+        
         self.offline = NTTunableBoolean( "/OfflineOverride/SwerveDrive", False )
         
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
@@ -139,9 +141,8 @@ class SwerveDrive(Subsystem):
         if DriverStation.isDisabled() or self.offline.get():
             self.stop()
         elif self.isCharacterizing.get():
-            #for module in self.modules:
-            #    module.driveMotor.set( self.characterizationVolts.get() )
-            pass
+            for module in self.modules:
+                module.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:
             for module in self.modules:
                 module.run()
@@ -323,13 +324,27 @@ class SwerveDrive(Subsystem):
         :returns: Tuple of SwerveModulePosition (distance, rotation)
         """
         return tuple( modules.getModulePosition() for modules in self.modules )
-    
+
+    """
+    Characterization Functions
+    """
+    def runCharacterization(self, volts:float = 0.0, rotation:bool = False) -> None:
+        """
+        :param volts: volts to run drive motors at
+        :param rotation: state of rotation
+        """
+        self.charSettingsVolts.set(volts)
+        self.charSettingsRotation.set(rotation)
+
+    """
+    DriveTime Functions
+    """
     def stop(self): # -> CommandBase:
         """
         Stops this SwerveDrive
         """
         self.runChassisSpeeds( ChassisSpeeds(0,0,0) )
-        
+
     def runPercentageInputs(self, x:float = 0.0, y:float = 0.0, r:float = 0.0) -> None:
         """
         Runs this SwerveDrive in x,y velocities and r rotations based on the maximum velocity characterized

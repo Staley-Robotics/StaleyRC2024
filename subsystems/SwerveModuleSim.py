@@ -68,7 +68,7 @@ class SwerveModuleSim(SwerveModule):
         self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
         # Create Motors
-        self.driveSim = FlywheelSim( DCMotor.NEO(2), 1 / self.driveGearRatio.get(), 0.025 )
+        self.driveSim = FlywheelSim( DCMotor.NEO(2), 1 / self.driveGearRatio.get(), 0.25 )
         self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
 
         # Set Drive Motor Sensor Data 
@@ -152,21 +152,33 @@ class SwerveModuleSim(SwerveModule):
         self.turnPID.setIZone( self.turn_kIZone.get() )
         self.turnPID.enableContinuousInput( -math.pi, math.pi )
 
+    def setDriveVoltage(self, volts:float = 0.0) -> None:
+        """
+        Set the current drive motor voltage in volts
+
+        :param volts: motor voltage (range -12.0 -> 12.0)
+        """
+        volts = min( max( volts, -12.0 ), 12.0 )
+        volts = applyDeadband( volts, 0.0001 )
+        self.driveSim.setInputVoltage( volts )
+        self.driveAppliedVolts = volts
+
     def setDriveVelocity(self, velocity:float = 0.0) -> None:
         """
         Set the current drive velocity in meters per second
+
+        :param velocity: velocity (meters per second)
         """
         velocityRadPerSec = velocity / self.wheelRadius.get()
         calcPid = self.drivePID.calculate( self.driveSim.getAngularVelocity(), velocityRadPerSec ) 
         calcFf = self.driveFF.calculate( velocityRadPerSec )
-        self.driveAppliedVolts = calcPid + calcFf
-        self.driveAppliedVolts = min( max( self.driveAppliedVolts, -12.0 ), 12.0 )
-        self.driveAppliedVolts = applyDeadband( self.driveAppliedVolts, 0.04 )
-        self.driveSim.setInputVoltage( self.driveAppliedVolts )
+        self.setDriveVoltage( calcPid + calcFf )
 
     def setTurnPosition(self, rotation:Rotation2d) -> None:
         """
         Set the current Turning Motor position based on Rotation
+
+        :param rotation: rotation (Rotation2d)
         """
         self.turnAppliedVolts = self.turnPID.calculate( self.turnRelativePositionRad, rotation.radians() )
         self.turnAppliedVolts = min( max( self.turnAppliedVolts, -12.0 ), 12.0 )
