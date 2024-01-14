@@ -24,7 +24,7 @@ class RobotContainer:
         # Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
-        self.rumble = NTTunableBoolean( "/Config/Game/EndGameNotifications/rumble", False )
+        self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
         # Create Subsystems
         self.subsystem = SampleSubsystem()
@@ -133,7 +133,7 @@ class RobotContainer:
                     lambda: (
                         self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
                         #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
-                        self.rumble.set( True ) # Visualization on Dashboard
+                        self.notifier.set( True ) # Visualization on Dashboard
                     )
                 ).withTimeout( rumbleTime )
             )
@@ -143,7 +143,7 @@ class RobotContainer:
                     lambda: (
                         self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
                         #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
-                        self.rumble.set( False ) # Visualization on Dashboard
+                        self.notifier.set( False ) # Visualization on Dashboard
                     )
                 ).withTimeout( pulseDelay )
             )
