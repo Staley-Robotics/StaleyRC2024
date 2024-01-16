@@ -7,7 +7,10 @@ import RobotContainer
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         # Start Logging using the built in DataLogManager
-        wpilib.DataLogManager.start()
+        try:
+            wpilib.DataLogManager.start( dir='/U/logs' )
+        except:
+            wpilib.DataLogManager.start()
         wpilib.DriverStation.startDataLog(wpilib.DataLogManager.getLog())
 
         self.m_robotContainer = RobotContainer.RobotContainer()
