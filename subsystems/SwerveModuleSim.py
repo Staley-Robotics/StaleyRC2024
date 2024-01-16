@@ -68,7 +68,7 @@ class SwerveModuleSim(SwerveModule):
         self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
         # Create Motors
-        self.driveSim = FlywheelSim( DCMotor.NEO(2), 1 / self.driveGearRatio.get(), 0.25 )
+        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.25 )
         self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
 
         # Set Drive Motor Sensor Data 

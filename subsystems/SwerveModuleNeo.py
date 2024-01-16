@@ -60,7 +60,7 @@ class SwerveModuleNeo(SwerveModule):
         self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.0, self.updateDrivePIDController ) #0.04
         self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
         self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController ) #1.0
-        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.0, self.updateDrivePIDController ) #0.065
+        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.22, self.updateDrivePIDController ) #0.065
         self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
         self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
         self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
@@ -69,7 +69,7 @@ class SwerveModuleNeo(SwerveModule):
 
         # Turn Motor PID Values
         self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
-        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0, self.updateTurnPIDController ) #0.5
+        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0.04, self.updateTurnPIDController ) #0.5
         self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
         self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
         self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
@@ -103,6 +103,7 @@ class SwerveModuleNeo(SwerveModule):
         self.turnMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
         self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
         self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
+        #self.turnMotorPid.setOutputRange( -0.15, 0.15 )
         self.updateTurnPIDController()     
 
         # Save Turn Motor Config
@@ -154,13 +155,13 @@ class SwerveModuleNeo(SwerveModule):
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
 
-        self.moduleStateMeasured = SwerveModuleState(
-            speedMetersPerSecond=self.driveMotorEncoder.getVelocity(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+        self.moduleState = SwerveModuleState(
+            speed=self.driveMotorEncoder.getVelocity(),
+            angle=Rotation2d(0).fromDegrees( self.turnMotorEncoder.getPosition() )
         )
         self.modulePosition =  SwerveModulePosition(
             distance=self.driveMotorEncoder.getPosition(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+            angle=Rotation2d(0).fromDegrees( self.turnMotorEncoder.getPosition() )
         )
 
     def updateDriveEncoderConversions(self):

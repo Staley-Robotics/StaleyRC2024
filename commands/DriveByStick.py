@@ -97,11 +97,11 @@ class DriveByStick(Command):
         r *= abs( r )
 
         # Slew Rate Limiter
-        x = self.srl_vX.calculate( x )
-        y = self.srl_vY.calculate( y )
-        hX = self.srl_hX.calculate( hX )
-        hY = self.srl_hY.calculate( hY )
-        r = self.srl_rO.calculate( r )
+        #x = self.srl_vX.calculate( x )
+        #y = self.srl_vY.calculate( y )
+        #hX = self.srl_hX.calculate( hX )
+        #hY = self.srl_hY.calculate( hY )
+        #r = self.srl_rO.calculate( r )
 
         # Calculate Fine Tuned Controls
         magV = self.ctlFullVelocity.get() if not self.finetuneEnabled.get() else self.ctlFineVelocity.get()
