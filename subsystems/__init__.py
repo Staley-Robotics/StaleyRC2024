@@ -1,7 +1,6 @@
 from .Gyro import *
 from .GyroPigeon2 import *
 from .GyroPigeon2Phx6 import *
-from .PDP import *
 from .SampleSubsystem import *
 from .SwerveDrive import *
 from .SwerveModule import *
