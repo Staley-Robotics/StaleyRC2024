@@ -38,10 +38,11 @@ class SwerveModuleSim(SwerveModule):
         self.name = subsystemName
 
         self.drive_kS = NTTunableFloat( "SwerveModule/Drive/PID/kS", 0, self.updateDrivePIDController ) #0.065
-        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/PID/kV", 0, self.updateDrivePIDController ) #0.065
+        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/PID/kV", 0.22, self.updateDrivePIDController ) #0.065
+        self.drive_kA = NTTunableFloat( "SwerveModule/Drive/PID/kA", 0, self.updateDrivePIDController ) #0.065
 
         # Create Motors
-        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.25 )
+        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.025 )
         self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
 
         # Set Drive Motor Sensor Data 
@@ -123,7 +124,7 @@ class SwerveModuleSim(SwerveModule):
         # Turn Integrated PID Controller
         self.turnPID = PIDController( self.turn_kP.get(), self.turn_kI.get(), self.turn_kD.get(), loopTime )
         self.turnPID.setIZone( self.turn_kIZone.get() )
-        self.turnPID.enableContinuousInput( -math.pi, math.pi )
+        self.turnPID.enableContinuousInput( -180, 180 ) #-math.pi, math.pi )
 
     def setDriveVoltage(self, volts:float = 0.0) -> None:
         """
@@ -132,7 +133,7 @@ class SwerveModuleSim(SwerveModule):
         :param volts: motor voltage (range -12.0 -> 12.0)
         """
         volts = min( max( volts, -12.0 ), 12.0 )
-        volts = applyDeadband( volts, 0.0001 )
+        volts = applyDeadband( volts, 0.001 )
         self.driveSim.setInputVoltage( volts )
         self.driveAppliedVolts = volts
 
@@ -142,10 +143,10 @@ class SwerveModuleSim(SwerveModule):
 
         :param velocity: velocity (meters per second)
         """
-        velocityRadPerSec = velocity / self.wheelRadius.get()
-        calcPid = self.drivePID.calculate( self.driveSim.getAngularVelocity(), velocityRadPerSec ) 
-        calcFf = self.driveFF.calculate( velocityRadPerSec )
-        self.setDriveVoltage( calcPid + calcFf )
+        curVeloc = self.driveSim.getAngularVelocity() * self.wheelRadius.get()
+        calcPid = self.drivePID.calculate( curVeloc, velocity ) 
+        calcFf = self.driveFF.calculate( velocity )
+        self.setDriveVoltage( (calcPid + calcFf) * 12.0 )
 
     def setTurnPosition(self, rotation:Rotation2d) -> None:
         """
@@ -153,7 +154,8 @@ class SwerveModuleSim(SwerveModule):
 
         :param rotation: rotation (Rotation2d)
         """
-        self.turnAppliedVolts = self.turnPID.calculate( self.turnRelativePositionRad, rotation.radians() )
-        self.turnAppliedVolts = min( max( self.turnAppliedVolts, -12.0 ), 12.0 )
-        self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.005 )
+        curPosition = units.radiansToDegrees( self.turnRelativePositionRad )
+        calcPid = self.turnPID.calculate( curPosition, rotation.degrees() )
+        self.turnAppliedVolts = min( max( calcPid * 12.0, -12.0 ), 12.0 )
+        self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.001 )
         self.turnSim.setInputVoltage( self.turnAppliedVolts )
