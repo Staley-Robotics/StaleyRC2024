@@ -113,7 +113,7 @@ class SwerveModuleSim(SwerveModule):
         Update the PID Controller for the Drive Motor
         """
         # Drive Integrated PID Controller
-        self.drivePID = PIDController( self.drive_kP.get(), self.drive_kI.get(), self.drive_kD.get(), loopTime )
+        self.drivePID = PIDController( self.drive_kP.get(), self.drive_kI.get(), self.drive_kD.get() )
         self.drivePID.setIZone( self.drive_kIZone.get() )
         self.driveFF = SimpleMotorFeedforwardMeters( self.drive_kS.get(), self.drive_kV.get() )
 
@@ -122,7 +122,7 @@ class SwerveModuleSim(SwerveModule):
         Update the PID Controller for the Turn Motor
         """
         # Turn Integrated PID Controller
-        self.turnPID = PIDController( self.turn_kP.get(), self.turn_kI.get(), self.turn_kD.get(), loopTime )
+        self.turnPID = PIDController( self.turn_kP.get(), self.turn_kI.get(), self.turn_kD.get() )
         self.turnPID.setIZone( self.turn_kIZone.get() )
         self.turnPID.enableContinuousInput( -180, 180 ) #-math.pi, math.pi )
 
@@ -133,7 +133,7 @@ class SwerveModuleSim(SwerveModule):
         :param volts: motor voltage (range -12.0 -> 12.0)
         """
         volts = min( max( volts, -12.0 ), 12.0 )
-        volts = applyDeadband( volts, 0.001 )
+        volts = applyDeadband( volts, 0.001 * 12, 12.0 ) # 0.1% Deadband on Motor Voltage
         self.driveSim.setInputVoltage( volts )
         self.driveAppliedVolts = volts
 
@@ -146,7 +146,9 @@ class SwerveModuleSim(SwerveModule):
         curVeloc = self.driveSim.getAngularVelocity() * self.wheelRadius.get()
         calcPid = self.drivePID.calculate( curVeloc, velocity ) 
         calcFf = self.driveFF.calculate( velocity )
-        self.setDriveVoltage( (calcPid + calcFf) * 12.0 )
+        calc = calcPid + calcFf
+        calc = applyDeadband( calc, 0.001 ) # Velocity Error Range:: 0.001 m/s
+        self.setDriveVoltage( calc * 12.0 )
 
     def setTurnPosition(self, rotation:Rotation2d) -> None:
         """
@@ -156,6 +158,6 @@ class SwerveModuleSim(SwerveModule):
         """
         curPosition = units.radiansToDegrees( self.turnRelativePositionRad )
         calcPid = self.turnPID.calculate( curPosition, rotation.degrees() )
-        self.turnAppliedVolts = min( max( calcPid * 12.0, -12.0 ), 12.0 )
-        self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 0.001 )
+        self.turnAppliedVolts = min( max( calcPid, -12.0 ), 12.0 )
+        self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 12.0 * 0.001, 12.0 ) # 0.1% Deadband on Motor Voltage
         self.turnSim.setInputVoltage( self.turnAppliedVolts )
