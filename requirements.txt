@@ -3,6 +3,7 @@
 
 ### RobotPy
 robotpy==2024.1.1.3
+robotpy_installer==2024.0.5 #bug with 2024.1.0
 #pyfrc=2024.0.1
 #pyntcore-2024.1.1.1
 #robotpy-cli=2024.0.0
