@@ -2,7 +2,7 @@ from commands2 import Subsystem
 from ntcore import NetworkTableInstance
 from wpilib import PowerDistribution
 
-class PDP(Subsystem):
+class LoggedPDP:
     """
     PDP Subsystem
     """

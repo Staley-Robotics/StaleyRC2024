@@ -1,23 +1,41 @@
 import wpilib
+import wpiutil.log
 import hal
 import commands2
+import ntcore
 import RobotContainer
-
+from util.LoggedPDP import *
+from util.LoggedConsole import *
 
 class MyRobot(wpilib.TimedRobot):
+    def __init__(self):
+        super().__init__()
+
+        # Setup Console Logging
+        loggedConsole:LoggedConsole = None
+        if wpilib.RobotBase.isReal():
+            loggedConsole = LoggedConsoleRIO()
+        else:
+            loggedConsole = LoggedConsoleSIM()
+        self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
+
+        # Setup PDP Logging
+        loggedPDP:LoggedPDP = LoggedPDP()
+        self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
+    
     def robotInit(self):
         # Start Logging using the built in DataLogManager
-        try:
-            wpilib.DataLogManager.start( dir='/U/logs' )
-        except:
-            wpilib.DataLogManager.start()
-        wpilib.DriverStation.startDataLog(wpilib.DataLogManager.getLog())
+        if wpilib.RobotBase.isReal():
+            wpilib.DataLogManager.start( dir='/U/logs', period=1.0 )
+        else:
+            wpilib.DataLogManager.start( period=1.0 )
+        wpilib.DriverStation.startDataLog( wpilib.DataLogManager.getLog() )
 
         self.m_robotContainer = RobotContainer.RobotContainer()
-        #hal.report(
-        #    hal.tResourceType.kResourceType_Framework,
-        #    hal.tInstances.kFramework_RobotBuilder
-        #)
+        hal.report(
+            hal.tResourceType.kResourceType_Framework,
+            hal.tInstances.kFramework_Timed
+        )
 
     def robotPeriodic(self):
         wpilib.setCurrentThreadPriority(True, 99)

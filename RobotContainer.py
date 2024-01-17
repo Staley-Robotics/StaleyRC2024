@@ -28,7 +28,6 @@ class RobotContainer:
 
         # Create Subsystems
         self.subsystem = SampleSubsystem()
-        self.pdp = PDP()
         
         # DriveTrain
         modules = []
@@ -82,8 +81,8 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
-        self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
+        #self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
+        #self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
