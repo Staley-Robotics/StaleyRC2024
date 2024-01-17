@@ -28,7 +28,7 @@ class MyRobot(wpilib.TimedRobot):
         if wpilib.RobotBase.isReal():
             wpilib.DataLogManager.start( dir='/U/logs', period=1.0 )
         else:
-            wpilib.DataLogManager.start( period=1.0 )
+            wpilib.DataLogManager.start( dir='.logs', period=1.0 )
         wpilib.DriverStation.startDataLog( wpilib.DataLogManager.getLog() )
 
         self.m_robotContainer = RobotContainer.RobotContainer()
