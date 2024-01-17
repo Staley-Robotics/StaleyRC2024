@@ -12,6 +12,7 @@ import dataclasses
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 import wpiutil.wpistruct
+from util import *
 
 # Class: SwerveModule
 class SwerveModule:
@@ -48,6 +49,52 @@ class SwerveModule:
     modulePosition:SwerveModulePosition = SwerveModulePosition( 0, Rotation2d() )
     moduleState:SwerveModuleState = SwerveModuleState( 0, Rotation2d() )
     moduleSetpoint:SwerveModuleState = SwerveModuleState( 0, Rotation2d() )
+
+    def __init__(self) -> None:
+        # Encoder Conversions
+        self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
+        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
+        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
+
+        # Drive Motor PID Values
+        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.0, self.updateDrivePIDController ) #0.04
+        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
+        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController ) #1.0
+        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.22, self.updateDrivePIDController ) #0.065
+        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
+        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
+
+        # Turn Motor PID Values
+        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0.04, self.updateTurnPIDController ) #0.5
+        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
+        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
+        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
+        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController )
+        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController )
+
+    def updateDriveEncoderConversions(self):
+        """
+        Update the Onboard Position and Velocity Conversions with the Drive Motor
+        """
+        pass
+
+    def updateTurnEncoderConversions(self):
+        """
+        Update the Onboard Position and Velocity Conversions with the Turn Motor
+        """
+        pass
+
+    def updateDrivePIDController(self):
+        """
+        Update the PID Controller for the Drive Motor
+        """
+        pass
+
+    def updateTurnPIDController(self):
+        """
+        Update the PID Controller for the Turn Motor
+        """
+        pass
     
     def updateInputs(self, inputs:SwerveModuleInputs):
         """

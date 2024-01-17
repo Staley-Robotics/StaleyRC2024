@@ -54,31 +54,14 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.name = subsystemName
 
         ### Tunable Variables
-        # Encoder Conversions
-        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
-        self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
-        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
-
         # Drive Motor PID Values
         self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
-        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.0, self.updateDrivePIDController ) #0.04
-        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
-        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController ) #1.0
-        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.0, self.updateDrivePIDController ) #0.065
-        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
-        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
         self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
         self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
         self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
 
         # Turn Motor PID Values
         self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
-        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0, self.updateTurnPIDController ) #0.5
-        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
-        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
-        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
-        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController )
-        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController )
         self.turn_kSlotIdx = NTTunableInt( "SwerveModule/Turn/PID/kSlotIdx", 0, self.updateTurnPIDController )
         self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
         self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
@@ -140,8 +123,10 @@ class SwerveModuleNeoPhx6(SwerveModule):
         :param inputs: SwerveModuleInputs objects that need to be updated
         """
         # Drive Motor Data
-        inputs.drivePositionRad = self.driveMotorEncoder.getPosition()
-        inputs.driveVelocityRadPerSec = self.driveMotorEncoder.getVelocity()
+        inputs.driveRadPosition = self.driveMotorEncoder.getPosition()
+        inputs.driveRadPerSecVelocity = self.driveMotorEncoder.getVelocity()
+        inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
+        inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
         inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
         inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
@@ -149,8 +134,10 @@ class SwerveModuleNeoPhx6(SwerveModule):
         # Turn Motor Data
         inputs.turnCanCoderRelative = units.rotationsToDegrees( self.turnSensor.get_position().value_as_double )
         inputs.turnCanCoderAbsolute = units.rotationsToDegrees( self.turnSensor.get_absolute_position().value_as_double )
-        inputs.turnPositionRad = self.turnMotorEncoder.getPosition()
-        inputs.turnVelocityRadPerSec = self.turnMotorEncoder.getVelocity()
+        inputs.turnRadPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnRadPerSecVelocity = self.turnMotorEncoder.getVelocity()
+        inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
         inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()

@@ -34,38 +34,11 @@ class SwerveModuleSim(SwerveModule):
         Initialization
         """
         ### Module Name
+        super().__init__()
         self.name = subsystemName
 
-        # Wheel Constraints
-        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
-        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
-        self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
-
-        # Drive Motor PID Values
-        self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
-        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.8, self.updateDrivePIDController ) #0.04
-        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController )
-        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController ) #1.0
-        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.0, self.updateDrivePIDController ) #0.065
-        self.drive_kS = NTTunableFloat( "SwerveModule/Drive/FF/kS", 0.04, self.updateDrivePIDController )
-        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/FF/kV", 0.1275, self.updateDrivePIDController )
-        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController )
-        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
-        self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
-        self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
-        self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
-
-        # Turn Motor PID Values
-        self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
-        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 10, self.updateTurnPIDController ) #0.5
-        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
-        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
-        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )
-        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController )
-        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController )
-        self.turn_kSlotIdx = NTTunableInt( "SwerveModule/Turn/PID/kSlotIdx", 0, self.updateTurnPIDController )
-        self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
-        self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
+        self.drive_kS = NTTunableFloat( "SwerveModule/Drive/PID/kS", 0, self.updateDrivePIDController ) #0.065
+        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/PID/kV", 0, self.updateDrivePIDController ) #0.065
 
         # Create Motors
         self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.25 )
