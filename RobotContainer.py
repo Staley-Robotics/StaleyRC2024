@@ -19,13 +19,13 @@ class RobotContainer:
         
         """
         # Create Subsystems
-        self.subsystem = subsystems.SampleSubsystem()
+        self.launcher = subsystems.Launcher()
 
         # Add Subsystems to SmartDashboard
-        wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
+        wpilib.SmartDashboard.putData( "Launcher", self.launcher)
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", commands.SampleCommand1() )
+        wpilib.SmartDashboard.putData( "Command", commands.RunLauncher(self.launcher) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -35,11 +35,11 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        self.m_driver1.a().whileTrue( commands.SampleCommand1() )
+        self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
 
         # Configure Driver 2 Button Mappings
-        self.m_driver1 = commands2.button.CommandXboxController(0)
-        self.m_driver1.a().whileTrue( sequences.SampleSequence() )
+        '''self.m_driver1 = commands2.button.CommandXboxController(0)
+        self.m_driver1.a().whileTrue( sequences.SampleSequence() )'''
 
         # Configure Default Commands
         #self.subsystem.setDefaultCommand(
