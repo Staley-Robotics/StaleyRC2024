@@ -87,10 +87,10 @@ class SwerveModuleSim(SwerveModule):
         # Turn Motor Data
         inputs.turnCanCoderRelative = 0.0
         inputs.turnCanCoderAbsolute = self.turnAbsolutePosition
-        inputs.turnRadPosition = self.turnRelativePositionRad
         inputs.turnDegPerSecVelocity = units.radiansToDegrees( self.turnSim.getAngularVelocity() )
-        inputs.turnDegPosition = units.radiansToDegrees( self.turnRelativePositionRad )
+        inputs.turnDegPosition = self.turnRelativePositionDeg
         inputs.turnRadPerSecVelocity = self.turnSim.getAngularVelocity()
+        inputs.turnRadPosition = self.turnRelativePositionRad
         inputs.turnAppliedVolts = self.turnAppliedVolts
         inputs.turnCurrentAmps = abs( self.turnSim.getCurrentDraw() )
         inputs.turnTempCelcius = 0.0
@@ -147,6 +147,7 @@ class SwerveModuleSim(SwerveModule):
         calcPid = self.drivePID.calculate( curVeloc, velocity ) 
         calcFf = self.driveFF.calculate( velocity )
         calc = calcPid + calcFf
+        calc = min( max( calc, -1.0), 1.0 )
         calc = applyDeadband( calc, 0.001 ) # Velocity Error Range:: 0.001 m/s
         self.setDriveVoltage( calc * 12.0 )
 
@@ -156,8 +157,7 @@ class SwerveModuleSim(SwerveModule):
 
         :param rotation: rotation (Rotation2d)
         """
-        curPosition = units.radiansToDegrees( self.turnRelativePositionRad )
-        calcPid = self.turnPID.calculate( curPosition, rotation.degrees() )
-        self.turnAppliedVolts = min( max( calcPid, -12.0 ), 12.0 )
-        self.turnAppliedVolts = applyDeadband( self.turnAppliedVolts, 12.0 * 0.001, 12.0 ) # 0.1% Deadband on Motor Voltage
+        calcPid = self.turnPID.calculate( self.turnRelativePositionDeg, rotation.degrees() )
+        calcPid = min( max( calcPid, -1.0 ), 1.0 )
+        self.turnAppliedVolts = calcPid * 12.0
         self.turnSim.setInputVoltage( self.turnAppliedVolts )

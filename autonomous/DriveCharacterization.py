@@ -73,7 +73,7 @@ class DriveCharacterization(commands2.Command):
                         self.volts = (self.myTimer.get() - self.startDelay) * self.rampVoltsPerSec * (1.0 if self.forward else -1.0)
                         self.charMOI.set( self.volts )
                 case DriveCharacterization.Stage.kMaxVelocity:
-                    if round(self.lastCspeeds.vx,2) == round(cSpeeds.vx,2) and abs(round(cSpeeds.vx,2)) >= 0.01:
+                    if round(self.lastCspeeds.vx,3) == round(cSpeeds.vx,3) and abs(round(cSpeeds.vx,2)) >= 1.0:
                         self.myStage = DriveCharacterization.Stage.kMaxAngularVelocity
                         self.myTimer.reset()
                         self.volts = 0.0
@@ -83,7 +83,7 @@ class DriveCharacterization(commands2.Command):
                         self.charMaxAccel.set( abs(round(cSpeeds.vx,3)) / (self.myTimer.get() - self.startDelay) )
                         self.lastCspeeds = cSpeeds
                 case DriveCharacterization.Stage.kMaxAngularVelocity:
-                    if cSpeeds.omega != 0.0 and round(cSpeeds.omega,2) == round(self.lastCspeeds.omega,2):
+                    if abs(round(cSpeeds.omega,3)) >= 1.0 and round(cSpeeds.omega,3) == round(self.lastCspeeds.omega,3):
                         self.myStage = DriveCharacterization.Stage.kComplete
                         self.myTimer.reset()
                         self.volts = 0
