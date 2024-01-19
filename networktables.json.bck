@@ -57,5 +57,61 @@
       "persistent": true,
       "retained": true
     }
+  },
+  {
+    "name": "/Config/Launcher/defaultIncrement",
+    "type": "double",
+    "value": 0.05,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/lFlywheelPort",
+    "type": "double",
+    "value": 14.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/rFlywheelPort",
+    "type": "double",
+    "value": 18.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/lFlywheelInverted",
+    "type": "boolean",
+    "value": true,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/defaultSpeed",
+    "type": "double",
+    "value": 0.8,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/maxSpeed",
+    "type": "double",
+    "value": 0.95,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Launcher/minSpeed",
+    "type": "double",
+    "value": 0.1,
+    "properties": {
+      "persistent": true
+    }
   }
 ]
