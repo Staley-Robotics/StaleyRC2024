@@ -46,7 +46,7 @@ class DriveCharacterization(commands2.Command):
         self.lastCspeeds = ChassisSpeeds()
 
     def initialize(self):
-        self.myStage == DriveCharacterization.Stage.kNotStarted
+        self.myStage = DriveCharacterization.Stage.kNotStarted
         self.charEnabled.set(True)
         self.volts = 0.0
         self.lastCspeeds = ChassisSpeeds()

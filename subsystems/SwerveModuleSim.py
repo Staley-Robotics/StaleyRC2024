@@ -42,7 +42,7 @@ class SwerveModuleSim(SwerveModule):
         self.drive_kA = NTTunableFloat( "SwerveModule/Drive/PID/kA", 0, self.updateDrivePIDController ) #0.065
 
         # Create Motors
-        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.025 )
+        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.060 )
         self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
 
         # Set Drive Motor Sensor Data 

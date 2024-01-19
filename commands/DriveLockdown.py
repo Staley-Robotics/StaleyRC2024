@@ -20,13 +20,12 @@ class DriveLockdown(Command):
         self.addRequirements( [self.swerveDrive] )
 
     def execute(self):
-        modules = [
-            SwerveModuleState( 0, Rotation2d(45) ),
-            SwerveModuleState( 0, Rotation2d(135) ),
-            SwerveModuleState( 0, Rotation2d(135) ),
-            SwerveModuleState( 0, Rotation2d(45) )
-        ]
-        self.swerveDrive.runSwerveModuleStates( modules )
+        modStates = []
+        for module in self.swerveDrive.modules:
+            modStates.append(
+                SwerveModuleState( 0, module.getReferencePosition().angle())
+            )
+        self.swerveDrive.runSwerveModuleStates( modStates )
 
     def end(self, interrupted:bool) -> None:
         pass

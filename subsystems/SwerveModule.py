@@ -65,7 +65,7 @@ class SwerveModule:
         self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController )
 
         # Turn Motor PID Values
-        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0.04, self.updateTurnPIDController ) #0.5
+        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0.02, self.updateTurnPIDController ) #0.5
         self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController )
         self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController )
         self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController )

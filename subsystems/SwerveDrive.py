@@ -169,7 +169,7 @@ class SwerveDrive(Subsystem):
         """
         SwerveDrive Simulation Periodic Loop
         """
-        self.gyro.simulationPeriodic( self.getRotationVelocitySetpoint() )
+        self.gyro.simulationPeriodic( self.getRotationVelocity() )
         
 
     def isFieldRelative(self) -> bool:
