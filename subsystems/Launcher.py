@@ -1,9 +1,10 @@
 import wpilib
-import wpimath
+
+import phoenix5
 
 import commands2
 
-from constants import LauncherConsts as LCs
+from util import *
 
 class Launcher(commands2.Subsystem):
     """
@@ -11,31 +12,66 @@ class Launcher(commands2.Subsystem):
     """
     def __init__(self):
         super().__init__()
-        #TODO: find actual motor type to be used
-        self.l_launcher_motor = wpilib.Talon(LCs.lFlywheelPort) #NOTE: arbitrary channel chosen
-        self.l_launcher_motor.setInverted(LCs.lFlywheelInverted) #NOTE: assuming r motor turns clockwise by default
-        self.r_launcher_motor = wpilib.Talon(LCs.rFlywheelPort)
-        self.r_launcher_motor.setInverted(LCs.rFlywheelInverted)
 
+        #---------------CONSTANTS ISH---------------
+        self.defaultIncrement = NTTunableFloat('Launcher/defaultIncrement', 0.05, persistent=True)
+        self.lFlywheelPort = NTTunableInt('Launcher/lFlywheelPort', 14, persistent=True)
+        self.rFlywheelPort = NTTunableInt('Launcher/rFlywheelPort', 18, persistent=True)
+
+        self.lFlywheelInverted = NTTunableBoolean('Launcher/lFlywheelInverted', True, persistent=True)
+        self.rFlywheelInverted = NTTunableBoolean('Launcher/lFlywheelInverted', False, persistent=True)
+
+        self.defaultSpeed = NTTunableFloat('Launcher/defaultSpeed', 0.8, persistent=True)
+        self.maxSpeed = NTTunableFloat('Launcher/maxSpeed', 0.95, persistent=True)
+        self.minSpeed = NTTunableFloat('Launcher/minSpeed', 0.1, persistent=True)
+
+        #-------------MOTORS-------------
+        self.l_launcher_motor = phoenix5.WPI_TalonSRX(self.lFlywheelPort.get())
+        self.l_launcher_motor.setInverted(self.lFlywheelInverted.get())
+        self.r_launcher_motor = phoenix5.WPI_TalonSRX(self.rFlywheelPort.get())
+        self.r_launcher_motor.setInverted(self.rFlywheelInverted.get())
         #self.shooterMotors = wpilib.MotorControllerGroup(self.l_launcher_motor, self.r_launcher_motor)
 
+        #-------------SPEED HANDLING------------
+        self.running = NTTunableBoolean('Launcher/running', False)
+        #stored speed motors will run when activated
+        self.speed = NTTunableFloat('Launcher/stored_speed', self.defaultSpeed.get())
+        #actual motor speed setting
+        self.actual_speed = NTTunableFloat('Launcher/actual_set_speed',self.defaultSpeed.get())
+
+        
+
     def periodic(self) -> None:
-        return super().periodic()
+        self.l_launcher_motor.set(self.actual_speed.get())
+        self.r_launcher_motor.set(self.actual_speed.get())
     
     def simulationPeriodic(self) -> None:
         return super().simulationPeriodic()
     
     def start_launcher(self):
-        """
-        INCOMPLETE
-        currently, sets motor speed to 0.8
-
-        could vary speed based on calculated distance,
-        or just launch it really fast every time, idk
-        """
-        self.l_launcher_motor.set(0.8)
-        self.r_launcher_motor.set(0.8)
+        """changes launcher speed to current stored speed"""
+        self.running.set(True)
+        self.actual_speed.set(self.speed.get())
     
     def stop_launcher(self):
-        self.l_launcher_motor.stopMotor()
-        self.r_launcher_motor.stopMotor()
+        '''changes launcher speed to 0.0'''
+        self.running.set(False)
+        self.actual_speed.set(0.0)
+    
+    def increment_speed(self, amnt=None):
+        """
+        increase stored motor speed by input amount or default value
+        automatically updates actual speed if launcher is running
+        """
+        if amnt is None: amnt = self.defaultIncrement.get()
+        self.speed.set(min(self.speed.get() + amnt, self.maxSpeed.get()))
+        if self.running.get(): self.actual_speed.set(self.speed.get())
+    def decrement_speed(self, amnt=None):
+        """
+        increase stored motor speed by input amount or default value
+        automatically updates actual speed if launcher is running
+        """
+        if amnt is None: amnt = self.defaultIncrement.get()
+        self.speed.set(max(self.speed.get() - amnt, self.minSpeed.get()))
+
+        if self.running.get(): self.actual_speed.set(self.speed.get())

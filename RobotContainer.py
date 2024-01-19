@@ -25,7 +25,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Launcher", self.launcher)
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", commands.RunLauncher(self.launcher) )
+        wpilib.SmartDashboard.putData( "Launcher Running", commands.RunLauncher(self.launcher) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -35,7 +35,11 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+        # B button go brrrr
         self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
+        #change launcher speeds
+        self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
+        self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
 
         # Configure Driver 2 Button Mappings
         '''self.m_driver1 = commands2.button.CommandXboxController(0)
@@ -51,4 +55,3 @@ class RobotContainer:
         :returns: the autonomous command that has been selected from the ShuffleBoard
         """
         return self.m_chooser.getSelected()
-    

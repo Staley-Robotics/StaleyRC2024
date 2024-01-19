@@ -1,6 +1,6 @@
 import commands2
 
-from subsystems import *
+from subsystems import Launcher
 
 class RunLauncher(commands2.Command):
     def __init__(self, launcher: Launcher):
@@ -9,7 +9,7 @@ class RunLauncher(commands2.Command):
 
     def initialize(self):
         self.launcher.start_launcher()
-    
+
     def end(self, interrupted: bool):
         self.launcher.stop_launcher()
     
