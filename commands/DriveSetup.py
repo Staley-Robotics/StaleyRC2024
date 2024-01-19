@@ -6,15 +6,17 @@ from wpilib import RobotState
 
 # Import Subsystems and Commands
 from subsystems import SwerveDrive
-
+from util import *
 # Constants
 
 
 # Toggle: Half Speed
 class ToggleHalfSpeed(InstantCommand):
+    finetuneEnabled = NTTunableBoolean( "/CmdConfig/DriveByStick/Control/FineEnabled", False )
+
     def __init__(self, DriveSubsystem:SwerveDrive) -> None:
         super().__init__(
-            toRun=lambda: DriveSubsystem.halfSpeed.toggle()
+            toRun=lambda: self.finetuneEnabled.set( not self.finetuneEnabled.get() )
         )
 
     def runsWhenDisabled(self) -> bool: return True
@@ -23,16 +25,7 @@ class ToggleHalfSpeed(InstantCommand):
 class ToggleFieldRelative(InstantCommand):
     def __init__(self, DriveSubsystem:SwerveDrive) -> None:
         super().__init__(
-            toRun=lambda: DriveSubsystem.fieldRelative.toggle()
-        )
-    
-    def runsWhenDisabled(self) -> bool: return True
-
-# Toggle: Motion Magic
-class ToggleMotionMagic(InstantCommand):
-    def __init__(self, DriveSubsystem:SwerveDrive) -> None:
-        super().__init__(
-            toRun=lambda: DriveSubsystem.motionMagic.toggle()
+            toRun=lambda: DriveSubsystem.fieldRelative.set( not DriveSubsystem.fieldRelative.get() )
         )
     
     def runsWhenDisabled(self) -> bool: return True
