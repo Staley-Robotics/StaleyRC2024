@@ -83,6 +83,8 @@ class RobotContainer:
         self.m_driver1 = commands2.button.CommandXboxController(0)
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
         self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
+        self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
+        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
