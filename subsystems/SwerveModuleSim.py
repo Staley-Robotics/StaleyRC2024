@@ -137,6 +137,17 @@ class SwerveModuleSim(SwerveModule):
         self.driveSim.setInputVoltage( volts )
         self.driveAppliedVolts = volts
 
+    def setTurnVoltage(self, volts:float = 0.0) -> None:
+        """
+        Set the current turn motor voltage in volts
+        
+        :param volts: motor voltage (range -12.0 -> 12.0)
+        """
+        volts = min( max( volts, -12.0 ), 12.0 )
+        volts = applyDeadband( volts, 0.04 * 12, 12.0 ) # 4% Deadband on Motor Voltage
+        self.turnSim.setInputVoltage( volts )
+        self.turnAppliedVolts = volts
+
     def setDriveVelocity(self, velocity:float = 0.0) -> None:
         """
         Set the current drive velocity in meters per second
@@ -157,7 +168,8 @@ class SwerveModuleSim(SwerveModule):
 
         :param rotation: rotation (Rotation2d)
         """
-        calcPid = self.turnPID.calculate( self.turnRelativePositionDeg, rotation.degrees() )
+        currentDeg = self.turnRelativePositionDeg % 360
+        targetDeg = rotation.degrees()
+        calcPid = self.turnPID.calculate( currentDeg, rotation.degrees() )
         calcPid = min( max( calcPid, -1.0 ), 1.0 )
-        self.turnAppliedVolts = calcPid * 12.0
-        self.turnSim.setInputVoltage( self.turnAppliedVolts )
+        self.setTurnVoltage( calcPid * 12.0 )

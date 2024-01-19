@@ -25,14 +25,15 @@ class DriveToPose(Command):
         self.setName( "DriveToPose" )
 
     def initialize(self):
+        self.swerveDrive.resetHolonomicDriveController()
         self._m_controller = self.swerveDrive.getHolonomicDriveController()
+
 
     def execute(self):
         currentPose = self.swerveDrive.getPose()
         targetPose = self.getTargetPose()
 
-        heading = targetPose.relativeTo( currentPose ).rotation()
-        cSpeeds = self._m_controller.calculate( currentPose, targetPose, 0, heading )
+        cSpeeds = self._m_controller.calculate( currentPose, targetPose, 0, targetPose.rotation() )
         self.swerveDrive.runChassisSpeeds( cSpeeds, False )
 
     def end(self, interrupted:bool) -> None:

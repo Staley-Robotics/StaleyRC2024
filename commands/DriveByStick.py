@@ -43,9 +43,9 @@ class DriveByStick(Command):
         self.ctlFullHolonomic = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Holonomic", 0.8 )
         self.ctlFullRotation = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Rotation", 0.8 )
 
-        self.srlV = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
-        self.srlH = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
-        self.srlR = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
+        # self.srlV = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
+        # self.srlH = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
+        # self.srlR = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
 
         # This Command Global Properties
         self.drive = swerveDrive
@@ -55,21 +55,21 @@ class DriveByStick(Command):
         self.hY = holonomicY
         self.rO = rotate
 
-        # Slew Rate Limiters
-        self.updateSlewRateLimiterVelocity()
-        self.updateSlewRateLimiterHolonomic()
-        self.updateSlewRateLimiterRotation()
+        # # Slew Rate Limiters
+        # self.updateSlewRateLimiterVelocity()
+        # self.updateSlewRateLimiterHolonomic()
+        # self.updateSlewRateLimiterRotation()
 
-    def updateSlewRateLimiterVelocity(self):
-        self.srl_vX = SlewRateLimiter( self.srlV.get() )
-        self.srl_vY = SlewRateLimiter( self.srlV.get() )
+    # def updateSlewRateLimiterVelocity(self):
+    #     self.srl_vX = SlewRateLimiter( self.srlV.get() )
+    #     self.srl_vY = SlewRateLimiter( self.srlV.get() )
 
-    def updateSlewRateLimiterHolonomic(self):
-        self.srl_hX = SlewRateLimiter( self.srlH.get() )
-        self.srl_hY = SlewRateLimiter( self.srlH.get() )
+    # def updateSlewRateLimiterHolonomic(self):
+    #     self.srl_hX = SlewRateLimiter( self.srlH.get() )
+    #     self.srl_hY = SlewRateLimiter( self.srlH.get() )
 
-    def updateSlewRateLimiterRotation(self):
-        self.srl_rO = SlewRateLimiter( self.srlR.get() )
+    # def updateSlewRateLimiterRotation(self):
+    #     self.srl_rO = SlewRateLimiter( self.srlR.get() )
 
     def initialize(self) -> None:
         self.tPid = self.drive.getHolonomicDriveController().getThetaController()
@@ -119,8 +119,8 @@ class DriveByStick(Command):
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
             r = min( max( r, -1.0 ), 1.0 )
-        elif abs(r) > 0.05:
-            self.drive.resetHolonomicDriveController()
+        else:
+            self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
 
         # Send ChassisSpeeds
         self.drive.runPercentageInputs(x, y, r)

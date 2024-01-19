@@ -165,7 +165,7 @@ class SwerveDrive(Subsystem):
         """
         SwerveDrive Simulation Periodic Loop
         """
-        self.gyro.simulationPeriodic( self.getRotationVelocity )
+        self.gyro.simulationPeriodic( self.getRotationVelocitySetpoint )
 
     def isFieldRelative(self) -> bool:
         """
@@ -268,29 +268,41 @@ class SwerveDrive(Subsystem):
         """
         return self.gyro.getRotation2d()
 
-    def getRotationVelocity(self) -> float:
+    def getRotationVelocity(self, fieldRelative:bool = False) -> float:
         """
         Get the Angular Velocity of this SwerveDrive
         
         :returns: float in radians per second
         """
-        return self.getChassisSpeeds().omega
+        return self.getChassisSpeeds(fieldRelative).omega
     
-    def getChassisSpeeds(self) -> ChassisSpeeds:
+    def getRotationVelocitySetpoint(self, fieldRelative:bool = False) -> float:
+        """
+        Get the Angular Velocity of this SwerveDrive's Future Setpoint
+        
+        :returns: float in radians per second
+        """
+        return self.getChassisSpeedsSetpoint(fieldRelative).omega
+
+    def getChassisSpeeds(self, fieldRelative:bool = False) -> ChassisSpeeds:
         """
         Get the Current Chassis Speeds based on the Wheel Measurements
         
         :returns: ChassisSpeeds in meters per second velocity in x and y direction and rotations per
         """
-        return self.getKinematics().toChassisSpeeds( self.getModuleStates() )
+        cSpeeds = self.getKinematics().toChassisSpeeds( self.getModuleStates() )
+        if fieldRelative: cSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds( cSpeeds, self.getRobotAngle() )
+        return cSpeeds
     
-    def getChassisSpeedsSetpoint(self) -> ChassisSpeeds:
+    def getChassisSpeedsSetpoint(self, fieldRelative:bool = False) -> ChassisSpeeds:
         """
         Get the Chassis Speeds based on the Wheel Measurements
         
         :returns: ChassisSpeeds in meters per second velocity in x and y direction and rotations per
         """
-        return self.getKinematics().toChassisSpeeds( self.getModuleSetpoints() )
+        cSpeeds = self.getKinematics().toChassisSpeeds( self.getModuleSetpoints() )
+        if fieldRelative: cSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds( cSpeeds, self.getRobotAngle() )
+        return cSpeeds
 
     def getModuleSetpoints(self) -> typing.Tuple[ SwerveModuleState,
                                                SwerveModuleState,
