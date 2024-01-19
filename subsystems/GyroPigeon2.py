@@ -59,13 +59,12 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
         inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
 
-    def simulationPeriodic(self, velocity:typing.Callable[[],None]) -> None:
+    def simulationPeriodic(self, velocity:float) -> None:
         """
         Run a periodic loop during Simulations
-        :param velocity: A callable method to get the current Velocity in Radians Per Second
+        :param velocity: The current Velocity in Radians Per Second
         """
-        velocRadPerSec = velocity()
-        velocDegPerSec = units.radiansToDegrees( velocRadPerSec )
+        velocDegPerSec = units.radiansToDegrees( velocity )
         velocDegPer20ms = velocDegPerSec * 0.02 # Rio Loop Cycle
         self.getSimCollection().addHeading( velocDegPer20ms )
         newYaw = self.getYaw()
