@@ -133,7 +133,7 @@ class SwerveModuleSim(SwerveModule):
         :param volts: motor voltage (range -12.0 -> 12.0)
         """
         volts = min( max( volts, -12.0 ), 12.0 )
-        volts = applyDeadband( volts, 0.001 * 12, 12.0 ) # 0.1% Deadband on Motor Voltage
+        #volts = applyDeadband( volts, 0.001 * 12, 12.0 ) # 0.1% Deadband on Motor Voltage
         self.driveSim.setInputVoltage( volts )
         self.driveAppliedVolts = volts
 
@@ -144,7 +144,7 @@ class SwerveModuleSim(SwerveModule):
         :param volts: motor voltage (range -12.0 -> 12.0)
         """
         volts = min( max( volts, -12.0 ), 12.0 )
-        volts = applyDeadband( volts, 0.04 * 12, 12.0 ) # 4% Deadband on Motor Voltage
+        #volts = applyDeadband( volts, 0.04 * 12, 12.0 ) # 4% Deadband on Motor Voltage
         self.turnSim.setInputVoltage( volts )
         self.turnAppliedVolts = volts
 
@@ -159,7 +159,7 @@ class SwerveModuleSim(SwerveModule):
         calcFf = self.driveFF.calculate( velocity )
         calc = calcPid + calcFf
         calc = min( max( calc, -1.0), 1.0 )
-        calc = applyDeadband( calc, 0.001 ) # Velocity Error Range:: 0.001 m/s
+        #calc = applyDeadband( calc, 0.001 ) # Velocity Error Range:: 0.001 m/s
         self.setDriveVoltage( calc * 12.0 )
 
     def setTurnPosition(self, rotation:Rotation2d) -> None:
