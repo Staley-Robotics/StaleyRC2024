@@ -2,15 +2,19 @@ import io
 import sys
 import typing
 
-from wpilib import DriverStation
+import wpilib
 from ntcore import NetworkTableInstance
 
 class LoggedConsole:
     def getNewData(self) -> str:
-        raise NotImplementedError
+        return ""
     
     def periodic(self) -> None:
-        raise NotImplementedError
+        data = self.getNewData()
+        if data != "":
+            NetworkTableInstance.getDefault().getTable("Logging").putString(
+                "Console", data
+            )
 
 class LoggedConsoleRIO(LoggedConsole):
     filePath = "/home/lvuser/FRC_UserProgram.log"
@@ -24,8 +28,7 @@ class LoggedConsoleRIO(LoggedConsole):
         try:
             self.reader = io.BufferedReader( io.FileIO(self.filePath, "r") )
         except FileNotFoundError as e:
-            DriverStation.reportError( f"Failed to open console file {self.filePath}", True )
-
+            wpilib.reportError( f"Failed to open console file {self.filePath}", True )
 
     def getNewData(self) -> str:
         if self.reader == None:
@@ -36,7 +39,7 @@ class LoggedConsoleRIO(LoggedConsole):
             try:
                 nextChar = self.reader.read()
             except Exception as e:
-                DriverStation.reportError( f"Failed to read from console file {self.filePath}", True )
+                wpilib.reportError( f"Failed to read from console file {self.filePath}", True )
             
             if nextChar != -1:
                 self.data[self.writePosition] = bytes(nextChar)
@@ -86,13 +89,6 @@ class LoggedConsoleSIM(LoggedConsole):
         self.originalStderr = sys.stderr
         sys.stdout = self.SplitTextIO( self.originalStdout, self.customStdout )
         sys.stderr = self.SplitTextIO( self.originalStderr, self.customStderr )
-
-    def periodic(self) -> None:
-        data = self.getNewData()
-        if data != "":
-            NetworkTableInstance.getDefault().getTable("Logging").putString(
-                "Console", data
-            )
 
     def getNewData(self) -> str:
         fullStdoutStr:str = self.customStdout.getvalue()

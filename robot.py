@@ -14,11 +14,10 @@ class MyRobot(wpilib.TimedRobot):
         # Setup Console Logging
         loggedConsole:LoggedConsole = None
         if wpilib.RobotBase.isReal():
-            #loggedConsole = LoggedConsoleRIO()
-            pass
+            loggedConsole = LoggedConsoleRIO()
         else:
             loggedConsole = LoggedConsoleSIM()
-        #self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
+        self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
 
         # Setup PDP Logging
         loggedPDP:LoggedPDP = LoggedPDP()
