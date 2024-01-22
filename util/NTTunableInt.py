@@ -2,69 +2,94 @@ import typing
 from ntcore import *
 
 class NTTunableInt:
+    """
+    NTTunableInt is a custom class designed to:
+        1. Publish a Int value to NetworkTables (with persistence if requested)
+        2. Store the Int value in memory for faster access
+        3. Creates a NetworkTables listener to provide ad-hoc updates to the in memory copy
+        4. Triggers custom update functions
+    """
+
     table:str = None
     name:str = None
     value:int = 0.0
-    callable:typing.Callable[[],None] = lambda: None
+    updater:typing.Callable[[],None] = lambda: None
     persistent:bool = False
 
     def __init__( self,
                   name:str,
                   value:int,
-                  callable:typing.Callable[[],None] = lambda: None,
+                  updater:typing.Callable[[],None] = lambda: None,
                   persistent:bool = False
                 ) -> None:
         """
+        Initialization
         """
         # Save Global Variables
-        self.name = name
-        self.value = value
-        self.callable = callable
+        if not name.startswith("/"):
+            self.rootTbl = "Config"
+            self.name = name
+        elif len(name) != 1:
+            if len(name.split("/")) == 2:
+                self.rootTbl = "Config"
+                self.name = name.split("/")[1]
+            else:
+                self.rootTbl = name.split("/")[1]
+                self.name = "/".join(name.split("/")[2:])
+        else:
+            raise Exception( f"{self.__class__.__str__()}: Invalid Name" )
+        
+        self.updater = updater
 
         # Get Network Tables
-        ntInst = NetworkTableInstance.getDefault()
-        ntTbl = ntInst.getTable("Tunable")
+        self.ntTbl = NetworkTableInstance.getDefault().getTable(self.rootTbl)
         
-        if ntTbl.setDefaultNumber(self.name, value):
-            self.value = int(value)
-            # Set Persistent Flag if requested
-            if persistent:
-                ntTbl.setPersistent( self.name )
-        else:
-            self.value = int( ntTbl.getNumber( self.name ) )
-
-        # Clear Persistent Flag if requested
+        # Save Value to Network Tables and Memory
+        self.value = int( self.ntTbl.getNumber( self.name, value ) )
+        if not self.ntTbl.putNumber( self.name, self.value ):
+            raise Exception(
+                f"{self.__class__.__str__()}: Network Table Value already exists as different type."
+            )
+        
+        # Properly Configure Persistence
+        if persistent:
+            self.ntTbl.setPersistent( self.name )
         if not persistent:
-            ntTbl.clearPersistent( self.name )
+            self.ntTbl.clearPersistent( self.name )
 
         # Add Listener
-        ntInst.addListener(
-            [f"/Tunable/{self.name}"],
+        NetworkTableInstance.getDefault().addListener(
+            [f"/{self.rootTbl}/{self.name}"],
             EventFlags.kValueAll,
             self.update
         )
 
     def get(self) -> int:
         """
+        Get the current value from memory.
         """
         return int(self.value)
-    
+
+    def set(self, value:int) -> None:
+        """
+        Sets the updated value on the NetworkTable and in memory.
+        """
+        if self.ntTbl.putNumber( self.name, value ):
+            self.value = value
+        else:
+            raise Exception(
+                f"{self.__class__.__str__()}: Network Table Value already exists as different type."
+            )
+
     def update(self, event:Event) -> None:
         """
+        Get the updated value from the NetworkTables Listener.
+        Reverts the value if there is a type error.
         """
-        # Get the updated value from the Event
         try:
             value = int( event.data.value.value() )
-        except Exception as e:
-            pass
-        
-        # Validate Value
-        if type(self.value) is int:
-            # Update Value in Memory and Update Configuration
             self.value = value
-            self.callable()
-        else:
-            # Value is invalid, return value to standard
-            ntTbl = NetworkTableInstance.getDefault().getTable("Tunable")
-            if not ntTbl.putNumber( self.name, self.value ):
-                raise TypeError( f"{self.name} is not of type Int.  Please verify the appropriate NetworkTable Entry Type and try again." )
+            self.updater()
+        except Exception as e:
+            if not self.ntTbl.putNumber( self.name, self.value ):
+                raise Exception( f"{self.__class__.__str__()}: Network Table Value Update Error." )
