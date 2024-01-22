@@ -152,7 +152,7 @@ cython_debug/
 #.idea/
 
 # WPILib Excludes
-networktables.json
+networktables.json*
 simgui-ds.json
 simgui-window.json
 simgui.json
