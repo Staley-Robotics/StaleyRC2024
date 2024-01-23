@@ -142,7 +142,8 @@ class SwerveDrive(Subsystem):
         # Run Modules
         if DriverStation.isDisabled() or self.offline.get():
             self.stop()
-        elif self.isCharacterizing.get():
+
+        if self.isCharacterizing.get():
             for module in self.modules:
                 module.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:

@@ -76,7 +76,9 @@ class RobotContainer:
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
         self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
-        self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
+        self.m_chooser.addOption("3 - Drive Under Stage", AutoUnderStage( self.drivetrain ) )
+        self.m_chooser.addOption("4 - Drive Under Stage (PP)", AutoUnderStagePP( self.drivetrain ) )
+        self.m_chooser.addOption("5 - Autonomous Command", SampleAuto1() )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
         
         # Configure Driver 1 Button Mappings
