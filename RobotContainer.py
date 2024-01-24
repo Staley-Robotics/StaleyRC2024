@@ -153,7 +153,7 @@ class RobotContainer:
             )
 
         # Bind Rumble Triggers to 
-        commands2.Trigger(
+        commands2.button.Trigger(
             lambda: ( DriverStation.isTeleopEnabled() 
                 and DriverStation.getMatchTime() > 0.0 
                 and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )
