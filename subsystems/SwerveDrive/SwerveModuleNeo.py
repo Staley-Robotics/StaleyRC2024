@@ -22,6 +22,7 @@ from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
+from wpimath import units
 
 # Self Made Classes
 from .SwerveModule import SwerveModule
@@ -120,10 +121,10 @@ class SwerveModuleNeo(SwerveModule):
         :param inputs: SwerveModuleInputs objects that need to be updated
         """
         # Drive Motor Data
-        inputs.driveRadPosition = self.driveMotorEncoder.getPosition()
-        inputs.driveRadPerSecVelocity = self.driveMotorEncoder.getVelocity()
         inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
         inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
+        #inputs.driveRadPosition = inputs.driveMtrsPosition / self.wheelRadius.get()
+        #inputs.driveRadPerSecVelocity = inputs.driveMtrsPerSecVelocity / self.wheelRadius.get()
         inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
         inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
@@ -131,21 +132,21 @@ class SwerveModuleNeo(SwerveModule):
         # Turn Motor Data
         inputs.turnCanCoderRelative = self.turnSensor.getPosition()
         inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
-        inputs.turnRadPosition = self.turnMotorEncoder.getPosition()
-        inputs.turnRadPerSecVelocity = self.turnMotorEncoder.getVelocity()
         inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
         inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
+        #inputs.turnRadPosition = units.degreesToRadians( inputs.turnDegPosition )
+        #inputs.turnRadPerSecVelocity = units.degreesToRadians( inputs.turnDegPerSecVelocity )
         inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
 
         self.moduleState = SwerveModuleState(
-            speed=self.driveMotorEncoder.getVelocity(),
-            angle=Rotation2d(0).fromDegrees( self.turnMotorEncoder.getPosition() )
+            speed=inputs.driveMtrsPerSecVelocity,
+            angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
         self.modulePosition =  SwerveModulePosition(
-            distance=self.driveMotorEncoder.getPosition(),
-            angle=Rotation2d(0).fromDegrees( self.turnMotorEncoder.getPosition() )
+            distance=inputs.driveMtrsPosition,
+            angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
 
     def updateDriveEncoderConversions(self):

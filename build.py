@@ -5,7 +5,6 @@ def scandir( dir, recursionText="" ) -> str:
     text = """"""
     
     for e1 in os.scandir( dir ):
-        print(e1.path)
         if e1.is_dir():
             text += scandir( e1, f"{recursionText}.{e1.name}")
         elif e1.name.endswith(".py") and e1.name != "__init__.py":

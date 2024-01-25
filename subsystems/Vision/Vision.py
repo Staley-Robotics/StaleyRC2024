@@ -19,12 +19,13 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 
 # Custom Imports
 from .VisionCamera import VisionCamera
+from util import *
 
-ambiguityThreshold = 0.15
-fieldBorderMargin = 0.5
-fieldLength = 15.98
-fieldWidth = 8.21
-zMargin = 0.75
+# ambiguityThreshold = 0.15
+# fieldBorderMargin = 0.5
+# fieldLength = 15.98
+# fieldWidth = 8.21
+# zMargin = 0.75
 
 class Vision(Subsystem):
     """
@@ -33,10 +34,12 @@ class Vision(Subsystem):
 
     def __init__( self,
                   cameras:typing.Tuple[VisionCamera], 
-                  odometryFunction:typing.Callable[[], SwerveDrive4PoseEstimator]):
+                  odometryFunction:typing.Callable[[int], SwerveDrive4PoseEstimator]):
         """
         Initialization
         """
+        self.offline = NTTunableBoolean( "/OfflineOverride/Vision", False )
+
         # Camera Configuration
         self.cameras:typing.Tuple[VisionCamera] = cameras
         self.cameraInputs:typing.Tuple[VisionCamera.VisionCameraInputs] = []
@@ -57,55 +60,41 @@ class Vision(Subsystem):
         for x in range(len(self.cameras)):
             self.ntCameraInputs.append( ntInst.getStructTopic( f"/Vision/{self.cameras[x].name}", VisionCamera.VisionCameraInputs ).publish() )
 
-        self.ntCameraOutputs:typing.Tuple[typing.Dict[str,StructPublisher]] = []
-        for x in range(len(self.cameras)):
-            self.ntCameraOutputs.append(
-                {
-                    "HasTargets": ntInst.getBooleanTopic( f"/Logging/Vision/{self.cameras[x].name}/HasTargets" ).publish(),
-                    "LatencySecs": ntInst.getFloatTopic(  f"/Logging/Vision/{self.cameras[x].name}/LatencySecs" ).publish(),
-                    "BlueRobotPose2d": ntInst.getStructTopic( f"/Logging/Vision/{self.cameras[x].name}/BlueRobotPose2d", Pose2d ).publish(),
-                    "BlueRobotPose3d": ntInst.getStructTopic( f"/Logging/Vision/{self.cameras[x].name}/BlueRobotPose3d", Pose3d ).publish(),
-                    "RedRobotPose2d": ntInst.getStructTopic( f"/Logging/Vision/{self.cameras[x].name}/RedRobotPose2d", Pose2d ).publish(),
-                    "RedRobotPose3d": ntInst.getStructTopic( f"/Logging/Vision/{self.cameras[x].name}/RedRobotPose3d", Pose3d ).publish(),
-                    "TagPoses":    ntInst.getStructArrayTopic( f"/Logging/Vision/{self.cameras[x].name}/TagPoses", Pose3d ).publish()
-                }
-            )
-
     def periodic(self):
         """
         Periodic Loop
         """
+        # Override for Turning Vision on and Off
+        if self.offline.get(): return
+
         for x in range(len(self.cameras)):
             # Logging Inputs
             self.cameras[x].updateInputs( self.cameraInputs[x] )
             self.ntCameraInputs[x].set( self.cameraInputs[x] )
+           
+            # Fuse Data with Odometry
+            if DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self.cameraInputs[x].blueHasData:
+                self.getOdometry(0).addVisionMeasurement(
+                    self.cameraInputs[x].blueRobotPose2d,
+                    Timer.getFPGATimestamp() - self.cameraInputs[x].blueLatencySecs
+                )
+            elif DriverStation.getAlliance() == DriverStation.Alliance.kRed and self.cameraInputs[x].redHasData:
+                self.getOdometry(0).addVisionMeasurement(
+                    self.cameraInputs[x].redRobotPose2d,
+                    Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
+                )
 
-            # Run VisionCamera objects
-            self.cameras[x].run()
-            
-            # Loging Outputs
-            if self.cameras[x].hasData:
-                self.ntCameraOutputs[x]["HasTargets"].set( True )
-                self.ntCameraOutputs[x]["LatencySecs"].set( value=self.cameras[x].latencySecs )
-                self.ntCameraOutputs[x]["BlueRobotPose2d"].set( value=self.cameras[x].blueRobotPose2d )
-                self.ntCameraOutputs[x]["BlueRobotPose3d"].set( value=self.cameras[x].blueRobotPose3d )
-                self.ntCameraOutputs[x]["RedRobotPose2d"].set( value=self.cameras[x].redRobotPose2d )
-                self.ntCameraOutputs[x]["RedRobotPose3d"].set( value=self.cameras[x].redRobotPose3d )
-                #self.ntCameraOutputs[x]["TagPoses"].set( value=[] )
-                
-                # Fuse Data with Odometry
-                if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
-                    self.getOdometry().addVisionMeasurement(
-                        self.cameras[x].blueRobotPose2d,
-                        Timer.getFPGATimestamp() - self.cameras[x].latencySecs
-                    )
-                elif DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-                    self.getOdometry().addVisionMeasurement(
-                        self.cameras[x].redRobotPose2d,
-                        Timer.getFPGATimestamp() - self.cameras[x].latencySecs
-                    )
-            else:
-                self.ntCameraOutputs[x]["HasTargets"].set( False )
+            # Fuse Data with Odometry Test
+            if DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self.cameraInputs[x].blueHasData:
+                self.getOdometry(1).addVisionMeasurement(
+                    self.cameraInputs[x].blueRobotPose2d,
+                    Timer.getFPGATimestamp() - self.cameraInputs[x].blueLatencySecs
+                )
+            elif DriverStation.getAlliance() == DriverStation.Alliance.kRed and self.cameraInputs[x].redHasData:
+                self.getOdometry(1).addVisionMeasurement(
+                    self.cameraInputs[x].redRobotPose2d,
+                    Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
+                )
 
 
             
