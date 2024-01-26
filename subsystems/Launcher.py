@@ -1,7 +1,7 @@
 import wpilib
 
-import phoenix5
-import rev
+import wpiutil.wpistruct
+import dataclasses
 
 import commands2
 
@@ -11,29 +11,28 @@ class Launcher(commands2.Subsystem):
     """
     Subsystem to handle double flywheel note launcher
     """
+
+    @wpiutil.wpistruct.make_wpistruct(name='LauncherInputs')
+    @dataclasses.dataclass
+    class LauncherInputs:
+        '''
+        A WPIStruct object containing all Launcher data
+        This is meant to simplify logging of contained data
+        '''
+        lMotorVelocity:float = 0
+        rMotorVelocity:float = 0
+
     def __init__(self):
         super().__init__()
 
         #---------------CONSTANTS ISH---------------
-        self.defaultIncrement = NTTunableFloat('Launcher/defaultIncrement', 0.05, persistent=True)
-        self.lFlywheelPort = NTTunableInt('Launcher/lFlywheelPort', 14, persistent=True)
-        self.rFlywheelPort = NTTunableInt('Launcher/rFlywheelPort', 18, persistent=True)
-
         self.lFlywheelInverted = NTTunableBoolean('Launcher/lFlywheelInverted', True, persistent=False, updater=lambda : self.l_launcher_motor.setInverted(self.lFlywheelInverted.get()))
         self.rFlywheelInverted = NTTunableBoolean('Launcher/rFlywheelInverted', False, persistent=False, updater=lambda : self.r_launcher_motor.setInverted(self.rFlywheelInverted.get()))
 
         self.defaultSpeed = NTTunableFloat('Launcher/defaultSpeed', 0.8, persistent=True)
         self.maxSpeed = NTTunableFloat('Launcher/maxSpeed', 0.95, persistent=True)
         self.minSpeed = NTTunableFloat('Launcher/minSpeed', 0.1, persistent=True)
-
-        #-------------MOTORS-------------
-        #self.l_launcher_motor = phoenix5.WPI_TalonSRX(self.lFlywheelPort.get())
-        self.l_launcher_motor = rev.CANSparkMax(self.lFlywheelPort.get(), rev.CANSparkMax.MotorType.kBrushless)
-        self.l_launcher_motor.setInverted(self.lFlywheelInverted.get())
-        #self.r_launcher_motor = phoenix5.WPI_TalonSRX(self.rFlywheelPort.get())
-        self.r_launcher_motor = rev.CANSparkMax(self.rFlywheelPort.get(), rev.CANSparkMax.MotorType.kBrushless)
-        self.r_launcher_motor.setInverted(self.rFlywheelInverted.get())
-        #self.shooterMotors = wpilib.MotorControllerGroup(self.l_launcher_motor, self.r_launcher_motor)
+        self.defaultIncrement = NTTunableFloat('Launcher/defaultIncrement', 0.05, persistent=True)
 
         #-------------SPEED HANDLING------------
         self.is_running = NTTunableBoolean('Launcher/is_running', False)
@@ -42,11 +41,11 @@ class Launcher(commands2.Subsystem):
         #actual motor speed setting
         self.actual_speed = NTTunableFloat('Launcher/actual_set_speed',0.0)
 
-        
-
     def periodic(self) -> None:
-        self.l_launcher_motor.set(self.actual_speed.get())
-        self.r_launcher_motor.set(self.actual_speed.get())
+        """
+        set motor speeds to actual_speed value and do any necessary updates
+        """
+        pass
     
     def simulationPeriodic(self) -> None:
         return super().simulationPeriodic()
@@ -68,6 +67,7 @@ class Launcher(commands2.Subsystem):
         """
         if amnt is None: amnt = self.defaultIncrement.get()
         self.speed.set(min(self.speed.get() + amnt, self.maxSpeed.get()))
+
         if self.is_running.get(): self.actual_speed.set(self.speed.get())
     def decrement_speed(self, amnt=None):
         """

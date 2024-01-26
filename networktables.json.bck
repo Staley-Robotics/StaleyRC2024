@@ -1,21 +1,5 @@
 [
   {
-    "name": "/Config/Constants/Launcher/lFlywheelPort",
-    "type": "double",
-    "value": 14.0,
-    "properties": {
-      "persistent": true
-    }
-  },
-  {
-    "name": "/Config/Constants/Launcher/rFlywheelPort",
-    "type": "double",
-    "value": 18.0,
-    "properties": {
-      "persistent": true
-    }
-  },
-  {
     "name": "/Config/Constants/Launcher/lFlywheelInverted",
     "type": "boolean",
     "value": true,
@@ -83,14 +67,6 @@
     }
   },
   {
-    "name": "/Config/Launcher/lFlywheelInverted",
-    "type": "boolean",
-    "value": true,
-    "properties": {
-      "persistent": true
-    }
-  },
-  {
     "name": "/Config/Launcher/defaultSpeed",
     "type": "double",
     "value": 0.8,
@@ -109,9 +85,10 @@
   {
     "name": "/Config/Launcher/minSpeed",
     "type": "double",
-    "value": 0.1,
+    "value": -0.0,
     "properties": {
-      "persistent": true
+      "persistent": true,
+      "retained": true
     }
   }
 ]

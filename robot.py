@@ -21,8 +21,8 @@ class MyRobot(wpilib.TimedRobot):
         #self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
 
         # Setup PDP Logging
-        loggedPDP:LoggedPDP = LoggedPDP()
-        self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
+        #loggedPDP:LoggedPDP = LoggedPDP()
+        #self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
     
     def robotInit(self):
         # Start Logging using the built in DataLogManager
@@ -44,15 +44,17 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.setCurrentThreadPriority(True, 10)
 
     def autonomousInit(self):
-        self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
+        pass
+        '''self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
 
         if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.schedule()
+            self.m_autonomousCommand.schedule()'''
 
     def autonomousPeriodic(self): pass
     def autonomousExit(self):
-        if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.cancel()
+        pass
+        '''if self.m_autonomousCommand != None:
+            self.m_autonomousCommand.cancel()'''
 
     def teleopInit(self): pass
     def teleopPeriodic(self): pass
