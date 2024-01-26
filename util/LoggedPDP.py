@@ -11,7 +11,15 @@ class LoggedPDP:
         """
         Initialization
         """
-        self.pdp: PowerDistribution = PowerDistribution()
+        self.pdp: PowerDistribution = None
+        try:
+            self.pdp = PowerDistribution( 0, PowerDistribution.ModuleType.kCTRE )
+            self.pdp.getVersion()
+        except:
+            self.pdp = PowerDistribution( 1, PowerDistribution.ModuleType.kRev )
+        
+        tbl = NetworkTableInstance.getDefault().getTable("PowerDistribution")
+        tbl.putString( "Model", self.pdp.getType().name )
         self.pdp.resetTotalEnergy()
 
     def periodic(self):
@@ -21,6 +29,7 @@ class LoggedPDP:
         channelCount = 16 if self.pdp.getType() == PowerDistribution.ModuleType.kCTRE else 24
 
         tbl = NetworkTableInstance.getDefault().getTable("PowerDistribution")
+        tbl.putNumber( "Model", self.pdp.getType() )
         tbl.putNumber( "ChannelCount", channelCount )
         tbl.putNumber( "Temperature" , self.pdp.getTemperature() )
         tbl.putNumber( "TotalCurrent", self.pdp.getTotalCurrent() )

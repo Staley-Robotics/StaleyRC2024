@@ -14,7 +14,6 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    phoenix6:bool = False
     testing:bool = False
 
     def __init__(self):
@@ -40,14 +39,6 @@ class RobotContainer:
                 SwerveModuleSim("BR", -0.25, -0.25 ) 
             ]
             gyro = GyroPigeon2( 10, "rio", 0 )
-        elif self.phoenix6:
-            modules = [
-                SwerveModuleNeoPhx6("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleNeoPhx6("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleNeoPhx6("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleNeoPhx6("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
-            ]
-            gyro = GyroPigeon2Phx6( 10, "rio", 0 )
         else:
             modules = [
                 SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
@@ -71,12 +62,16 @@ class RobotContainer:
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
+        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ) )
+        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
         self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
-        self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
+        self.m_chooser.addOption("3 - Drive Under Stage", AutoUnderStage( self.drivetrain ) )
+        self.m_chooser.addOption("4 - Drive Under Stage (PP)", AutoUnderStagePP( self.drivetrain ) )
+        self.m_chooser.addOption("5 - Autonomous Command", SampleAuto1() )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
         
         # Configure Driver 1 Button Mappings
@@ -151,7 +146,7 @@ class RobotContainer:
             )
 
         # Bind Rumble Triggers to 
-        commands2.Trigger(
+        commands2.button.Trigger(
             lambda: ( DriverStation.isTeleopEnabled() 
                 and DriverStation.getMatchTime() > 0.0 
                 and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )

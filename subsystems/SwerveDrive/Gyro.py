@@ -62,3 +62,6 @@ class Gyro:
         :returns: The current heading of the robot as a frc#Rotation2d
         """
         return Rotation2d()
+    
+    def setYaw(self, angleDeg: float, timeoutMs: int = 0) -> int:
+        return 0

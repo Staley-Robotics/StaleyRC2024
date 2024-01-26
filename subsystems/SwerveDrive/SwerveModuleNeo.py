@@ -5,7 +5,7 @@ Date:  2024-01-09
 
 Drive Motor Controllers:  REV NEO 
 Turn Motor Controllers:  REV NEO
-Turn Sensors:  CAN CODERS (Phoenix6 API)
+Turn Sensors:  CAN CODERS
 
 Velocity: Closed Loop (SparkMAX Integrated)
 Turn:  Closed Loop (SparkMAX Integrated)
@@ -16,32 +16,29 @@ Turn:  Closed Loop (SparkMAX Integrated)
 import math
 
 # FRC Component Imports
-#from ctre.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
-from phoenix6 import StatusCode
-from phoenix6.configs import CANcoderConfiguration, cancoder_configs
-from phoenix6.hardware import CANcoder
+from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
 from rev import * #CANSparkMax, SparkMaxPIDController, SparkMaxAlternateEncoder, SparkMaxAbsoluteEncoder, AbsoluteEncoder, RelativeEncoder
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
-from wpimath import units
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
+from wpimath import units
 
 # Self Made Classes
 from .SwerveModule import SwerveModule
 from util import *
 
 # Class: SwerveModule
-class SwerveModuleNeoPhx6(SwerveModule):
+class SwerveModuleNeo(SwerveModule):
     """
-    Custom SwerveModuleNeoPhx6 using NEO drive and turn motors on a live robot.
+    Custom SwerveModuleNeo using NEO drive and turn motors on a live robot.
 
-    CTRE CANCoders on Phoenix6 Firmware are used for Absolute position on the turn motor.
+    CTRE CANCoders are used for Absolute position on the turn motor.
     """
 
     driveMotor:CANSparkMax = None
     turnMotor:CANSparkMax = None
-    turnSensor:CANcoder = None
+    turnSensor:WPI_CANCoder = None
 
     referencePosition:Translation2d = None
     moduleState:SwerveModuleState = None
@@ -51,10 +48,11 @@ class SwerveModuleNeoPhx6(SwerveModule):
         Initialization
         """
         ### Module Name
+        super().__init__()
         self.name = subsystemName
 
         ### Tunable Variables
-        # Drive Motor PID Values
+        # Physical Neo Specific Drive Motor PID Values
         self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
         self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
         self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
@@ -66,14 +64,13 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
         self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
-        ### Turn Sensor (Phoenix6)
-        cfg = CANcoderConfiguration()
-        cfg.magnet_sensor.absolute_sensor_range = cancoder_configs.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
-        cfg.magnet_sensor.sensor_direction = cancoder_configs.SensorDirectionValue.COUNTER_CLOCKWISE_POSITIVE 
-        self.turnSensor = CANcoder( sensorId, "rio" )
-        self.turnSensor.configurator.apply(cfg)
-        if not RobotBase.isSimulation():
-            self.turnSensor.set_position( self.turnSensor.get_absolute_position().value_as_double - units.degreesToRotations(turnOffset) )
+        ### Turn Sensor
+        self.turnSensor = WPI_CANCoder( sensorId ) #, "canivore1")
+        self.turnSensor.configFactoryDefault()
+        self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
+        self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
+        self.turnSensor.configSensorDirection(False)
+        if not RobotBase.isSimulation(): self.turnSensor.setPosition(self.turnSensor.getAbsolutePosition() - turnOffset)
 
         ### Turn Motor
         self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )    
@@ -91,6 +88,7 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.turnMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
         self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
         self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
+        #self.turnMotorPid.setOutputRange( -0.15, 0.15 )
         self.updateTurnPIDController()     
 
         # Save Turn Motor Config
@@ -114,7 +112,7 @@ class SwerveModuleNeoPhx6(SwerveModule):
         self.driveMotor.burnFlash()
 
         ### Swerve Module Information
-        self.setReferencePosition( posX, posY )
+        self.referencePosition = Translation2d( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
     def updateInputs(self, inputs:SwerveModule.SwerveModuleInputs):
@@ -123,32 +121,32 @@ class SwerveModuleNeoPhx6(SwerveModule):
         :param inputs: SwerveModuleInputs objects that need to be updated
         """
         # Drive Motor Data
-        inputs.driveRadPosition = self.driveMotorEncoder.getPosition()
-        inputs.driveRadPerSecVelocity = self.driveMotorEncoder.getVelocity()
         inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
         inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
+        #inputs.driveRadPosition = inputs.driveMtrsPosition / self.wheelRadius.get()
+        #inputs.driveRadPerSecVelocity = inputs.driveMtrsPerSecVelocity / self.wheelRadius.get()
         inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
         inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
 
         # Turn Motor Data
-        inputs.turnCanCoderRelative = units.rotationsToDegrees( self.turnSensor.get_position().value_as_double )
-        inputs.turnCanCoderAbsolute = units.rotationsToDegrees( self.turnSensor.get_absolute_position().value_as_double )
-        inputs.turnRadPosition = self.turnMotorEncoder.getPosition()
-        inputs.turnRadPerSecVelocity = self.turnMotorEncoder.getVelocity()
+        inputs.turnCanCoderRelative = self.turnSensor.getPosition()
+        inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
         inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
         inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
+        #inputs.turnRadPosition = units.degreesToRadians( inputs.turnDegPosition )
+        #inputs.turnRadPerSecVelocity = units.degreesToRadians( inputs.turnDegPerSecVelocity )
         inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
 
-        self.modulePosition = SwerveModulePosition(
-            distance=self.driveMotorEncoder.getPosition(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
-        )
         self.moduleState = SwerveModuleState(
-            speed=self.driveMotorEncoder.getVelocity(),
-            angle=Rotation2d( self.turnMotorEncoder.getPosition() )
+            speed=inputs.driveMtrsPerSecVelocity,
+            angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
+        )
+        self.modulePosition =  SwerveModulePosition(
+            distance=inputs.driveMtrsPosition,
+            angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
 
     def updateDriveEncoderConversions(self):
@@ -167,7 +165,7 @@ class SwerveModuleNeoPhx6(SwerveModule):
         turnToDegrees = self.turnGearRatio.get() * 360
         self.turnMotorEncoder.setPositionConversionFactor( turnToDegrees ) # Radians
         self.turnMotorEncoder.setVelocityConversionFactor( turnToDegrees / 60 ) # Radians per Second
-        self.turnMotorEncoder.setPosition( units.rotationsToDegrees( self.turnSensor.get_position().value_as_double ) )
+        self.turnMotorEncoder.setPosition( self.turnSensor.getPosition() )
 
     def updateDrivePIDController(self):
         """
@@ -216,8 +214,8 @@ class SwerveModuleNeoPhx6(SwerveModule):
         :param volts: motor voltage (range -12.0 -> 12.0)
         """
         self.driveMotor.setVoltage( volts )
-        
-    def setDriveVelocity(self, velocity:float = 0.0) -> None:
+
+    def setDriveVelocity(self, velocity: float = 0) -> None:
         """
         Set the current drive velocity in meters per second
 
@@ -227,12 +225,12 @@ class SwerveModuleNeoPhx6(SwerveModule):
         velocMode = CANSparkMax.ControlType.kVelocity #if not self.driveSmart.get() else CANSparkMax.ControlType.kSmartVelocity
         self.driveMotorPid.setReference( velocity, velocMode, self.drive_kSlotIdx.get() )
 
-    def setTurnPosition(self, rotation:Rotation2d) -> None:
+    def setTurnPosition(self, rotation:Rotation2d = Rotation2d) -> None:
         """
         Set the current Turning Motor position based on Rotation
 
         :param rotation: rotation (Rotation2d)
         """
-        # Set Turn
+        # Set Angle
         turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
         self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )

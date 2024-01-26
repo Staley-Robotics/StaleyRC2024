@@ -99,7 +99,19 @@ class SwerveDrive(Subsystem):
             self.getKinematics(),
             self.gyro.getRotation2d(),
             self.getModulePositions(),
-            Pose2d(Translation2d(0,0), Rotation2d())
+            Pose2d(Translation2d(0,0), Rotation2d(0))
+        )
+        self.odometry2 = SwerveDrive4PoseEstimator(
+            self.getKinematics(),
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            Pose2d(Translation2d(0,0), Rotation2d(0))
+        )
+        self.odometryWheelsOnly = SwerveDrive4PoseEstimator(
+            self.getKinematics(),
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            Pose2d(Translation2d(0,0), Rotation2d(0))
         )
 
         # PID Controllers for Drive Motion
@@ -120,6 +132,8 @@ class SwerveDrive(Subsystem):
         self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModule.SwerveModuleInputs ).publish()
 
         self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
+        self.ntRobotPose2dNoTime = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/RobotUpdateNoTime", Pose2d ).publish()
+        self.ntRobotPose2dWheels = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/RobotWheelsOnly", Pose2d ).publish()
         self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Robot/Current", ChassisSpeeds ).publish()
         self.ntChassisSpeedsNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Robot/Next", ChassisSpeeds ).publish()
         self.ntChassisSpeedsFieldCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Field/Current", ChassisSpeeds ).publish()
@@ -142,7 +156,8 @@ class SwerveDrive(Subsystem):
         # Run Modules
         if DriverStation.isDisabled() or self.offline.get():
             self.stop()
-        elif self.isCharacterizing.get():
+
+        if self.isCharacterizing.get():
             for module in self.modules:
                 module.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:
@@ -150,14 +165,24 @@ class SwerveDrive(Subsystem):
                 module.run()
 
         # Odometry from Module Position Data
-        pose = self.getOdometry().updateWithTime(
+        pose = self.odometry.updateWithTime(
             Timer.getFPGATimestamp(),
+            self.gyro.getRotation2d(),
+            self.getModulePositions()
+        )
+        pose2 = self.odometry2.update(
+            self.gyro.getRotation2d(),
+            self.getModulePositions()
+        )
+        pose3 = self.odometryWheelsOnly.update(
             self.gyro.getRotation2d(),
             self.getModulePositions()
         )
 
         # Logging: RobotPose, ChassisSpeeds, SwerveModuleStates Speeds
         self.ntRobotPose2d.set( pose )
+        self.ntRobotPose2dNoTime.set( pose2 )
+        self.ntRobotPose2dWheels.set( pose3 )
         self.ntChassisSpeedsCurrent.set( self.getChassisSpeeds() )
         self.ntChassisSpeedsFieldCurrent.set( self.getChassisSpeeds(True) )
         self.ntSwerveModuleStatesCurrent.set( self.getModuleStates() )
@@ -171,7 +196,6 @@ class SwerveDrive(Subsystem):
         """
         self.gyro.simulationPeriodic( self.getRotationVelocity() )
         
-
     def isFieldRelative(self) -> bool:
         """
         Get the Field Relative Drive State of this SwerveDrive
@@ -179,6 +203,20 @@ class SwerveDrive(Subsystem):
         :returns: boolean
         """
         return self.fieldRelative.get()
+
+    def syncGyro(self) -> None:
+        pose = self.getPose()
+        self.gyro.setYaw( pose.rotation().degrees() )
+
+    def resetOdometry(self) -> None:
+        pose = Pose2d( Translation2d(0, 0), Rotation2d(0) )
+        self.gyro.setYaw( 0 )
+        self.odometry.resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            pose
+        )
+        pass
 
     def getKinematics(self) -> SwerveDrive4Kinematics:
         """
@@ -188,12 +226,19 @@ class SwerveDrive(Subsystem):
         """
         return self.kinematics
        
-    def getOdometry(self) -> SwerveDrive4PoseEstimator:
+    def getOdometry(self, version = 0) -> SwerveDrive4PoseEstimator:
         """
         Get The Current Odometry (fused with Vision Data) of this SwerveDrive
 
         :returns: SwerveDrive4PoseEstimator
         """
+        match version:
+            case 0:
+                return self.odometry
+            case 1:
+                return self.odometry2
+            case 2:
+                return self.odometryWheelsOnly
         return self.odometry
 
     def updateHolonomicDriveController(self) -> None:
