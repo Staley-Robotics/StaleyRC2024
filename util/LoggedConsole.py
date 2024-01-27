@@ -32,7 +32,7 @@ class LoggedConsoleRIO(LoggedConsole):
 
     def getNewData(self) -> str:
         if self.reader == None:
-            return
+            return ""
         
         while True:
             nextChar:int = -1

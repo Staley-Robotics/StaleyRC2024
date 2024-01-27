@@ -20,8 +20,8 @@ class MyRobot(wpilib.TimedRobot):
         # self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
 
         # Setup PDP Logging
-        loggedPDP:LoggedPDP = LoggedPDP()
-        self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
+        #loggedPDP:LoggedPDP = LoggedPDP()
+        #self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
     
     def robotInit(self):
         # Start Logging using the built in DataLogManager

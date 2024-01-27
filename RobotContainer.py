@@ -62,8 +62,8 @@ class RobotContainer:
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
-        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ) )
-        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ) )
+        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
