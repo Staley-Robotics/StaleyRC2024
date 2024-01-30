@@ -32,7 +32,7 @@ class RobotContainer:
         self.subsystem = SampleSubsystem()
         self.mech = Mechanism2D()
 
-        # DriveTrain
+        """# DriveTrain
         modules = []
         gyro = None
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -67,29 +67,34 @@ class RobotContainer:
             VisionCameraLimelight( "limelight-two" )
         ]
         self.vision = Vision( cameras, self.drivetrain.getOdometry )
+        """
+        
         
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
 
-        # wpilib.SmartDashboard.putData("Mechanism2D", self.mech)
-
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
 
+        """
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
         self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
         self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
+        """
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+
+        '''
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
         self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
+        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) )
+        ''' 
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
@@ -99,6 +104,7 @@ class RobotContainer:
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
         self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
 
+        '''
         # Configure Default Commands
         self.drivetrain.setDefaultCommand(
             commands.DriveByStick(
@@ -120,6 +126,7 @@ class RobotContainer:
         :returns: the autonomous command that has been selected from the ShuffleBoard
         """
         return self.m_chooser.getSelected()
+    '''
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

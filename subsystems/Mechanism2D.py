@@ -20,17 +20,15 @@ class Mechanism2D():
         
         self.elevatorEncoder = wpilib.Encoder(1, 2, True, wpilib.Encoder.EncodingType.k1X)
 
-        self.mechSize = 3, 3
-
         # the main mechanism object
-        self.mech = wpilib.Mechanism2d(self.mechSize)
+        self.mech = wpilib.Mechanism2d(3, 3)
         # a mechanism root node
         self.root = self.mech.getRoot("arm", 2, 0)
 
         # MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
         # off the root node or another ligament object
         self.elevator = self.root.appendLigament(
-            "elevator", self.kElevatorMinimumLength.get(), 90
+            "elevator", self.kElevatorMinimumLength.get(), 90, color=wpilib.Color8Bit(wpilib.Color.kOrange)
         )
         self.wrist = self.elevator.appendLigament(
             "wrist", 0.5, 90, 6, wpilib.Color8Bit(wpilib.Color.kPurple)
