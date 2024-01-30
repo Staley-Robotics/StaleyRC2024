@@ -88,6 +88,7 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+        self.m_driver1.x().onTrue(self.mech.increaseElevatorHeight())
 
         '''
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )

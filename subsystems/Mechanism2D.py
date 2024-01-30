@@ -20,6 +20,10 @@ class Mechanism2D():
         
         self.elevatorEncoder = wpilib.Encoder(1, 2, True, wpilib.Encoder.EncodingType.k1X)
 
+        # Tunables-unables
+
+
+
         # the main mechanism object
         self.mech = wpilib.Mechanism2d(3, 3)
         # a mechanism root node
@@ -44,3 +48,7 @@ class Mechanism2D():
             self.kElevatorMinimumLength + self.elevatorEncoder.getDistance()
         )
         self.wrist.setAngle(self.wrist.getAngle())
+
+    def increaseElevatorHeight(self):
+        """Increases the minimun height of the elevator"""
+        self.kElevatorMinimumLength.set(self.kElevatorMinimumLength.get() + .1)
