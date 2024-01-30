@@ -21,6 +21,21 @@ class IntakeMidPosition(commands2.Command):
         pass
         
 
-class SampleCommand2(commands2.Command):
-    def __init__(self):
+class IntakeEject(commands2.Command):
+    def __init__(self, intake: Intake):
         super().__init__()
+        self.intake = intake
+        self.addRequirements(intake)
+        self.setName("IntakeEject")
+
+    def execute(self):
+        if self.intake.getBackIR() or self.intake.getFrontIR():
+            self.intake.setTargetVel(-1)
+    
+    def isFinished(self):
+        return not self.intake.getFrontIR() or self.intake.getBackIR()
+
+    def end(self, interrupted:bool):
+        pass
+
+
