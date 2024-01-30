@@ -10,6 +10,8 @@ from sequences import *
 from autonomous import *
 from util import *
 
+# from subsystems import Mechanism2D
+
 class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
@@ -28,7 +30,8 @@ class RobotContainer:
 
         # Create Subsystems
         self.subsystem = SampleSubsystem()
-        
+        self.mech = Mechanism2D()
+
         # DriveTrain
         modules = []
         gyro = None
@@ -69,6 +72,8 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
 
+        # wpilib.SmartDashboard.putData("Mechanism2D", self.mech)
+
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
 
@@ -105,6 +110,10 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
+
+        #Make mechanism
+        mechanism = wpilib.Mechanism2d(3, 3)
+
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

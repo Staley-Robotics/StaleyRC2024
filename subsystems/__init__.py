@@ -10,3 +10,4 @@ from .SwerveModuleSim import *
 from .Vision import *
 from .VisionCamera import *
 from .VisionCameraLimelight import *
+from .Mechanism2D import *
