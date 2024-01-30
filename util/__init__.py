@@ -1,3 +1,4 @@
+from .LoggedCAN import *
 from .LoggedConsole import *
 from .LoggedPDP import *
 from .NTTunableBoolean import *

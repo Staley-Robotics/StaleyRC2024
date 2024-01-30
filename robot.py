@@ -6,6 +6,7 @@ import ntcore
 import RobotContainer
 from util.LoggedPDP import *
 from util.LoggedConsole import *
+from util.LoggedCAN import *
 
 class MyRobot(wpilib.TimedRobot):
     def __init__(self):
@@ -22,6 +23,10 @@ class MyRobot(wpilib.TimedRobot):
         # Setup PDP Logging
         #loggedPDP:LoggedPDP = LoggedPDP()
         #self.addPeriodic( loggedPDP.periodic, 0.02, 0 )
+
+        # Setup CAN Logging
+        loggedCAN:LoggedCAN = LoggedCAN()
+        self.addPeriodic( loggedCAN.periodic, 0.02, 0 )
     
     def robotInit(self):
         # Start Logging using the built in DataLogManager
