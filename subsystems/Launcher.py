@@ -12,15 +12,23 @@ class Launcher(commands2.Subsystem):
     Subsystem to handle double flywheel note launcher
     """
 
-    @wpiutil.wpistruct.make_wpistruct(name='LauncherInputs')
+    @wpiutil.wpistruct.make_wpistruct(name='launcherinputs')
     @dataclasses.dataclass
     class LauncherInputs:
         '''
         A WPIStruct object containing all Launcher data
         This is meant to simplify logging of contained data
         '''
-        lMotorVelocity:float = 0
-        rMotorVelocity:float = 0
+        #left motor
+        lMotorAppliedVolts: float = 0
+        lMotorurrentAmps: float = 0
+        lMotorTempCelcius: float = 0
+
+        #right motor
+        rMotorAppliedVolts: float = 0
+        rMotorurrentAmps: float = 0
+        rMotorTempCelcius: float = 0
+        
 
     def __init__(self):
         super().__init__()

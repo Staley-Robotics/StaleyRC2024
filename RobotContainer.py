@@ -25,7 +25,7 @@ class RobotContainer:
         Initialization
         """
         # Create Subsystems
-        self.launcher = LauncherSparkMax()
+        self.launcher = LauncherTalonFX()
         # Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
