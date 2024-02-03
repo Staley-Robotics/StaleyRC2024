@@ -25,7 +25,7 @@ class RobotContainer:
         Initialization
         """
         # Create Subsystems
-        self.launcher = LauncherTalonFX()
+        self.launcher = LauncherSparkMaxWFeed()
         # Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
@@ -95,6 +95,8 @@ class RobotContainer:
         #change launcher speeds
         self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
         self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
+        #run feeder
+        self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
 
         # Configure Driver 2 Button Mappings
         '''self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )

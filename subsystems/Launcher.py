@@ -39,8 +39,8 @@ class Launcher(commands2.Subsystem):
 
         self.defaultSpeed = NTTunableFloat('Launcher/defaultSpeed', 0.8, persistent=True)
         self.maxSpeed = NTTunableFloat('Launcher/maxSpeed', 0.95, persistent=True)
-        self.minSpeed = NTTunableFloat('Launcher/minSpeed', 0.1, persistent=True)
-        self.defaultIncrement = NTTunableFloat('Launcher/defaultIncrement', 0.05, persistent=True)
+        self.minSpeed = NTTunableFloat('Launcher/minSpeed', 0.1, persistent=False)
+        self.defaultIncrement = NTTunableFloat('Launcher/defaultIncrement', 0.05, persistent=False)
 
         #-------------SPEED HANDLING------------
         self.is_running = NTTunableBoolean('Launcher/is_running', False)

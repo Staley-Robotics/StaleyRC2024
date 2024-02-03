@@ -17,3 +17,4 @@ from .VisionCameraLimelight import *
 from .Launcher import *
 from .LauncherTalonFX import *
 from .LauncherSparkMax import *
+from .LauncherSparkMaxWFeed import *

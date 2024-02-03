@@ -48,4 +48,15 @@ class DecrementLauncherSpeed(commands2.Command):
     
     def isFinished(self) -> bool: return False
 
+class RunFeeder(commands2.Command):
+    def __init__(self, launcher: Launcher):
+        super().__init__
+        self.launcher = launcher
+
+    def initialize(self):
+        self.launcher.run_feeder()
+    
+    def end(self, interrupted: bool):
+        self.launcher.stop_feeder()
+
 
