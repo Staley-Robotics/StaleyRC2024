@@ -205,8 +205,25 @@ class SwerveDrive(Subsystem):
         return self.fieldRelative.get()
 
     def syncGyro(self) -> None:
+        print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
         self.gyro.setYaw( pose.rotation().degrees() )
+        self.getOdometry(0).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            pose
+        )
+        self.getOdometry(1).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            pose
+        )
+        self.getOdometry(2).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            self.getOdometry(2).getEstimatedPosition()
+        )
+        print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
 
     def resetOdometry(self) -> None:
         pose = Pose2d( Translation2d(0, 0), Rotation2d(0) )

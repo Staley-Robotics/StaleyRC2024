@@ -30,10 +30,10 @@ class DrivePathPP(FollowPathHolonomic):
         path:PathPlannerPath = PathPlannerPath(
             bezier_points = PathPlannerPath.bezierFromPoses( waypoints() ),
             constraints = PathConstraints(
-                maxVelocityMps = drivetrain.maxVelocity.get(),
-                maxAccelerationMpsSq = drivetrain.maxVelocity.get() / 2,
-                maxAngularVelocityRps = drivetrain.maxAngularVelocity.get(),
-                maxAngularAccelerationRpsSq = drivetrain.maxAngularVelocity.get() / 2
+                maxVelocityMps = 4.25, #drivetrain.maxVelocity.get(),
+                maxAccelerationMpsSq = 4.25 / 2, #drivetrain.maxVelocity.get() / 2,
+                maxAngularVelocityRps = 2 * math.pi, #drivetrain.maxAngularVelocity.get(),
+                maxAngularAccelerationRpsSq = math.pi #drivetrain.maxAngularVelocity.get() / 2
             ),
             goal_end_state = GoalEndState(
                 velocity = 0.0,
@@ -51,13 +51,13 @@ class DrivePathPP(FollowPathHolonomic):
         output_robot_relative:typing.Callable[[ChassisSpeeds], None] = drivetrain.runChassisSpeeds
         config: HolonomicPathFollowerConfig = HolonomicPathFollowerConfig(
             translationConstants = PIDConstants(
-                drivetrain.getHolonomicDriveController().getXController().getP(),
+                3, #drivetrain.getHolonomicDriveController().getXController().getP(),
                 drivetrain.getHolonomicDriveController().getXController().getI(),
                 drivetrain.getHolonomicDriveController().getXController().getD(),
                 drivetrain.getHolonomicDriveController().getXController().getIZone(),
             ),
             rotationConstants= PIDConstants(
-                drivetrain.getHolonomicDriveController().getThetaController().getP(),
+                1.2, #drivetrain.getHolonomicDriveController().getThetaController().getP(),
                 drivetrain.getHolonomicDriveController().getThetaController().getI(),
                 drivetrain.getHolonomicDriveController().getThetaController().getD(),
                 drivetrain.getHolonomicDriveController().getThetaController().getIZone(),
