@@ -2,6 +2,7 @@ import dataclasses
 import typing
 
 from commands2 import Subsystem
+import hal
 from ntcore import NetworkTableInstance
 from wpilib import PowerDistribution
 
@@ -31,66 +32,78 @@ class LoggedPDP:
         FaultsBrownouts:float = 0.0
         FaultsCanWarning:float = 0.0
 
-        StickFaultsBrownouts:float = 0.0
-        StickFaultsCanBusOff:float = 0.0
-        StickFaultsCanWarning:float = 0.0
+        StickyFaultsBrownouts:float = 0.0
+        StickyFaultsCanBusOff:float = 0.0
+        StickyFaultsCanWarning:float = 0.0
 
-        #ChannelCurrent:float[24] = dataclasses.field( default_factory = float )
-        FaultsBreakers:float = dataclasses.field( default_factory = float )
-        #StickFaultsBreakers:list = dataclasses.field( default_factory = float )
-
-        def __init__(self, channels):
-            self.ChannelCount = channels
-            #self.ChannelCurrent = list()
-            faultsBreakers = list(range(channels))
-            #self.StickFaultsBreakers = list()
-
-            for i in range(self.ChannelCount):
-                #self.ChannelCurrent.append( 0.0 )
-                faultsBreakers[i] = 0.0
-                #self.StickFaultsBreakers.append( 0.0 )
-
-            print( faultsBreakers )
-            self.FaultsBreakers = faultsBreakers
-
-    def __init__(self):
+        # ChannelCurrent:wpiutil.wpistruct.double = dataclasses.field( default_factory = tuple )
+        # FaultsBreakers:bool = dataclasses.field( default_factory = bool )
+        # StickyFaultsBreakers:bool = dataclasses.field( default_factory = bool )
+        
+        # def __post_init__(self):
+        #     self.ChannelCurrent = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        #     self.FaultsBreakers = [ False, False, False, False, False, False, False, False, False, False, False, False, 
+        #                        False, False, False, False, False, False, False, False, False, False, False, False ]
+        #     self.StickyFaultsBreakers = [ False, False, False, False, False, False, False, False, False, False, False, False, 
+        #                              False, False, False, False, False, False, False, False, False, False, False, False ]
+            
+    def __init__(self, type:PowerDistribution.ModuleType = PowerDistribution.ModuleType.kCTRE, canId:int = None ):
         """
         Initialization
         """
         self.pdp: PowerDistribution = None
-        try:
-            self.pdp = PowerDistribution( 0, PowerDistribution.ModuleType.kCTRE )
-            self.pdp.getVersion()
-        except:
-            self.pdp = PowerDistribution( 1, PowerDistribution.ModuleType.kRev )
+        channels = 0
+        match type:
+            case PowerDistribution.ModuleType.kCTRE:
+                canId = 0 if canId == None else canId
+                self.pdp = PowerDistribution( canId, PowerDistribution.ModuleType.kCTRE )
+                channels = 16
+            case PowerDistribution.ModuleType.kRev:
+                canId = 1 if canId == None else canId
+                self.pdp = PowerDistribution( canId, PowerDistribution.ModuleType.kRev )
+                channels = 24
+            case _:
+                pass
         
         if self.pdp == None:
             return
         
         self.pdp.resetTotalEnergy()
         self.pdpLogger = NetworkTableInstance.getDefault().getStructTopic( "/PowerDistribution", LoggedPDP.LoggedPDPInputs ).publish()
-        self.pdpInputs = self.LoggedPDPInputs( 24 )
+        self.pdpLoggerChannelCurrent = NetworkTableInstance.getDefault().getFloatArrayTopic( "/PowerDistribution/ChannelCurrent" ).publish()
+        self.pdpLoggerFaultsBreakers = NetworkTableInstance.getDefault().getBooleanArrayTopic( "/PowerDistribution/FaultBreakers" ).publish()
+        self.pdpLoggerStickyFaultsBreakers = NetworkTableInstance.getDefault().getBooleanArrayTopic( "/PowerDistribution/StickyFaultsBreakers" ).publish()
+
+        self.pdpInputs = self.LoggedPDPInputs()
+
+        self.pdpInputs.ChannelCount = channels
+        self.ChannelCurrent = [ 0 for x in range(channels) ]
+        self.FaultsBreakers = [ False for x in range(channels) ]
+        self.StickyFaultsBreakers = [ False for x in range(channels) ]
 
     def updateInputs(self, inputs:LoggedPDPInputs):            
-        inputs.Model = self.pdp.getType()
-        #inputs.ChannelCount = channelCount
+        #inputs.Model = self.pdp.getType()
+        
         inputs.Temperature = self.pdp.getTemperature()
         inputs.TotalCurrent = self.pdp.getTotalCurrent()
         inputs.TotalEnergy = self.pdp.getTotalEnergy()
         inputs.TotalPower = self.pdp.getTotalPower()
         inputs.Voltage = self.pdp.getVoltage()
 
-        inputs.FaultsBrownouts = self.pdp.getFaults().Brownout
-        inputs.FaultsCanWarning = self.pdp.getFaults().CanWarning
+        faults = self.pdp.getFaults()
+        stickyFaults = self.pdp.getStickyFaults()
 
-        inputs.StickFaultsBrownouts = self.pdp.getStickyFaults().Brownout
-        inputs.StickFaultsCanBusOff = self.pdp.getStickyFaults().CanBusOff
-        inputs.StickFaultsCanWarning = self.pdp.getStickyFaults().CanWarning
+        inputs.FaultsBrownouts = faults.Brownout
+        inputs.FaultsCanWarning = faults.CanWarning
+
+        inputs.StickyFaultsBrownouts = stickyFaults.Brownout
+        inputs.StickyFaultsCanBusOff = stickyFaults.CanBusOff
+        inputs.StickyFaultsCanWarning = stickyFaults.CanWarning
 
         for i in range( inputs.ChannelCount ):
-            #inputs.ChannelCurrent[i] = self.pdp.getCurrent(i)
-            inputs.FaultsBreakers[i] = self.pdp.getFaults().getBreakerFault(i)
-            #inputs.StickFaultsBreakers[i] = self.pdp.getStickyFaults().getBreakerFault(i)
+            self.ChannelCurrent[i] = self.pdp.getCurrent(i)
+            self.FaultsBreakers[i] = faults.getBreakerFault(i)
+            self.StickyFaultsBreakers[i] = stickyFaults.getBreakerFault(i)
 
     def periodic(self):
         """
@@ -101,3 +114,7 @@ class LoggedPDP:
         
         self.updateInputs( self.pdpInputs )
         self.pdpLogger.set( self.pdpInputs )
+        self.pdpLoggerChannelCurrent.set( self.ChannelCurrent )
+        self.pdpLoggerFaultsBreakers.set( self.FaultsBreakers )
+        self.pdpLoggerStickyFaultsBreakers.set( self.StickyFaultsBreakers )
+        

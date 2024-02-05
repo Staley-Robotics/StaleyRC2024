@@ -1,4 +1,4 @@
-from .LoggedCAN import *
+from .LoggedSystemStats import *
 from .LoggedConsole import *
 from .LoggedPDP import *
 from .NTTunableBoolean import *
