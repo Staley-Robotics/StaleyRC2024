@@ -92,10 +92,10 @@ class RobotContainer:
         self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
 
         # Configure Driver 2 Button Mappings
-        '''self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
+        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
         self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) '''
+        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) )
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
@@ -105,7 +105,7 @@ class RobotContainer:
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
         self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
 
-        '''# Configure Default Commands
+        # Configure Default Commands
         self.drivetrain.setDefaultCommand(
             commands.DriveByStick(
                 self.drivetrain,

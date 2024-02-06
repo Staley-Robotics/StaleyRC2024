@@ -12,7 +12,7 @@ from .Vision.Vision import *
 from .Vision.VisionCamera import *
 from .Vision.VisionCameraLimelight import *
 
-from .Launcher import *
-from .LauncherTalonFX import *
-from .LauncherSparkMax import *
-from .LauncherSparkMaxWFeed import *
+from .Launcher.Launcher import *
+from .Launcher.LauncherTalonFX import *
+from .Launcher.LauncherSparkMax import *
+from .Launcher.LauncherSparkMaxWFeed import *
