@@ -7,10 +7,13 @@ import RobotContainer
 from util.LoggedPDP import *
 from util.LoggedConsole import *
 
+from subsystems import Mechanism2D
+
 class MyRobot(wpilib.TimedRobot):
     def __init__(self):
         super().__init__()
 
+        self.mech = Mechanism2D()
         # Setup Console Logging
         loggedConsole:LoggedConsole = None
         if wpilib.RobotBase.isReal():

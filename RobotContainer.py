@@ -72,7 +72,8 @@ class RobotContainer:
         
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
-        wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
+        # wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
+        # wpilib.SmartDashboard.putData( "Mech2D", self.mech.get())
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
@@ -87,8 +88,14 @@ class RobotContainer:
         """
         
         # Configure Driver 1 Button Mappings
-        self.m_driver1 = commands2.button.CommandXboxController(0)
-        self.m_driver1.x().onTrue(self.mech.increaseElevatorHeight())
+        self.m_driver1 = commands2.button.CommandPS4Controller(0)
+        # self.m_driver1.x().onTrue(self.mech.increaseElevatorHeight())
+        # self.m_driver1.rightBumper().onTrue(self.mech.setAngleWrist())
+        # self.m_driver1.leftBumper().onTrue(self.mech.setAngleWrist())
+        self.m_driver1.circle().whileTrue(commands.IncrementWristAngle(self.mech))
+        self.m_driver1.triangle().whileTrue(commands.DecrementWristAngle(self.mech))
+        self.m_driver1.square().whileTrue(commands.IncremementAngleIncrement(self.mech))
+        self.m_driver1.cross().whileTrue(commands.DecrementAngleIncrement(self.mech))
 
         '''
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )

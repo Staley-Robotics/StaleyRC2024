@@ -74,38 +74,9 @@ class Mechanism2D:
     #     """Increases the minimun height of the elevator"""
     #     self.kElevatorMinimumLength.set(self.kElevatorMinimumLength.get() + 1)
 
-    def incrementWristAngle(self):
-        """
-        Increases the angle of the wrist
-        
-        (Turns the wrist clockwise in the sim)
-        """
-        self.wrist.setAngle(self.wrist.getAngle() + self.angleIncrement.get())
-        wpilib.SmartDashboard.putNumber("AngleIncrement", self.angleIncrement.get())
+    def wristToAngle(self):
+        """Sets heading of wrist to the direction of the left stick"""
 
-    def decrementWristAngle(self):
-        """
-        Decreases the angle of the wrist
-
-        (Turns the wrist counterclockwise in the sim)
-        """
-        self.wrist.setAngle(self.wrist.getAngle() - self.angleIncrement.get())
-        wpilib.SmartDashboard.putNumber("AngleIncrement", self.angleIncrement.get())
-
-
-    def incrementAngleIncrement(self):
-        """
-        Increases the angleIncrement
-        """
-        self.angleIncrement.set(self.angleIncrement.get() + self.angleIncrementIncrement.get())
-        wpilib.SmartDashboard.putNumber("AngleIncrement", self.angleIncrement.get())
-
-    def decrementAngleIncrement(self):
-        """
-        Decreases the angleIncrement
-        """
-        self.angleIncrement.set(self.angleIncrement.get() - self.angleIncrementIncrement.get())
-        wpilib.SmartDashboard.putNumber("AngleIncrement", self.angleIncrement.get())
 
     def get(self):
         """
