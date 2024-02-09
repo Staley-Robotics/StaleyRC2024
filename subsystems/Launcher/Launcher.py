@@ -34,8 +34,6 @@ class Launcher(commands2.Subsystem):
         super().__init__()
 
         #---------------CONSTANTS ISH---------------
-        self.lFlywheelInverted = NTTunableBoolean('Launcher/lFlywheelInverted', True, persistent=False, updater=lambda : self.l_launcher_motor.setInverted(self.lFlywheelInverted.get()))
-        self.rFlywheelInverted = NTTunableBoolean('Launcher/rFlywheelInverted', False, persistent=False, updater=lambda : self.r_launcher_motor.setInverted(self.rFlywheelInverted.get()))
 
         self.defaultSpeed = NTTunableFloat('Launcher/defaultSpeed', 0.8, persistent=True)
         self.maxSpeed = NTTunableFloat('Launcher/maxSpeed', 0.95, persistent=True)

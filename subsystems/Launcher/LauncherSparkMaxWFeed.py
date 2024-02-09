@@ -16,13 +16,17 @@ class LauncherSparkMaxWFeed(Launcher):
     def __init__(self):
         super().__init__()
 
+        self.lFlywheelInverted = NTTunableBoolean('Launcher/lFlywheelInverted', True, persistent=False, updater=lambda : self.lMotor.setInverted(self.lFlywheelInverted.get()))
+        self.rFlywheelInverted = NTTunableBoolean('Launcher/rFlywheelInverted', False, persistent=False, updater=lambda : self.rMotor.setInverted(self.rFlywheelInverted.get()))
+
+
         #-------------MOTORS-------------
-        self.lMotor = rev.CANSparkMax(20, rev.CANSparkMax.MotorType.kBrushless)
+        self.lMotor = rev.CANSparkMax(9, rev.CANSparkMax.MotorType.kBrushless)
         self.lMotor.setInverted(self.lFlywheelInverted.get())
-        self.rMotor = rev.CANSparkMax(9, rev.CANSparkMax.MotorType.kBrushless)
+        self.rMotor = rev.CANSparkMax(8, rev.CANSparkMax.MotorType.kBrushless)
         self.rMotor.setInverted(self.rFlywheelInverted.get())
 
-        self.feederMotor = phoenix5.WPI_TalonFX(16)
+        self.feederMotor = rev.CANSparkMax(20, rev.CANSparkMax.MotorType.kBrushless)
         self.feeder_speed = NTTunableFloat('Launcher/Feeder_speed', 0.5)
         self.feeder_actual = NTTunableFloat('Launcher/Active_speed', 0)
         
@@ -51,8 +55,8 @@ class LauncherSparkMaxWFeed(Launcher):
         inputs.rMotorurrentAmps = self.rMotor.getOutputCurrent()
         inputs.rMotorTempCelcius = self.rMotor.getMotorTemperature()
     
-    def run_feeder(self):
-        self.feeder_actual.set(self.feeder_speed.get())
+    def run_feeder(self, reversed=False):
+        self.feeder_actual.set(self.feeder_speed.get() * (-1 if reversed else 1))
     def stop_feeder(self):
         self.feeder_actual.set(0)
     

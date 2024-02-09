@@ -1,6 +1,5 @@
 from .SampleSubsystem import *
 
-
 from .SwerveDrive.Gyro import *
 from .SwerveDrive.GyroPigeon2 import *
 from .SwerveDrive.SwerveDrive import *
@@ -16,3 +15,7 @@ from .Launcher.Launcher import *
 from .Launcher.LauncherTalonFX import *
 from .Launcher.LauncherSparkMax import *
 from .Launcher.LauncherSparkMaxWFeed import *
+
+from .ShooterPivot import *
+
+from .Intake import *

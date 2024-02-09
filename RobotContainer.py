@@ -4,6 +4,7 @@ import commands2
 import commands2.button
 import commands2.cmd
 import wpilib
+import wpimath
 from wpilib.interfaces import GenericHID
 
 from subsystems import *
@@ -23,8 +24,6 @@ class RobotContainer:
         """
         Initialization
         """
-        # Create Subsystems
-        self.launcher = LauncherSparkMaxWFeed()
         # Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
@@ -32,6 +31,10 @@ class RobotContainer:
 
         # Create Subsystems
         self.subsystem = SampleSubsystem()
+        self.launcher = LauncherSparkMaxWFeed()
+        self.intake = Intake()
+        #self.pivot = ShooterPivot()
+        #self.pivot = ShooterPivot()
         
         ''' # DriveTrain
         modules = []
@@ -61,18 +64,19 @@ class RobotContainer:
         ]
         self.vision = Vision( cameras, self.drivetrain.getOdometry )
         '''
-        # Add Subsystems to SmartDashboard
-        wpilib.SmartDashboard.putData( "Launcher", self.launcher)
+
+        # # Add Subsystems to SmartDashboard
+        # wpilib.SmartDashboard.putData( "Launcher", self.launcher)
+
+        # # Add Commands to SmartDashboard
+        # wpilib.SmartDashboard.putData( "Launcher Running", commands.RunLauncher(self.launcher) )
+        # #wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
+        # #wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Launcher Running", commands.RunLauncher(self.launcher) )
-        #wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
-        #wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
-
-        # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
-        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ) )
-        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ) )
+        # wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
+        # wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ) )
+        # wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ) )
 
         '''# Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -80,23 +84,26 @@ class RobotContainer:
         self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
         self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
-        
+        '''
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
         # B button go brrrr
         self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
-        #change launcher speeds
+        # change launcher speeds
         self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
         self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
-        #run feeder
+        # run feeder
         self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
-
+        self.m_driver1.x().whileTrue(commands.RunFeederReversed(self.launcher))
+        #run intake
+        self.m_driver1.a().whileTrue(commands.RunIntake(self.intake))
+        '''
         # Configure Driver 2 Button Mappings
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
         self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
         self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) )
-
+        
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
         #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
@@ -116,12 +123,21 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )'''
+        # self.pivot.setDefaultCommand(
+        #     commands.PointPivotToAngle(
+        #         self.pivot,
+        #         self.m_driver1.getLeftX,
+        #         self.m_driver1.getLeftY
+        #     )
+        # )
+
 
     '''def getAutonomousCommand(self) -> commands2.Command:
         """
         :returns: the autonomous command that has been selected from the ShuffleBoard
         """
         return self.m_chooser.getSelected()'''
+    
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

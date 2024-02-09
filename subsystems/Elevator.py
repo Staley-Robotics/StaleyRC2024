@@ -7,12 +7,19 @@ import commands2
 
 from util import *
 
+'''
+NOTE:
+two motors is weird, same voltage=dif speed, how??? 
+PID and crossing feedback device proabl idk
+'''
+
+
 class Elevator(commands2.Subsystem):
     """
-    Subsystem to handle a 2(?) motor elevator
+    Subsystem to handle a 2(probalby) motor elevator
     """
 
-    @wpiutil.wpistruct.make_wpistruct(name='launcherinputs')
+    @wpiutil.wpistruct.make_wpistruct(name='elevatorinputs')
     @dataclasses.dataclass
     class ElevatorInputs:
         '''
