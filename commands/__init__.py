@@ -16,4 +16,4 @@ from .IndexerUtils import *
 
 from .pointToStick import *
 
-#from PivotUtils import *
+from .PivotUtils import *

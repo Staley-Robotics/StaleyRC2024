@@ -13,7 +13,7 @@ from sequences import *
 from autonomous import *
 from util import *
 
-#NOTE: swerve sections commented out for launcher/intake prototyping
+#NOTE: swerve sections commented out for other prototyping
 class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
@@ -30,11 +30,9 @@ class RobotContainer:
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
         # Create Subsystems
-        self.subsystem = SampleSubsystem()
         self.launcher = LauncherSparkMaxWFeed()
         self.intake = Intake()
-        #self.pivot = ShooterPivot()
-        #self.pivot = ShooterPivot()
+        self.pivot = ShooterPivot()
         
         ''' # DriveTrain
         modules = []
@@ -123,13 +121,13 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )'''
-        # self.pivot.setDefaultCommand(
-        #     commands.PointPivotToAngle(
-        #         self.pivot,
-        #         self.m_driver1.getLeftX,
-        #         self.m_driver1.getLeftY
-        #     )
-        # )
+        self.pivot.setDefaultCommand(
+            commands.PointPivotToAngle(
+                self.pivot,
+                self.m_driver1.getLeftTriggerAxis,
+                self.m_driver1.getRightTriggerAxis
+            )
+        )
 
 
     '''def getAutonomousCommand(self) -> commands2.Command:

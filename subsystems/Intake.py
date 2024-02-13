@@ -6,6 +6,8 @@ import wpilib
 import wpiutil
 import dataclasses
 
+import ntcore
+
 import rev
 import phoenix5
 
@@ -51,11 +53,6 @@ class Intake(commands2.Subsystem):
 
     def __init__(self):
         super().__init__()
-        #tunabels
-        self.uMotorInverted = NTTunableBoolean('Intake/Upper Motor Inverted', False, updater=lambda:self.uMotor.setInverted(self.uMotorInverted.get()))
-        self.lMotorInverted = NTTunableBoolean('Intake/Lower Motor Inverted', False, updater=lambda:self.lMotor.setInverted(self.lMotorInverted.get()))
-
-
         # Motor initialization
         self.uMotor = phoenix5.WPI_TalonFX(3)
         self.lMotor = phoenix5.WPI_TalonFX(4)
@@ -64,29 +61,35 @@ class Intake(commands2.Subsystem):
         #self.uEncoder = self.uMotor.getEncoder()
         #self.lEncoder = self.lMotor.getEncoder()
         
-        # No PID required
-
         # Other INITS
         self.runVel = NTTunableFloat('Intake/run velocity', 0.0, persistent=False)
         self.targetVel = 0.0
         self.RuntimeVel = 0.0
 
+        # Tunables
+        self.uMotorInverted = NTTunableBoolean('Intake/Upper Motor Inverted', False, updater=lambda:self.uMotor.setInverted(self.uMotorInverted.get()))
+        self.lMotorInverted = NTTunableBoolean('Intake/Lower Motor Inverted', False, updater=lambda:self.lMotor.setInverted(self.lMotorInverted.get()))
+
+        # Logging
+        self.ntIntakeInputs = ntcore.NetworkTableInstance.getDefault().getStructTopic('Intake/Inputs', self.IntakeInputs).publish()
+
 
     def periodic(self) -> None:
         # Smart Dashboard information output
+        # self.updateInputs()
         self.runMotors()
         return super().periodic()
 
     def updateInputs(self, inputs: IntakeInputs):
         inputs.uMotorAppliedOutput: float = self.uMotor.getAppliedOutput()
         inputs.uMotorVoltage: float = self.uMotor.getBusVoltage()
-        inputs.uMotorVelocity: float = self.uEncoder.getVelocity()
+        #inputs.uMotorVelocity: float = self.uEncoder.getVelocity()
         inputs.uMotorCurrent: float =  self.uMotor.getOutputCurrent()
         inputs.uMotorTempCelsius: float =  self.uMotor.getMotorTemperature()
 
         inputs.lMotorAppliedOutput: float = self.uMotor.getAppliedOutput()
         inputs.lMotorVoltage: float = self.uMotor.getBusVoltage()
-        inputs.lMotorVelocity: float = self.uEncoder.getVelocity()
+        #inputs.lMotorVelocity: float = self.uEncoder.getVelocity()
         inputs.lMotorCurrent: float = self.uMotor.getOutputCurrent()
         inputs.lMotorTempCelsius: float = self.uMotor.getMotorTemperature()
 
@@ -113,8 +116,8 @@ class Intake(commands2.Subsystem):
         self.targetVel = velocity
 
     def runMotors(self) -> None:
-        self.uMotor.set(self.runVel.get())
-        self.lMotor.set(self.runVel.get())
+        self.uMotor.set(self.targetVel)
+        self.lMotor.set(self.targetVel)
 
     def run(self, reversed=False):
         self.setTargetVel(self.runVel.get() * (-1 if reversed else 1))

@@ -1,5 +1,3 @@
-from .SampleSubsystem import *
-
 from .SwerveDrive.Gyro import *
 from .SwerveDrive.GyroPigeon2 import *
 from .SwerveDrive.SwerveDrive import *
