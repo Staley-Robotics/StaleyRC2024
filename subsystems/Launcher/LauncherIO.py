@@ -37,11 +37,15 @@ class LauncherIO:
         pass
 
     def getVelocity(self) -> [float, float]:
-        pass
+        return [0.0, 0.0]
 
-    def atSetpoint(self) -> [bool, bool]:
-        pass
+    def atSetpoint(self, errorRange:float = 0.0) -> [bool, bool]:
+        leftVeloc, rightVeloc = self.getVelocity()
+        leftSp, rightSp = self.getSetpoint()
+        leftAtSpeed = abs( leftSp - leftVeloc ) < errorRange
+        rightAtSpeed = abs( rightSp - rightVeloc ) < errorRange
+        return [ leftAtSpeed, rightAtSpeed ]
     
     def getSetpoint(self) -> [float, float]:
-        pass
+        return [0.0, 0.0]
 

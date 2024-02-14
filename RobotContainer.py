@@ -20,14 +20,12 @@ class RobotContainer:
         """
         Initialization
         """
-        # Tunable Variables
+        ### Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
-        # Create Subsystems
-        self.subsystem = SampleSubsystem()
-        
+        ### Create Subsystems
         # IO Systems
         modulesIO = None
         gyroIO = None
@@ -60,11 +58,11 @@ class RobotContainer:
                 SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
             gyroIO = GyroPigeon2( 10, "rio", 0 )
-            intakeIO = IntakeIOFalcon()
-            indexerIO = IndexerIONeo()
-            launcherIO = LauncherIONeo()
-            pivotIO = PivotIOFalcon()
-            elevatorIO = ElevatorIONeo()
+            intakeIO = IntakeIOFalcon( 3, 4 )
+            indexerIO = IndexerIONeo( 16 )
+            launcherIO = LauncherIONeo( 20, 9 )
+            pivotIO = PivotIOFalcon( 15, 10 )
+            elevatorIO = ElevatorIONeo( 21, 22 )
 
         # Vision
         camerasIO:typing.Tuple[VisionCamera] = [
@@ -82,7 +80,6 @@ class RobotContainer:
         self.vision = Vision( camerasIO, self.drivetrain.getOdometry )
 
         # Add Subsystems to SmartDashboard
-        wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
         wpilib.SmartDashboard.putData( "Indexer", self.indexer )
