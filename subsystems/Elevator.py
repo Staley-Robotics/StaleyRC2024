@@ -90,7 +90,7 @@ class Elevator(commands2.Subsystem):
 
     def setReference(self, target:float) -> None:
         """
-        For target, use self.getSetpoint()
+        For target, use self.getSetpoint() or self.setPoint
         """
         self.rpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
         self.lpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
