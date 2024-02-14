@@ -89,23 +89,27 @@ class Elevator(commands2.Subsystem):
         self.lpid.setOutputRange(min, max)
 
     def setReference(self, target:float) -> None:
+        """
+        For target, use self.getSetpoint()
+        """
         self.rpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
         self.lpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
         
     
     #---------------Main functions-------------
 
+
     def getPosition(self):
         return self.rencoder.getPosition()
 
     def atPosition(self, target:float):
         return target-0.1 < target < target+0.1
-
-    def getSetpoint(self) -> float:
-        return self.setPoint
-
-    def setSetpoint(self, target:float) -> None:
-        self.setPoint=target
+    #                                               _
+    def getSetpoint(self) -> float: #                |
+        return self.setPoint #                       |
+    #                                                |-- Likely to remove these, they seem futile
+    def setSetpoint(self, target:float) -> None: #   |
+        self.setPoint=target #                      _|
 
     def invertRef(self) -> None:
         self.invertVal *= -1
