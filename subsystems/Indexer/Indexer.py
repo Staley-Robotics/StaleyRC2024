@@ -8,11 +8,11 @@ from .IndexerIO import IndexerIO
 class Indexer(Subsystem):
     class IndexerSpeeds:
         __priv__ = {
-            0: NTTunableFloat( "/Config/Indexer/Speeds/Handoff", 0.35 ),
-            1: NTTunableFloat( "/Config/Indexer/Speeds/Launch", 0.50 ),
-            2: NTTunableFloat( "/Config/Indexer/Speeds/Eject", -1.0 ),
-            3: NTTunableFloat( "/Config/Indexer/Speeds/SelfIn", 0.05 ),
-            4: NTTunableFloat( "/Config/Indexer/Speeds/SelfOut", -0.05 )
+            0: NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35 ),
+            1: NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50 ),
+            2: NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0 ),
+            3: NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05 ),
+            4: NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05 )
         }
         Stop = 0
         Handoff = __priv__[0].get()
@@ -51,6 +51,15 @@ class Indexer(Subsystem):
 
     def stop(self) -> None:
         self.set( self.IndexerSpeeds.Stop )
+
+    # def handoff(self) -> None:
+    #     self.set( self.IndexerSpeeds.Handoff )
+
+    # def launch(self) -> None:
+    #     self.set( self.IndexerSpeeds.Launch )
+
+    # def eject(self) -> None:
+    #     self.set( self.IndexerSpeeds.Eject )
 
     def setBrake(self, brake:bool) -> None:
         self.indexer.setBrake(brake)

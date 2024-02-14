@@ -50,7 +50,7 @@ class LauncherIONeo(LauncherIO):
         self.rightMotor.set( self.desiredVelocity[1] )
 
     def setVelocity(self, leftVelocity:float, rightVelocity:float ):
-        self.setVelocity = [ leftVelocity, rightVelocity ]
+        self.desiredVelocity = [ leftVelocity, rightVelocity ]
 
     def getVelocity(self):
         return self.actualVelocity

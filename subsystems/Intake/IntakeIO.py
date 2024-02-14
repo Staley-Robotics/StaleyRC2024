@@ -30,20 +30,21 @@ class IntakeIO:
     def run(self) -> None:
         pass
 
-    def stop(self) -> None:
-        pass
-
     def setBrake(self, brake:bool) -> None:
         pass
 
     def setVelocity(self, velocity:float) -> None:
         pass
 
-    def getVelocity(self) -> float:
-        pass
+    def getVelocity(self) -> [float, float]:
+        return [ 0.0, 0.0 ]
 
-    def atSetpoint(self) -> bool:
-        pass
+    def atSetpoint(self, errorRange:float = 0.0) -> [bool,bool]:
+        upperVeloc, lowerVeloc = self.getVelocity()
+        upperSp, lowerSp = self.getSetpoint()
+        upperAtSpeed = abs( upperSp - upperVeloc ) < errorRange
+        lowerAtSpeed = abs( lowerSp - lowerVeloc ) < errorRange
+        return [ upperAtSpeed, lowerAtSpeed ]
     
     def getSetpoint(self) -> float:
-        pass
+        return [ 0.0, 0.0 ]

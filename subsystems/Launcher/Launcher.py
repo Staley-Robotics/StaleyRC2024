@@ -52,20 +52,23 @@ class Launcher(Subsystem):
         # Post Run Logging
         #??? Don't Need It (Desired State / Current State)
 
+    def set(self, leftSpeed, rightSpeed):
+        self.launcher.setVelocity( leftSpeed, rightSpeed )
+
     def stop(self):
-        self.launcher.setVelocity( self.LauncherSpeeds.Stop, self.LauncherSpeeds.Stop )
+        self.set( self.LauncherSpeeds.Stop, self.LauncherSpeeds.Stop )
 
-    def speaker(self):
-        self.launcher.setVelocity( self.LauncherSpeeds.SpeakerLeft, self.LauncherSpeeds.SpeakerRight )
+    # def speaker(self):
+    #     self.set( self.LauncherSpeeds.SpeakerLeft, self.LauncherSpeeds.SpeakerRight )
 
-    def amp(self):
-        self.launcher.setVelocity( self.LauncherSpeeds.AmpLeft, self.LauncherSpeeds.AmpRight )
+    # def amp(self):
+    #     self.set( self.LauncherSpeeds.AmpLeft, self.LauncherSpeeds.AmpRight )
 
-    def trap(self):
-        self.launcher.setVelocity( self.LauncherSpeeds.TrapLeft, self.LauncherSpeeds.TrapRight )
+    # def trap(self):
+    #     self.set( self.LauncherSpeeds.TrapLeft, self.LauncherSpeeds.TrapRight )
 
-    def source(self):
-        self.launcher.setVelocity( self.LauncherSpeeds.SourceLeft, self.LauncherSpeeds.SourceRight )
+    # def source(self):
+    #     self.set( self.LauncherSpeeds.SourceLeft, self.LauncherSpeeds.SourceRight )
 
     def isRunning(self) -> bool:
         left, right = self.launcher.getVelocity()

@@ -13,6 +13,9 @@ class IndexerIO:
         currentAmps: float = 0
         tempCelcius: float = 0
 
+        sensorHandoff:bool = False
+        sensorLaunch:bool = False
+
     def __init__(self):
         pass
 
@@ -22,9 +25,6 @@ class IndexerIO:
     def run(self) -> None:
         pass
 
-    def stop(self) -> None:
-        pass
-
     def setBrake(self, brake:bool) -> None:
         pass
 
@@ -32,10 +32,13 @@ class IndexerIO:
         pass
 
     def getVelocity(self) -> float:
-        pass
+        return 0.0
 
-    def atSetpoint(self) -> bool:
-        pass
+    def atSetpoint(self, errorRange:float=0.0) -> bool:
+        sp = self.getSetpoint()
+        veloc = self.getVelocity()
+        atSpeed = abs( sp - veloc ) < errorRange
+        return atSpeed
     
     def getSetpoint(self) -> bool:
-        pass
+        return 0.0
