@@ -30,9 +30,6 @@ class LauncherIO:
     def run(self) -> None:
         pass
 
-    def stop(self) -> None:
-        pass
-
     def setVelocity(self, leftVelocity:float, rightVelocity:float) -> None:
         pass
 
