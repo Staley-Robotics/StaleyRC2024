@@ -28,37 +28,67 @@ class RobotContainer:
         # Create Subsystems
         self.subsystem = SampleSubsystem()
         
-        # DriveTrain
-        modules = []
-        gyro = None
+        # IO Systems
+        modulesIO = None
+        gyroIO = None
+        camerasIO = None
+        intakeIO = None
+        indexerIO = None
+        launcherIO = None
+        pivotIO = None
+        elevatorIO = None
+
+        # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
-            modules = [
+            modulesIO = [
                 SwerveModuleSim("FL",  0.25,  0.25 ), 
                 SwerveModuleSim("FR",  0.25, -0.25 ), 
                 SwerveModuleSim("BL", -0.25,  0.25 ),
                 SwerveModuleSim("BR", -0.25, -0.25 ) 
             ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
+            gyroIO = GyroPigeon2( 10, "rio", 0 )
+            intakeIO = IntakeIOSim()
+            indexerIO = IndexerIOSim()
+            launcherIO = LauncherIOSim()
+            pivotIO = PivotIOSim()
+            elevatorIO = ElevatorIOSim()
         else:
-            modules = [
+            modulesIO = [
                 SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
                 SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
                 SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
                 SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
-        self.drivetrain:SwerveDrive = SwerveDrive( modules, gyro )
+            gyroIO = GyroPigeon2( 10, "rio", 0 )
+            intakeIO = IntakeIOFalcon()
+            indexerIO = IndexerIONeo()
+            launcherIO = LauncherIONeo()
+            pivotIO = PivotIOFalcon()
+            elevatorIO = ElevatorIONeo()
 
         # Vision
-        cameras:typing.Tuple[VisionCamera] = [
+        camerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
-        self.vision = Vision( cameras, self.drivetrain.getOdometry )
-        
+
+        # Link IO Systems to Subsystems
+        self.drivetrain:SwerveDrive = SwerveDrive( modulesIO, gyroIO )
+        self.intake:Intake = Intake( intakeIO )
+        self.indexer:Indexer = Indexer( indexerIO )
+        self.launcher:Launcher = Launcher( launcherIO )
+        self.pivot:Pivot = Pivot( pivotIO )
+        self.elevator:Elevator = Elevator( elevatorIO )
+        self.vision = Vision( camerasIO, self.drivetrain.getOdometry )
+
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
+        wpilib.SmartDashboard.putData( "Intake", self.intake )
+        wpilib.SmartDashboard.putData( "Indexer", self.indexer )
+        wpilib.SmartDashboard.putData( "Launcher", self.launcher )
+        wpilib.SmartDashboard.putData( "Pivot", self.pivot )
+        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
@@ -152,4 +182,3 @@ class RobotContainer:
                 and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )
             )
         ).onTrue( rumbleSequence )
-    

@@ -19,7 +19,8 @@ class NotifierJNI:
     def __init__(self):
         pass
 
-    def initializeNotifier(self) -> int:
+    @staticmethod
+    def initializeNotifier() -> int:
         return 1
 
     def setNotifierName(self, notifier:int, name:str) -> None:
