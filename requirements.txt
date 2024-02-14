@@ -1,30 +1,39 @@
 ### RoboRio Installers
-#robotpy-installer=2024.0.2
+robotpy-installer==2024.1.4
 
 ### RobotPy
-robotpy==2024.1.1.1
+robotpy==2024.2.1.1
 #pyfrc=2024.0.1
-#pyntcore-2024.1.1.1
+#pyntcore-2024.2.1.2
 #robotpy-cli=2024.0.0
-#robotpy-hal-20224.1.1.1
-#robotpy-halsim-gui-2024.1.1.1
-#robotpy-wpimath-2024.1.1.1
-#robotpy-wpiutil-2024.1.1.1
-#wpilib-2024.1.1.1
+#robotpy-hal-2024.2.1.2
+#robotpy-halsim-gui==2024.2.1.2
+#robotpy-wpimath==2024.2.1.2
+#robotpy-wpinet==2024.2.1.2
+#robotpy-wpiutil==2024.2.1.2
+#wpilib==2024.2.1.2
+
+#robotpy-build==2024.0.0
+#robotpy-romi==2024.2.1.1
+#robotpy-sphinx-plugin==0.2.5
+#robotpy-wpilib-utilities==2024.0.0
+#robotpy-xrp==2024.2.1.2
 
 ### RobotPy Extras
-robotpy-apriltag==2024.1.1.1
-robotpy-commands-v2==2024.0.0b4
-robotpy-cscore==2024.1.1.1
-robotpy-halsim-ds-socket==2024.1.1.1
-robotpy-halsim-ws==2024.1.1.1
+robotpy-apriltag==2024.2.1.2
+robotpy-commands-v2==2024.2.2
+robotpy-cscore==2024.2.1.2
+robotpy-halsim-ds-socket==2024.2.1.2
+robotpy-halsim-ws==2024.2.1.2
 robotpy-navx==2024.1.0
-robotpy-pathplannerlib==2024.1.1
+robotpy-pathplannerlib==2024.1.6
+robotpy-playingwithfusion==2024.1.0
+
 
 ### Rev Robotics
 robotpy-rev==2024.2.0
 
 ### CTRE
-robotpy-ctre==2024.1.0 #phoenix5
+robotpy-ctre==2024.1.1 #phoenix5
 phoenix6==24.1.0
 
