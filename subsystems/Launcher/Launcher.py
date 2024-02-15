@@ -52,7 +52,7 @@ class Launcher(Subsystem):
         # Post Run Logging
         #??? Don't Need It (Desired State / Current State)
 
-    def set(self, leftSpeed, rightSpeed):
+    def set(self, leftSpeed:float, rightSpeed:float):
         self.launcher.setVelocity( leftSpeed, rightSpeed )
 
     def stop(self):

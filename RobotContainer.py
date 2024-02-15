@@ -61,7 +61,7 @@ class RobotContainer:
             intakeIO = IntakeIOFalcon( 3, 4 )
             indexerIO = IndexerIONeo( 16 )
             launcherIO = LauncherIONeo( 20, 9 )
-            pivotIO = PivotIOFalcon( 15, 10 )
+            pivotIO = PivotIOFalcon( 15, 10, 0.0 )
             elevatorIO = ElevatorIONeo( 21, 22 )
 
         # Vision

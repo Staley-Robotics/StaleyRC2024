@@ -41,7 +41,7 @@ class Intake(Subsystem):
         # Post Run Logging
         #??? Don't Need It (Desired State / Current State)
 
-    def set(self, speed:IntakeSpeeds):
+    def set(self, speed:float):
         self.intake.setVelocity( speed )
 
     def stop(self) -> None:
