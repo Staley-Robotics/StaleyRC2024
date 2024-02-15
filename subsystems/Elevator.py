@@ -3,7 +3,7 @@ import wpilib
 import wpiutil.wpistruct
 import dataclasses
 from rev import CANSparkMax, CANSparkLowLevel, SparkPIDController
-
+from wpilib import SmartDashboard
 import commands2
 
 from util import *
@@ -51,7 +51,7 @@ class Elevator(commands2.Subsystem):
         self.motor_min_speed = NTTunableFloat("Elevator/motor_min_speed", -1.0, persistent=False)
         self.increment = NTTunableFloat("Elevator/incrementVal", 0.05, persistent=False)
 
-        
+
         #--------------PID values--------------
         self.kP = 0
         self.kI = 0
@@ -150,7 +150,7 @@ class Elevator(commands2.Subsystem):
         do any necessary updates
         """
         self.setReference(self.getSetpoint())
-
+        SmartDashboard.putNumberArray("Encoder position", [self.rencoder.getPosition(), self.lencoder.getPosition()])
         return super().periodic()
 
     def simulationPeriodic(self) -> None:
