@@ -26,7 +26,8 @@ class Elevator(commands2.Subsystem):
         self.setPoint:float=0
         self.invertVal:int=1
         
-
+        
+        #Probably have to invert one of these motors to work right
         self.lmotor = CANSparkMax(0, CANSparkLowLevel.MotorType.kBrushless)
         self.rmotor = CANSparkMax(1, CANSparkLowLevel.MotorType.kBrushless)
 
@@ -104,7 +105,7 @@ class Elevator(commands2.Subsystem):
         return self.rencoder.getPosition()
 
     def atPosition(self, target:float):
-        return target-0.1 < target < target+0.1
+        return target-0.1 < self.getPosition() < target+0.1
     #                                               _
     def getSetpoint(self) -> float: #                |
         return self.setPoint #                       |
