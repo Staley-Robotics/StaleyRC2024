@@ -43,15 +43,17 @@ class Elevator(commands2.Subsystem):
 
         #---------------Tunables---------------
         
-        self.tuneP  = NTTunableFloat("Elevator/P_Gain",  0.0)
-        self.tuneI  = NTTunableFloat("Elevator/I_Gain",  0.0)
-        self.tuneD  = NTTunableFloat("Elevator/D_Gain",  0.0)
-        self.tuneFF = NTTunableFloat("Elevator/FF_Gain", 0.0)
-        self.motor_set_speed = NTTunableFloat('Elevator/motor_set_speed', 0.0)
-        self.motor_actual_speed = NTTunableFloat('Elevator/MotorSpeed', 0.0)
+        self.tuneP  = NTTunableFloat("Elevator/P_Gain",  0.0, persistent=True)
+        self.tuneI  = NTTunableFloat("Elevator/I_Gain",  0.0, persistent=True)
+        self.tuneD  = NTTunableFloat("Elevator/D_Gain",  0.0, persistent=True)
+        self.tuneFF = NTTunableFloat("Elevator/FF_Gain", 0.0, persistent=True)
+        self.motor_max_speed = NTTunableFloat('Elevator/motor_max_speed', 1.0, persistent=False)
+        self.motor_min_speed = NTTunableFloat("Elevator/motor_min_speed", -1.0, persistent=False)
+        self.increment = NTTunableFloat("Elevator/incrementVal", 0.05, persistent=False)
 
+        
         #--------------PID values--------------
-        self.kP = 0 
+        self.kP = 0
         self.kI = 0
         self.kD = 0
         self.kFF = 0
@@ -92,12 +94,11 @@ class Elevator(commands2.Subsystem):
         """
         For target, use self.getSetpoint() or self.setPoint
         """
-        self.rpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
-        self.lpid.setReference(target * self.invertVal, CANSparkMax.ControlType.kPosition)
+        self.rpid.setReference(target, CANSparkMax.ControlType.kPosition)
+        self.lpid.setReference(target, CANSparkMax.ControlType.kPosition)
         
     
     #---------------Main functions-------------
-
 
     def getPosition(self):
         return self.rencoder.getPosition()
@@ -111,10 +112,38 @@ class Elevator(commands2.Subsystem):
     def setSetpoint(self, target:float) -> None: #   |
         self.setPoint=target #                      _|
 
-    def invertRef(self) -> None:
+    
+    #------------TESTING FUNCTIONS-------------
+
+    def invertInc(self) -> None:
         self.invertVal *= -1
 
-    
+    def incrementP(self, val=None) -> None:
+        if not val: val = self.increment.get() * self.invertVal
+        self.kP += val
+        self.tuneP.set(self.kP)
+        self.setP(self.kP)
+
+    def incrementI(self, val=None) -> None:
+        if not val: val = self.increment.get() * self.invertVal
+        self.kI += val
+        self.tuneI.set(self.kI)
+        self.setI(self.kI)
+
+    def incrementD(self, val=None) -> None:
+        if not val: val = self.increment.get() * self.invertVal
+        self.kD += val
+        self.tuneD.set(self.kD)
+        self.setD(self.kD)
+
+    def incrementFF(self, val=None) -> None:
+        if not val: val = self.increment.get() * self.invertVal
+        self.kFF += val
+        self.tuneFF.set(self.kFF)
+        self.setFF(self.kFF)
+
+
+    #------------Periodic Functions------------
 
     def periodic(self) -> None:
         """
