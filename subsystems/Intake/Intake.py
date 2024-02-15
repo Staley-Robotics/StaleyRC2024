@@ -63,7 +63,7 @@ class Intake(commands2.Subsystem):
         
         # Other INITS
         self.runVel = NTTunableFloat('Intake/run velocity', 0.0, persistent=False)
-        self.targetVel = 0.0
+        self.targetVel = NTTunableFloat('Intake/Target Velocity', 0.0, persistent=False)
         self.RuntimeVel = 0.0
 
         # Tunables

@@ -1,7 +1,7 @@
 import wpilib
 
-from wpiutil.wpistruct import make_wpistruct
-from dataclasses import dataclass
+import wpiutil.wpistruct
+import dataclasses
 
 from commands2 import Subsystem
 
@@ -12,22 +12,30 @@ from util import *
 
 class Pivot(Subsystem):
     """
-    Subsystem to handle a one-motor pivot, which the Launcher/Indexer is attached to
+    Parent Subsystem to handle a one-motor pivot, which the Launcher/Indexer is attached to
+    
+    mostly just for logging setup
     """
 
-    @make_wpistruct(name='ShooterPivotInputs')
-    @dataclass
+    @wpiutil.wpistruct.make_wpistruct(name='ShooterPivotInputs')
+    @dataclasses.dataclass
     class PivotInputs:
         """
         A WPIStruct object containing all Subsystem data
         This is meant to simplify logging of contained data
         """
         motorTempCelsius:float = 0.0
+        motorVoltage:float = 0.0
+        motorCurrent:float = 0.0
+        motorVelocity:float = 0.0
+
+        motorPosition:float = 0.0
+        desiredMotorPosition:float = 0.0
 
     def __init__(self):
         super().__init__()
 
-        self.pivotSpeedMult = NTTunableFloat('Pivot/Speed Multiplier', 0.01, persistent=True)
+        self.pivotSpeedMult = NTTunableFloat('Pivot/Speed Multiplier', 0.1, persistent=True)
         self.actualSpeed = NTTunableFloat('Pivot/Actual Speed', 0.0)
 
     def periodic(self) -> None:

@@ -14,6 +14,8 @@ from .Launcher.LauncherTalonFX import *
 from .Launcher.LauncherSparkMax import *
 from .Launcher.LauncherSparkMaxWFeed import *
 
-from .ShooterPivot import *
+from .Pivot.Pivot import *
+from .Pivot.PivotIOTalon import *
 
-from .Intake import *
+from .Intake.Intake import *
+from .Intake.IntakeTalon_FX import *

@@ -17,3 +17,5 @@ from .IndexerUtils import *
 from .pointToStick import *
 
 from .PivotUtils import *
+
+from .irTesting import *

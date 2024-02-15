@@ -7,7 +7,7 @@ from util import *
 from subsystems import Pivot
 from ntcore import *
 
-class PivotTalon_FX(Pivot):
+class PivotIOTalon(Pivot):
     """
     Subsystem to handle double flywheel note launcher
     """
@@ -19,17 +19,23 @@ class PivotTalon_FX(Pivot):
         self.pivotKD = NTTunableFloat('Pivot/PID_kD', 0.0, updater=lambda:..., persistent=True)
         self.pivotKFF = NTTunableFloat('Pivot/PID_kFF', 0.2, updater=lambda:..., persistent=True)
 
+        self.desiredPosition = NTTunableFloat('Pivot/Desired Position', 0.0)
+
         # Motors
         self.motor = WPI_TalonFX(15)
+        self.motor.clearStickyFaults()
+        self.motor.configFactoryDefault()
+        self.motor.setNeutralMode(NeutralMode(2))
+        self.motor.setInverted(False)
+        #burn flash?
 
         # PID
-        self.encoder = CANCoder(10)
-        # Idk im tired
-        self.PID = PIDController(self.pivotKP.get(), self.pivotKI.get(), self.pivotKD.get())
+        
+
         
         # Logging
         self.motorInputs = self.PivotInputs()
-        self.ntMotorInputs = NetworkTableInstance.getDefault().getStructTopic('Pivot/Inputs', self.PivotInputs).publish()
+        self.ntMotorInputs = NetworkTableInstance.getDefault().getStructTopic('Pivot/Inputs', Pivot.PivotInputs).publish()
 
     def periodic(self) -> None:
         # Logging
@@ -39,14 +45,29 @@ class PivotTalon_FX(Pivot):
         # Run motor
         self.motor.set(self.actualSpeed.get())
 
-    def go_to(self, angle:float=0):
+    def go_to_angle(self, angle:float=0):
         """
-        pivot towards angle
+        points pivot toward :param angle: in degrees
+        0 is straight forwards
         """
-        #make PID exist
+        #not so fancy pid stuf
     
     def set_speed(self, speed):
+        """
+        for open loop control of pivot
+        :param speed: in range [-1,1], how fast motor should move -- limited by pivotSpeedMult
+        """
         self.actualSpeed.set(speed * self.pivotSpeedMult.get())
     
     def updateInputs(self, inputs: Pivot.PivotInputs):
+        """
+        you can read the name, and if you cant, then idk how you're reading this
+        """
+        #NOTE: not sure if funcs are correct
         inputs.motorTempCelsius = self.motor.getTemperature()
+        inputs.motorVoltage = self.motor.getMotorOutputVoltage()
+        inputs.motorCurrent = self.motor.getOutputCurrent()
+        inputs.motorVelocity = self.motor.getSelectedSensorVelocity()
+        
+        inputs.motorPosition = self.motor.getSelectedSensorPosition() #sensor units?
+        inputs.desiredMotorPosition = self.desiredPosition.get()

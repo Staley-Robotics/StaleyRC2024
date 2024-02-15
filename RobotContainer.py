@@ -30,112 +30,52 @@ class RobotContainer:
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
         # Create Subsystems
-        self.launcher = LauncherSparkMaxWFeed()
-        self.intake = Intake()
-        self.pivot = ShooterPivot()
-        
-        ''' # DriveTrain
-        modules = []
-        gyro = None
-        if wpilib.RobotBase.isSimulation() and not self.testing:
-            modules = [
-                SwerveModuleSim("FL",  0.25,  0.25 ), 
-                SwerveModuleSim("FR",  0.25, -0.25 ), 
-                SwerveModuleSim("BL", -0.25,  0.25 ),
-                SwerveModuleSim("BR", -0.25, -0.25 ) 
-            ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
-        else:
-            modules = [
-                SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
-            ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
-        self.drivetrain:SwerveDrive = SwerveDrive( modules, gyro )
+        #self.launcher = LauncherSparkMaxWFeed() #TODO: split to use indexer subsystem and independant launcher
+        #self.indexer = Index
+        self.intake = IntakeTalon_FX()
+        #self.pivot = PivotIOTalon()
 
-        # Vision
-        cameras:typing.Tuple[VisionCamera] = [
-            VisionCameraLimelight( "limelight-one" ),
-            VisionCameraLimelight( "limelight-two" )
-        ]
-        self.vision = Vision( cameras, self.drivetrain.getOdometry )
-        '''
+        '''IR?'''
+        # self.irSensor = DigitalInput(0)
+        # self.irEmitter = DigitalOutput(1)
 
-        # # Add Subsystems to SmartDashboard
-        # wpilib.SmartDashboard.putData( "Launcher", self.launcher)
 
-        # # Add Commands to SmartDashboard
-        # wpilib.SmartDashboard.putData( "Launcher Running", commands.RunLauncher(self.launcher) )
-        # #wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
-        # #wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
+        # Add Subsystems to SmartDashboard
+        #wpilib.SmartDashboard.putData( "Launcher", self.launcher)
+        #wpilib.SmartDashboard.putData('pivot', self.pivot)
 
         # Add Commands to SmartDashboard
-        # wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
-        # wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ) )
-        # wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ) )
+        #wpilib.SmartDashboard.putData( "Launcher Running", commands.RunLauncher(self.launcher) )
 
-        '''# Configure and Add Autonomous Mode to SmartDashboard
-        self.m_chooser = wpilib.SendableChooser()
-        self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
-        self.m_chooser.addOption("3 - Autonomous Command", SampleAuto1() )
-        wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
-        '''
+        # Add Commands to SmartDashboard
+        #nothing rn
+
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        # B button go brrrr
-        self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
-        # change launcher speeds
-        self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
-        self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
-        # run feeder
-        self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
-        self.m_driver1.x().whileTrue(commands.RunFeederReversed(self.launcher))
-        #run intake
-        self.m_driver1.a().whileTrue(commands.RunIntake(self.intake))
-        '''
-        # Configure Driver 2 Button Mappings
-        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
-        self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
-        self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) )
-        
-        # Configure Driver 2 Button Mappings
-        #self.m_driver2 = commands2.button.CommandXboxController(1)
-        #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
+        # # B button go brrrr
+        # self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
+        # # change launcher speeds
+        # self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
+        # self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
+        # # run feeder
+        # self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
+        # self.m_driver1.x().whileTrue(commands.RunFeederReversed(self.launcher))
+        # #run intake
+        # self.m_driver1.a().whileTrue(commands.RunIntake(self.intake))
+        # self.m_driver1.a().onTrue(commands.EnableEmitter(self.irEmitter))
+        # self.m_driver1.b().onTrue(commands.EnableEmitter(self.irEmitter))
 
-        # End Game Notifications
-        self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
-        self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
+        # self.m_driver1.x().whileTrue(commands.printReciever(self.irSensor))
 
-        # Configure Default Commands
-        self.drivetrain.setDefaultCommand(
-            commands.DriveByStick(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX,
-                self.m_driver1.getRightY,
-                self.m_driver1.getRightX,
-                lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
-            )
-        )'''
-        self.pivot.setDefaultCommand(
-            commands.PointPivotToAngle(
-                self.pivot,
-                self.m_driver1.getLeftTriggerAxis,
-                self.m_driver1.getRightTriggerAxis
-            )
-        )
-
-
-    '''def getAutonomousCommand(self) -> commands2.Command:
-        """
-        :returns: the autonomous command that has been selected from the ShuffleBoard
-        """
-        return self.m_chooser.getSelected()'''
     
+        #default commands
+        # self.pivot.setDefaultCommand(
+        #     commands.PointPivotToAngle(
+        #         self.pivot,
+        #         self.m_driver1.getLeftTriggerAxis,
+        #         self.m_driver1.getRightTriggerAxis
+        #     )
+        # )
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

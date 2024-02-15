@@ -59,14 +59,6 @@
     }
   },
   {
-    "name": "/Config/Launcher/defaultIncrement",
-    "type": "double",
-    "value": 0.05,
-    "properties": {
-      "persistent": true
-    }
-  },
-  {
     "name": "/Config/Launcher/lFlywheelPort",
     "type": "double",
     "value": 14.0,
@@ -96,15 +88,6 @@
     "value": 0.95,
     "properties": {
       "persistent": true
-    }
-  },
-  {
-    "name": "/Config/Launcher/minSpeed",
-    "type": "double",
-    "value": 0.1,
-    "properties": {
-      "persistent": true,
-      "retained": true
     }
   },
   {

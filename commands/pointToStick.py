@@ -7,7 +7,7 @@ from subsystems import *
 
 class pointToStick(commands2.command.Command):
     def __init__(self,
-                  pivot:ShooterPivot,
+                  pivot:Pivot,
                   trigger_axis:typing.Callable[[], float],
                   ):
         super().__init__()
