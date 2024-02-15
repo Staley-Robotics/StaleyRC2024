@@ -65,8 +65,6 @@ class IntakeTalon_FX(commands2.Subsystem):
         SmartDashboard.putData("emitter", self.IREmitter)
         SmartDashboard.putData("reciever", self.frontIR)
 
-        # self.IREmitter.set(True)
-        self.IREmitter.enablePWM(1)
         # No PID required
 
         # Other INITS

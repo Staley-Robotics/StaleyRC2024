@@ -127,6 +127,13 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
+        self.pivot.setDefaultCommand(
+            commands.RunPivotOpenLoop(
+            self.pivot,
+            self.m_driver1.getRightTriggerAxis,
+            self.m_driver1.getLeftTriggerAxis
+            )
+        )
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
