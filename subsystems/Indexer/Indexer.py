@@ -32,7 +32,8 @@ class Indexer(Subsystem):
         # Logging
         self.indexer.updateInputs( self.indexerInputs )
         self.indexerLogger.set( self.indexerInputs )
-
+        #NewLogger# Logger.getInstance().processInputs( "Indexer", self.indexerInputs )
+        
         # Run Subsystem
         if DriverStation.isDisabled() or self.offline.get():
             self.stop()

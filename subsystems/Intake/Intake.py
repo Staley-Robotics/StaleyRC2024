@@ -17,7 +17,7 @@ class Intake(Subsystem):
         Handoff = __priv__[1].get()
         Eject = __priv__[2].get()
 
-    def __init__(self, intake:IntakeIO):
+    def __init__( self, intake:IntakeIO ):
         self.intake = intake
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()

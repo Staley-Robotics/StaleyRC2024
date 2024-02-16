@@ -1,5 +1,5 @@
-from phoenix5 import *
-from phoenix5.sensors import *
+from phoenix5 import WPI_TalonFX, NeutralMode, RemoteFeedbackDevice, FeedbackDevice, ControlMode
+from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
 from wpilib import RobotBase
 
 from util import *

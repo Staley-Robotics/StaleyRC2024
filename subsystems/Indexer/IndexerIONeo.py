@@ -3,7 +3,7 @@ from rev import *
 from .IndexerIO import IndexerIO
 
 class IndexerIONeo(IndexerIO):
-    def __init__(self, idxCanId):
+    def __init__(self, idxCanId:int, lowerSensorId:int, upperSensorId:int):
         # Static Variables
         self.actualVelocity = 0.0
         self.desiredVelocity = 0.0

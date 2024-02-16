@@ -15,14 +15,14 @@ import wpiutil.wpistruct
 from util import *
 
 # Class: SwerveModule
-class SwerveModule:
+class SwerveModuleIO:
     """
     Custom SwerveModule Abstract Class used to extend a SwerveModule with our logging capabilities
     """
 
-    @wpiutil.wpistruct.make_wpistruct(name="SwerveModuleInputs")
+    @wpiutil.wpistruct.make_wpistruct(name="SwerveModuleIOInputs")
     @dataclasses.dataclass
-    class SwerveModuleInputs:
+    class SwerveModuleIOInputs:
         """
         A WPIStruct Object that contains all SwerveModule Data.
         This is intended to simplify logging of this data.
@@ -96,7 +96,7 @@ class SwerveModule:
         """
         pass
     
-    def updateInputs(self, inputs:SwerveModuleInputs):
+    def updateInputs(self, inputs:SwerveModuleIOInputs):
         """
         Update SwerveModuleInputs Values for Logging Purposes
         :param inputs: SwerveModuleInputs objects that need to be updated

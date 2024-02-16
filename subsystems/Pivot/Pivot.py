@@ -11,7 +11,7 @@ class Pivot(Subsystem):
             0: NTTunableFloat( "/Config/PivotPositions/Upward", 70.0 ),
             1: NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0 ),
             2: NTTunableFloat( "/Config/PivotPositions/Amp", -45.0 ),
-            3: NTTunableFloat( "/Config/PivotPositiosn/Trap", -60.0 ),
+            3: NTTunableFloat( "/Config/PivotPositions/Trap", -60.0 ),
             4: NTTunableFloat( "/Config/PivotPositions/Downward", -70.0 ),
         }
         Upward = __priv__[0].get()

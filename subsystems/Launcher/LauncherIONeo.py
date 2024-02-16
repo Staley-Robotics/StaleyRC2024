@@ -3,7 +3,7 @@ from rev import *
 from .LauncherIO import LauncherIO
 
 class LauncherIONeo(LauncherIO):
-    def __init__( self, leftCanId:int, rightCanId:int ):
+    def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
         self.desiredVelocity = [ 0.0, 0.0 ]
