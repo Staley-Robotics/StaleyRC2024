@@ -4,6 +4,8 @@ import typing
 import hal
 from wpilib import IterativeRobotBase
 
+from .Logger import Logger
+
 class AutoLogOutputManager:
     def __init__(self):
         pass
@@ -36,19 +38,6 @@ class NotifierJNI:
         pass
 
     def waitForNotifierAlarm(self, notifier:int):
-        pass
-
-class Logger:
-    def __init__(self):
-        pass
-
-    def getRealTimestamp(self):
-        return 0
-    
-    def periodicBeforeUser(self):
-        pass
-
-    def periodicAfterUser(self, start, end):
         pass
 
 class LoggedRobot(IterativeRobotBase):
