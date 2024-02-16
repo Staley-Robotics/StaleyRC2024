@@ -25,11 +25,11 @@ from wpimath.geometry import Translation2d, Rotation2d
 from wpimath import units
 
 # Self Made Classes
-from .SwerveModule import SwerveModule
+from .SwerveModuleIO import SwerveModuleIO
 from util import *
 
 # Class: SwerveModule
-class SwerveModuleNeo(SwerveModule):
+class SwerveModuleIONeo(SwerveModuleIO):
     """
     Custom SwerveModuleNeo using NEO drive and turn motors on a live robot.
 
@@ -115,7 +115,7 @@ class SwerveModuleNeo(SwerveModule):
         self.referencePosition = Translation2d( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateInputs(self, inputs:SwerveModule.SwerveModuleInputs):
+    def updateInputs(self, inputs:SwerveModuleIO.SwerveModuleIOInputs):
         """
         Update SwerveModuleInputs Values for Logging Purposes
         :param inputs: SwerveModuleInputs objects that need to be updated

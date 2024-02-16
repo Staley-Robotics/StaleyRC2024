@@ -20,45 +20,72 @@ class RobotContainer:
         """
         Initialization
         """
-        # Tunable Variables
+        ### Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
-        # Create Subsystems
-        self.subsystem = SampleSubsystem()
-        
-        # DriveTrain
-        modules = []
-        gyro = None
+        ### Create Subsystems
+        # IO Systems
+        ssModulesIO = None
+        ssGyroIO = None
+        ssCamerasIO = None
+        ssIntakeIO = None
+        ssIndexerIO = None
+        ssLauncherIO = None
+        ssPivotIO = None
+        ssElevatorIO = None
+
+        # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
-            modules = [
-                SwerveModuleSim("FL",  0.25,  0.25 ), 
-                SwerveModuleSim("FR",  0.25, -0.25 ), 
-                SwerveModuleSim("BL", -0.25,  0.25 ),
-                SwerveModuleSim("BR", -0.25, -0.25 ) 
+            ssModulesIO = [
+                SwerveModuleIOSim("FL",  0.25,  0.25 ), 
+                SwerveModuleIOSim("FR",  0.25, -0.25 ), 
+                SwerveModuleIOSim("BL", -0.25,  0.25 ),
+                SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
+            ssGyroIO = GyroIOPigeon2( 10, 0 )
+            ssIntakeIO = IntakeIOSim()
+            ssIndexerIO = IndexerIOSim()
+            ssLauncherIO = LauncherIOSim()
+            ssPivotIO = PivotIOSim()
+            ssElevatorIO = ElevatorIOSim()
         else:
-            modules = [
-                SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+            ssModulesIO = [
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            gyro = GyroPigeon2( 10, "rio", 0 )
-        self.drivetrain:SwerveDrive = SwerveDrive( modules, gyro )
+            ssGyroIO = GyroIOPigeon2( 10, 0 )
+            ssIntakeIO = IntakeIOFalcon( 3, 4, 0 )
+            ssIndexerIO = IndexerIONeo( 16, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 20, 9 , 3)
+            ssPivotIO = PivotIOFalcon( 15, 10, 0.0 )
+            ssElevatorIO = ElevatorIONeo( 21, 22 )
 
         # Vision
-        cameras:typing.Tuple[VisionCamera] = [
+        ssCamerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
-        self.vision = Vision( cameras, self.drivetrain.getOdometry )
-        
+
+        # Link IO Systems to Subsystems
+        self.drivetrain:SwerveDrive = SwerveDrive( ssModulesIO, ssGyroIO )
+        self.intake:Intake = Intake( ssIntakeIO )
+        self.indexer:Indexer = Indexer( ssIndexerIO )
+        self.launcher:Launcher = Launcher( ssLauncherIO )
+        self.pivot:Pivot = Pivot( ssPivotIO )
+        self.elevator:Elevator = Elevator( ssElevatorIO )
+        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
+
         # Add Subsystems to SmartDashboard
-        wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
+        wpilib.SmartDashboard.putData( "Intake", self.intake )
+        wpilib.SmartDashboard.putData( "Indexer", self.indexer )
+        wpilib.SmartDashboard.putData( "Launcher", self.launcher )
+        wpilib.SmartDashboard.putData( "Pivot", self.pivot )
+        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
@@ -152,4 +179,3 @@ class RobotContainer:
                 and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )
             )
         ).onTrue( rumbleSequence )
-    

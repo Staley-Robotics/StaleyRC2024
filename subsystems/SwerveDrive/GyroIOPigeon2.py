@@ -14,14 +14,14 @@ from wpilib import RobotBase
 from wpimath import units
 
 # Our Imports
-from .Gyro import Gyro
+from .GyroIO import GyroIO
 
-class GyroPigeon2(WPI_Pigeon2, Gyro):
+class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
     """
     Custom Pigeon Class extends WPI_Pigeon2 with logging capabilities
     """
 
-    def __init__( self, deviceNumber:int, canbus:str = '', startYaw:float = 0.0 ):
+    def __init__( self, deviceNumber:int, startYaw:float = 0.0 ):
         """
         Constructure for a custom WPI_Piegon2 with logging
 
@@ -31,7 +31,7 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         :param startYaw: Starting Yaw in Degrees once the Pigeon 2 is initialized.
         """
         # Initialize WPI_Pigeon2
-        super().__init__( deviceNumber, canbus )
+        super().__init__( deviceNumber, "canivore" )
 
         # Configure Default / Start Settings
         self.configFactoryDefault()
@@ -43,7 +43,7 @@ class GyroPigeon2(WPI_Pigeon2, Gyro):
         if RobotBase.isSimulation():
             self.getSimCollection().setRawHeading( startYaw )
 
-    def updateInputs(self, inputs:Gyro.GyroInputs):
+    def updateInputs(self, inputs:GyroIO.GyroIOInputs):
         """
         Update GyroInputs Values for Logging Purposes
         :param inputs: GyroInputs objects that need to be updated
