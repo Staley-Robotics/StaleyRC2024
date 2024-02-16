@@ -2,6 +2,7 @@ from .LoggedConsole import *
 from .LoggedPDP import *
 from .LoggedRobot import *
 from .LoggedSystemStats import *
+from .Logger import *
 from .NTTunableBoolean import *
 from .NTTunableFloat import *
 from .NTTunableInt import *
