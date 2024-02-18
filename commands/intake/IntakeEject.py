@@ -19,6 +19,9 @@ class IntakeEject(Command):
         super().__init__()
         self.timer = Timer()
         self.intake = intake
+        
+        self.setName( "IntakeEject" )
+        self.addRequirements( intake )
 
     def initialize(self) -> None:
         self.timer.reset()

@@ -18,6 +18,9 @@ class PivotAmp(Command):
         super().__init__()
         self.pivot = pivot
 
+        self.setName( "PivotAmp" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

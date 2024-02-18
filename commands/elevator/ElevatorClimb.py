@@ -18,6 +18,9 @@ class ElevatorClimb(Command):
         super().__init__()
         self.elevator = elevator
 
+        self.setName( "ElevatorClimb" )
+        self.addRequirements( elevator )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

@@ -18,6 +18,9 @@ class PivotTrap(Command):
         super().__init__()
         self.pivot = pivot
 
+        self.setName( "PivotTrap" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

@@ -20,6 +20,9 @@ class ElevatorManual(Command):
         self.elevator = elevator
         self.value = value
 
+        self.setName( "ElevatorManual" )
+        self.addRequirements( elevator )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

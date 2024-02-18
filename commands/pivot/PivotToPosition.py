@@ -20,6 +20,9 @@ class PivotToPosition(Command):
         self.pivot = pivot
         self.position = position
 
+        self.setName( "PivotToPosition" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

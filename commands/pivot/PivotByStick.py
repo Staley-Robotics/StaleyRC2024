@@ -21,6 +21,9 @@ class PivotByStick(Command):
         self.stick = stick
         self.position = 0.0
 
+        self.setName( "PivotByStick" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

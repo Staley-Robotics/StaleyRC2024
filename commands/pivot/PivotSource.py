@@ -18,6 +18,9 @@ class PivotSource(Command):
         super().__init__()
         self.pivot = pivot
 
+        self.setName( "PivotSource" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

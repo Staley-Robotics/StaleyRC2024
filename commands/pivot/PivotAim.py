@@ -20,6 +20,9 @@ class PivotAim(Command):
         self.pivot = pivot
         self.position = position
 
+        self.setName( "PivotAim" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

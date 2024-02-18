@@ -20,6 +20,9 @@ class IndexerEject(Command):
         self.timer = Timer()
         self.indexer = indexer
 
+        self.setName( "IndexerEject" )
+        self.addRequirements( indexer )
+
     def initialize(self) -> None:
         self.timer.reset()
         self.timer.start()

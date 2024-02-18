@@ -19,6 +19,9 @@ class IndexerHandoff(Command):
         self.indexer = indexer
         self.indexer.setBrake(False)
 
+        self.setName( "IndexerHandoff" )
+        self.addRequirements( indexer )
+
     def initialize(self) -> None:
         pass
 

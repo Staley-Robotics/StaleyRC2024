@@ -18,6 +18,9 @@ class LauncherTrap(Command):
         super().__init__()
         self.launcher = launcher
 
+        self.setName( "LauncherTrap" )
+        self.addRequirements( launcher )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

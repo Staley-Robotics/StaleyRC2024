@@ -18,6 +18,9 @@ class ElevatorTrap(Command):
         super().__init__()
         self.elevator = elevator
 
+        self.setName( "ElevatorTrap" )
+        self.addRequirements( elevator )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

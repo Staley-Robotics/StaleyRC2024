@@ -19,6 +19,9 @@ class IntakeHandoff(Command):
         self.intake = intake
         self.intake.setBrake(False)
 
+        self.setName( "IntakeHandoff" )
+        self.addRequirements( intake )
+
     def initialize(self) -> None:
         pass
 

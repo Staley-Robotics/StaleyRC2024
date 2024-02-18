@@ -19,6 +19,9 @@ class IntakeLoad(Command):
         self.intake = intake
         self.intake.setBrake(False)
 
+        self.setName( "IntakeLoad" )
+        self.addRequirements( intake )
+
     def initialize(self) -> None:
         pass
 

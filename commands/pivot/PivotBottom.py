@@ -18,6 +18,9 @@ class PivotBottom(Command):
         super().__init__()
         self.pivot = pivot
 
+        self.setName( "PivotBottom" )
+        self.addRequirements( pivot )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:

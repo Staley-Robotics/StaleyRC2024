@@ -18,6 +18,9 @@ class ElevatorAmp(Command):
         super().__init__()
         self.elevator = elevator
 
+        self.setName( "ElevatorAmp" )
+        self.addRequirements( elevator )
+
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
