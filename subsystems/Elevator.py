@@ -54,12 +54,12 @@ class Elevator(commands2.Subsystem):
 
 
         #--------------PID values--------------
-        self.kP = 0
-        self.kI = 0
-        self.kD = 0
+        self.kP =  0
+        self.kI =  0
+        self.kD =  0
         self.kFF = 0
 
-        self.kMaxOutput = 1
+        self.kMaxOutput =  1
         self.kMinOutput = -1
 
         # Set PID coefficients
