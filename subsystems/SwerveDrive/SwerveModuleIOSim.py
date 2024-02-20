@@ -18,13 +18,13 @@ from wpimath.system.plant import DCMotor
 from wpimath import units, applyDeadband
 
 # Our Imports
-from .SwerveModule import SwerveModule
+from .SwerveModuleIO import SwerveModuleIO
 from util import *
 
 loopTime = 0.02
 
 # Class: SwerveModule
-class SwerveModuleSim(SwerveModule):
+class SwerveModuleIOSim(SwerveModuleIO):
     """
     Custom SwerveModuleSim used to simulation the NEO motor without a live robot
     """
@@ -63,7 +63,7 @@ class SwerveModuleSim(SwerveModule):
         self.setReferencePosition( posX, posY )
         self.moduleState = SwerveModuleState( 0, Rotation2d(0) )
 
-    def updateInputs(self, inputs:SwerveModule.SwerveModuleInputs):
+    def updateInputs(self, inputs:SwerveModuleIO.SwerveModuleIOInputs):
         """
         Update SwerveModuleInputs Values for Logging Purposes
         :param inputs: SwerveModuleInputs objects that need to be updated

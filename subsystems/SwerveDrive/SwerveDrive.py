@@ -26,9 +26,9 @@ from ntcore import *
 
 # Our Imports
 from util import *
-from .SwerveModule import SwerveModule
-from .Gyro import Gyro
-from .GyroPigeon2 import GyroPigeon2
+from .SwerveModuleIO import SwerveModuleIO
+from .GyroIO import GyroIO
+from .GyroIOPigeon2 import GyroIOPigeon2
 
 class SwerveDrive(Subsystem):
     """
@@ -36,11 +36,11 @@ class SwerveDrive(Subsystem):
     """
     
     def __init__( self,
-                  modules:typing.Tuple[ SwerveModule,
-                                        SwerveModule,
-                                        SwerveModule,
-                                        SwerveModule ],
-                  gyro:Gyro=Gyro() ):
+                  modules:typing.Tuple[ SwerveModuleIO,
+                                        SwerveModuleIO,
+                                        SwerveModuleIO,
+                                        SwerveModuleIO ],
+                  gyro:GyroIO=GyroIO() ):
         """
         Initialization of a SwerveDrive
         """
@@ -81,10 +81,10 @@ class SwerveDrive(Subsystem):
         self.gyro = gyro
         self.modules = modules
 
-        self.gyroInputs = self.gyro.GyroInputs()
+        self.gyroInputs = self.gyro.GyroIOInputs()
         self.moduleInputs = []
         for mod in self.modules:
-            self.moduleInputs.append( mod.SwerveModuleInputs() )
+            self.moduleInputs.append( mod.SwerveModuleIOInputs() )
 
         # Kinematics
         self.kinematics = SwerveDrive4Kinematics(
@@ -124,12 +124,12 @@ class SwerveDrive(Subsystem):
             self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
             self.ntSwerveModuleStatesCurrent.close()
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleInputs" ):        
-            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleInputs", SwerveModule.SwerveModuleInputs ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( SwerveModule.SwerveModuleInputs() ) 
+            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleInputs", SwerveModuleIO.SwerveModuleIOInputs ).publish( PubSubOptions() )
+            self.ntSwerveModuleStatesCurrent.set( SwerveModuleIO.SwerveModuleIOInputs() ) 
             self.ntSwerveModuleStatesCurrent.close()
 
-        self.ntGyroInputs = NetworkTableInstance.getDefault().getStructTopic( "/SwerveDrive/Gyro", Gyro.GyroInputs ).publish()
-        self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModule.SwerveModuleInputs ).publish()
+        self.ntGyroInputs = NetworkTableInstance.getDefault().getStructTopic( "/SwerveDrive/Gyro", GyroIO.GyroIOInputs ).publish()
+        self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModuleIO.SwerveModuleIOInputs ).publish()
 
         self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
         self.ntRobotPose2dNoTime = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/RobotUpdateNoTime", Pose2d ).publish()
@@ -205,8 +205,25 @@ class SwerveDrive(Subsystem):
         return self.fieldRelative.get()
 
     def syncGyro(self) -> None:
+        print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
         self.gyro.setYaw( pose.rotation().degrees() )
+        self.getOdometry(0).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            pose
+        )
+        self.getOdometry(1).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            pose
+        )
+        self.getOdometry(2).resetPosition(
+            self.gyro.getRotation2d(),
+            self.getModulePositions(),
+            self.getOdometry(2).getEstimatedPosition()
+        )
+        print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
 
     def resetOdometry(self) -> None:
         pose = Pose2d( Translation2d(0, 0), Rotation2d(0) )

@@ -1,9 +1,9 @@
-from phoenix5 import *
+from phoenix5 import WPI_TalonFX, NeutralMode
 
 from .IntakeIO import IntakeIO
 
 class IntakeIOFalcon(IntakeIO):
-    def __init__(self, upperCanId, lowerCanId, sensorInId, sensorOutId ):
+    def __init__(self, upperCanId:int, lowerCanId:int, sensorId:int ):
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
         self.desiredVelocity = [ 0.0, 0.0 ]
@@ -19,7 +19,7 @@ class IntakeIOFalcon(IntakeIO):
         self.lowerMotor = WPI_TalonFX( lowerCanId, "canivore" )
         self.lowerMotor.clearStickyFaults()
         self.lowerMotor.configFactoryDefault()
-
+        self.lowerMotor.setNeutralMode( NeutralMode.Coast )
         self.lowerMotor.setInverted( True )
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):

@@ -6,14 +6,10 @@ from .drive.DrivePathPP import *
 from .drive.DrivePathWpiTraj import *
 from .drive.DriveSetup import *
 from .drive.DriveToPose import *
-
-from .RunLauncher import *
-from .LauncherUtils import *
-from .IntakeUtils import *
 from .IndexerUtils import *
-
-from .pointToStick import *
-
+from .IntakeUtils import *
+from .LauncherUtils import *
 from .PivotUtils import *
-
-from .irTesting import *
+from .pointToStick import *
+from .RunLauncher import *
+from .SampleCommand import *

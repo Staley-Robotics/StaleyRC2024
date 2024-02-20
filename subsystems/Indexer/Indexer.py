@@ -1,58 +1,72 @@
-import wpilib
-
-import wpiutil.wpistruct
-import dataclasses
-
-import commands2
-
-import phoenix5
+from commands2 import Subsystem
+from ntcore import NetworkTableInstance
+from wpilib import DriverStation
 
 from util import *
+from .IndexerIO import IndexerIO
 
-class Indexer(commands2.Subsystem):
-    """
-    Subsystem to handle a one-motor indexer, supplies notes to launcher, recieves from intake
-    """
+class Indexer(Subsystem):
+    class IndexerSpeeds:
+        __priv__ = {
+            0: NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35 ),
+            1: NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50 ),
+            2: NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0 ),
+            3: NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05 ),
+            4: NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05 )
+        }
+        Stop = 0
+        Handoff = __priv__[0].get()
+        Launch = __priv__[1].get()
+        Eject = __priv__[2].get()
+        SelfIn = __priv__[3].get()
+        SelfOut = __priv__[4].get()
 
-    @wpiutil.wpistruct.make_wpistruct(name='launcherinputs')
-    @dataclasses.dataclass
-    class IndexerInputs:
-        '''
-        A WPIStruct object containing all Indexer data
-        This is meant to simplify logging of contained data
-        '''
-        #motor inputs
-        motorAppliedVolts:float = 0
-        motorCurrentAmps:float = 0
-        motorTempCelsius:float = 0
+    def __init__(self, indexer:IndexerIO):
+        self.indexer = indexer
+        self.indexerInputs = indexer.IndexerIOInputs()
+        self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
 
-    def __init__(self):
-        super().__init__()
+        self.offline = NTTunableBoolean( "/OfflineOverride/Indexer", False )
 
-        #---------------Tunables---------------
-        self.motor_set_speed = NTTunableFloat('Indexer/motor_set_speed', 0.0)
-        self.motor_actual_speed = NTTunableFloat('Indexer/motor_actual_speed', 0.0)
-        self.motor_inverted = NTTunableBoolean('Indexer/direction_inverted', False, updater=lambda: self.motor.setInverted(self.motor_inverted.get()))
+    def periodic(self):
+        # Logging
+        self.indexer.updateInputs( self.indexerInputs )
+        self.indexerLogger.set( self.indexerInputs )
+        #NewLogger# Logger.getInstance().processInputs( "Indexer", self.indexerInputs )
+        
+        # Run Subsystem
+        if DriverStation.isDisabled() or self.offline.get():
+            self.stop()
 
-        #-------------Motors------------
-        self.motor = phoenix5.WPI_TalonFX(16)
+        if False: #self.isCharacterizing.get():
+            self.indexer.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
+        else:
+            ### Self Correct???
+            self.indexer.run()
 
-    def periodic(self) -> None:
-        """
-        do any necessary updates
-        """
-        self.motor.set(self.motor_actual_speed.get())
+        # Post Run Logging
+        #??? Don't Need It (Desired State / Current State)
+
+    def set(self, speed:float):
+        self.indexer.setVelocity( speed )
+
+    def stop(self) -> None:
+        self.set( self.IndexerSpeeds.Stop )
+
+    # def handoff(self) -> None:
+    #     self.set( self.IndexerSpeeds.Handoff )
+
+    # def launch(self) -> None:
+    #     self.set( self.IndexerSpeeds.Launch )
+
+    # def eject(self) -> None:
+    #     self.set( self.IndexerSpeeds.Eject )
+
+    def setBrake(self, brake:bool) -> None:
+        self.indexer.setBrake(brake)
+
+    def hasNote(self) -> bool:
+        return False
     
-    def run(self):
-        '''
-        start indexer motor spinning at 'motor_set_speed' until stop() is called
-        '''
-        self.motor_actual_speed.set(self.motor_set_speed.get())
-    def stop(self):
-        '''
-        set indexer motor speed to 0
-        '''
-        self.motor_actual_speed.set(0)
-    
-    def simulationPeriodic(self) -> None:
-        return super().simulationPeriodic()
+    def isRunning(self) -> bool:
+        return ( self.indexer.getVelocity() != self.IndexerSpeeds.Stop )

@@ -13,14 +13,14 @@ from ntcore import *
 from wpimath.geometry import Rotation2d
 import wpiutil.wpistruct
 
-class Gyro:
+class GyroIO:
     """
     Custom Pigeon Abstract Class used to extend a Gyro with our logging capabilities
     """
 
-    @wpiutil.wpistruct.make_wpistruct(name="GyroInputs")
+    @wpiutil.wpistruct.make_wpistruct(name="GyroIOInputs")
     @dataclasses.dataclass
-    class GyroInputs:
+    class GyroIOInputs:
         """
         A WPIStruct Object that contains all Gyro Reading Data.
         This is intended to simplify logging of this data.
@@ -33,7 +33,7 @@ class Gyro:
         pitchVelocityRadPerSec: float = 0.0
         yawVelocityRadPerSec: float = 0.0
 
-    def updateInputs(self, inputs:GyroInputs):
+    def updateInputs(self, inputs:GyroIOInputs):
         """
         Update GyroInputs Values for Logging Purposes
         :param inputs: GyroInputs objects that need to be updated

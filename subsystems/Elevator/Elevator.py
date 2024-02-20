@@ -1,45 +1,17 @@
-import wpilib
+from commands2 import Subsystem
 
-import wpiutil.wpistruct
-import dataclasses
+from .ElevatorIO import ElevatorIO
 
-import commands2
+class Elevator(Subsystem):
+    class ElevatorPosition:
+        Bottom = 0
+        Amp = 3
+        Climb = 0
+        Trap = 8
+        Top = 10
 
-from util import *
+    def __init__(self, elevator:ElevatorIO):
+        pass
 
-'''
-NOTE:
-two motors is weird, same voltage=dif speed, how??? 
-PID and crossing feedback device proabl idk
-'''
-
-
-class Elevator(commands2.Subsystem):
-    """
-    Subsystem to handle a 2(probalby) motor elevator
-    """
-
-    @wpiutil.wpistruct.make_wpistruct(name='elevatorinputs')
-    @dataclasses.dataclass
-    class ElevatorInputs:
-        '''
-        A WPIStruct object containing all Subsystem data
-        This is meant to simplify logging of contained data
-        '''
-        #put logging data here
-
-    def __init__(self):
-        super().__init__()
-
-        #---------------Tunables---------------
-
-        #-------------Whatever you want------------
-
-    def periodic(self) -> None:
-        """
-        do any necessary updates
-        """
-        return super().periodic()
-    
-    def simulationPeriodic(self) -> None:
-        return super().simulationPeriodic()
+    def periodic(self):
+        pass
