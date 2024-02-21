@@ -30,7 +30,9 @@ class RobotContainer:
 
         # Create Subsystems
         self.subsystem = SampleSubsystem()
-        self.mech = Mechanism2D()
+        # self.mech = Mechanism2D()
+        self.mech = Mechanism2DToStick()
+        self.lIgHtS = LEDs(0)
 
         """# DriveTrain
         modules = []
@@ -74,6 +76,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "SubsystemName", self.subsystem )
         # wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         # wpilib.SmartDashboard.putData( "Mech2D", self.mech.get())
+        wpilib.SmartDashboard.putData("Mech2DToStick", self.mech.get())
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
@@ -88,14 +91,26 @@ class RobotContainer:
         """
         
         # Configure Driver 1 Button Mappings
-        self.m_driver1 = commands2.button.CommandPS4Controller(0)
+        self.m_driver1 = commands2.button.CommandXboxController(0)
+
+        # -----MECHANISM2D BUTTON CONTROL-----
         # self.m_driver1.x().onTrue(self.mech.increaseElevatorHeight())
         # self.m_driver1.rightBumper().onTrue(self.mech.setAngleWrist())
         # self.m_driver1.leftBumper().onTrue(self.mech.setAngleWrist())
-        self.m_driver1.circle().whileTrue(commands.IncrementWristAngle(self.mech))
-        self.m_driver1.triangle().whileTrue(commands.DecrementWristAngle(self.mech))
-        self.m_driver1.square().whileTrue(commands.IncremementAngleIncrement(self.mech))
-        self.m_driver1.cross().whileTrue(commands.DecrementAngleIncrement(self.mech))
+        # self.m_driver1.a().whileTrue(commands.IncrementWristAngle(self.mech))
+        # self.m_driver1.b().whileTrue(commands.DecrementWristAngle(self.mech))
+        # self.m_driver1.x().whileTrue(commands.IncremementAngleIncrement(self.mech))
+        # self.m_driver1.y().whileTrue(commands.DecrementAngleIncrement(self.mech))
+
+        # -----MECHANISM2D STICK CONTROL-----
+        self.m_driver1.start().whileFalse(commands.wristToAngle(self.mech))
+        # self.m_driver1.start().whileFalse(commands.handtoAngle(self.mech))
+        self.m_driver1.start().whileFalse(commands.rotateAngle(self.mech))
+
+        # -----LED BUTTON CONTROL-----
+        self.m_driver1.b().whileTrue(commands.cycleColors(self.lIgHtS))
+        self.m_driver1.a().whileTrue(commands.defaultColor(self.lIgHtS))
+        self.m_driver1.rightStick().whileTrue(commands.DiStrAcTiON(self.lIgHtS)) #for some reason right stick is actually the left stick in sim ¯\_(ツ)_/¯
 
         '''
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )

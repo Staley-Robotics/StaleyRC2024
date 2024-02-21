@@ -50,7 +50,7 @@ class Mechanism2D:
         )
 
         # post the mechanism to the dashboard (do this in robotcontainer)
-        wpilib.SmartDashboard.putData("Mech2d", self.mech)
+        # wpilib.SmartDashboard.putData("Mech2d", self.mech) #comment out to allow Mechanism2DToStick to work in sim
         wpilib.SmartDashboard.putNumber("Wrist Angle1", self.wristAngleStart.get())
 
         # post some variables (like angle increment)
