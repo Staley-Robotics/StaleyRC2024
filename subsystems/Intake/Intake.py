@@ -22,7 +22,7 @@ class Intake(Subsystem):
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
 
-        self.offline = NTTunableBoolean( "/OfflineOverride/Intake", False )
+        self.offline = NTTunableBoolean( "/Disable/Intake", False, persistent=True )
 
     def periodic(self):
         # Logging

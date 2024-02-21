@@ -59,7 +59,7 @@ class SwerveDrive(Subsystem):
         self.charSettingsVolts = NTTunableFloat( "/Characterize/SwerveDrive/MySettings/volts", 0.0 )
         self.charSettingsRotation = NTTunableBoolean( "/Characterize/SwerveDrive/MySettings/rotation", False )
         
-        self.offline = NTTunableBoolean( "/OfflineOverride/SwerveDrive", False )
+        self.offline = NTTunableBoolean( "/Disable/SwerveDrive", False, persistent=True )
         
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )

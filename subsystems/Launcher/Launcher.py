@@ -33,7 +33,7 @@ class Launcher(Subsystem):
         self.launcherInputs = launcher.LauncherIOInputs
         self.launcherLogger = NetworkTableInstance.getDefault().getStructTopic( "/Launcher", LauncherIO.LauncherIOInputs ).publish()
 
-        self.offline = NTTunableBoolean( "/OfflineOverride/Launcher", False )
+        self.offline = NTTunableBoolean( "/Disable/Launcher", False, persistent=True )
 
     def periodic(self):
         # Logging

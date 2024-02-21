@@ -26,7 +26,7 @@ class Indexer(Subsystem):
         self.indexerInputs = indexer.IndexerIOInputs()
         self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
 
-        self.offline = NTTunableBoolean( "/OfflineOverride/Indexer", False )
+        self.offline = NTTunableBoolean( "/Disable/Indexer", False, persistent=True )
 
     def periodic(self):
         # Logging
