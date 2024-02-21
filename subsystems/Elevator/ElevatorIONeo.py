@@ -1,4 +1,6 @@
 from .ElevatorIO import ElevatorIO
 
 class ElevatorIONeo(ElevatorIO):
-    pass
+    
+    def __init__(self, leftCanId:int, rightCanId:int):
+        pass

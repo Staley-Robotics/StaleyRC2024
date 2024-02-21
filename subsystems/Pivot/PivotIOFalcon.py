@@ -35,7 +35,7 @@ class PivotIOFalcon(PivotIO):
         self.resetPid()
         
         # Link Encoder to Motor
-        self.pivotMotor.configRemoteFeedbackFilter( self.pivotEncoder )
+        self.pivotMotor.configRemoteFeedbackFilter( self.pivotEncoder, 0 )
         self.pivotMotor.configSelectedFeedbackSensor( RemoteFeedbackDevice.RemoteSensor0, 0  )
         self.pivotMotor.configSelectedFeedbackSensor( FeedbackDevice.None_, 1 )
 

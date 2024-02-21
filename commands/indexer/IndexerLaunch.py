@@ -6,13 +6,13 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Indexer import Indexer
+from subsystems import Indexer
 from util import *
 
 # Intake Load Command
 class IndexerLaunch(Command):
     def __init__( self,
-                  indexer:Intake,
+                  indexer:Indexer,
                 ):
         # CommandBase Initiation Configurations
         super().__init__()

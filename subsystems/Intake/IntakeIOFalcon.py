@@ -13,14 +13,14 @@ class IntakeIOFalcon(IntakeIO):
         self.upperMotor.clearStickyFaults()
         self.upperMotor.configFactoryDefault()
         self.upperMotor.setNeutralMode( NeutralMode.Coast )
-        self.upperMotor.setInverted( True )
+        self.upperMotor.setInverted( False )
 
         # Lower Motor
         self.lowerMotor = WPI_TalonFX( lowerCanId, "canivore" )
         self.lowerMotor.clearStickyFaults()
         self.lowerMotor.configFactoryDefault()
         self.lowerMotor.setNeutralMode( NeutralMode.Coast )
-        self.lowerMotor.setInverted( True )
+        self.lowerMotor.setInverted( False )
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()

@@ -42,7 +42,7 @@ class Intake(Subsystem):
         #??? Don't Need It (Desired State / Current State)
 
     def set(self, speed:float):
-        self.intake.setVelocity( speed )
+        self.intake.setVelocity( speed, speed )
 
     def stop(self) -> None:
         self.set( self.IntakeSpeeds.Stop )

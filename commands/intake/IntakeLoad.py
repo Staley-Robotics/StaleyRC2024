@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Intake import Intake
+from subsystems import Intake
 from util import *
 
 # Intake Load Command
@@ -17,13 +17,12 @@ class IntakeLoad(Command):
         # CommandBase Initiation Configurations
         super().__init__()
         self.intake = intake
-        self.intake.setBrake(False)
 
         self.setName( "IntakeLoad" )
         self.addRequirements( intake )
 
     def initialize(self) -> None:
-        pass
+        self.intake.setBrake(True)
 
     def execute(self) -> None:
         self.intake.set(Intake.IntakeSpeeds.Load)

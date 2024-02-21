@@ -1,3 +1,4 @@
+from .CrescendoUtil import *
 from .LoggedConsole import *
 from .LoggedPDP import *
 from .LoggedRobot import *
