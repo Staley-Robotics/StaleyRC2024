@@ -2,8 +2,13 @@ from rev import *
 
 from .IndexerIO import IndexerIO
 
+from util import *
+
 class IndexerIONeo(IndexerIO):
     def __init__(self, idxCanId:int, lowerSensorId:int, upperSensorId:int):
+        # Tunable Settings
+        motorInvert = NTTunableBoolean( "/Config/Intake/Neo/Invert", False, updater=lambda: self.idxMotor.setInverted( motorInvert.get() ), persistent=True )
+
         # Static Variables
         self.actualVelocity = 0.0
         self.desiredVelocity = 0.0
@@ -13,7 +18,7 @@ class IndexerIONeo(IndexerIO):
         self.idxMotor.clearFaults()
         self.idxMotor.restoreFactoryDefaults()
         self.idxMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.idxMotor.setInverted( False )
+        self.idxMotor.setInverted( motorInvert.get() )
         self.idxMotor.burnFlash()
 
         self.idxEncoder = self.idxMotor.getEncoder()

@@ -25,7 +25,7 @@ class Pivot(Subsystem):
         self.pivotInputs = pivot.PivotIOInputs
         self.pivotLogger = NetworkTableInstance.getDefault().getStructTopic( "/Pivot", PivotIO.PivotIOInputs ).publish()
         
-        self.offline = NTTunableBoolean( "/Disable/Pivot", False, persistent=True )
+        self.offline = NTTunableBoolean( "/DisableSubsystem/Pivot", False, persistent=True )
 
     def periodic(self):
         # Logging

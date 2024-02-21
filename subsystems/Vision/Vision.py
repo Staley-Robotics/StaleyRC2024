@@ -38,7 +38,7 @@ class Vision(Subsystem):
         """
         Initialization
         """
-        self.offline = NTTunableBoolean( "/Disable/Vision", False, persistent=True )
+        self.offline = NTTunableBoolean( "/DisableSubsystem/Vision", False, persistent=True )
 
         # Camera Configuration
         self.cameras:typing.Tuple[VisionCamera] = cameras

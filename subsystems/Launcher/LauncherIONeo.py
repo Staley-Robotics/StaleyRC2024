@@ -2,8 +2,14 @@ from rev import *
 
 from .LauncherIO import LauncherIO
 
+from util import *
+
 class LauncherIONeo(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
+        # Tunable Settings
+        leftInvert = NTTunableBoolean( "/Config/Launcher/Neo/LeftInvert", False, updater=lambda: self.leftMotor.setInverted( leftInvert.get() ), persistent=True )
+        rightInvert = NTTunableBoolean( "/Config/Launcher/Neo/RightInvert", False, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=True )
+
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
         self.desiredVelocity = [ 0.0, 0.0 ]
@@ -13,7 +19,7 @@ class LauncherIONeo(LauncherIO):
         self.leftMotor.clearFaults()
         self.leftMotor.restoreFactoryDefaults()
         self.leftMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.leftMotor.setInverted( True )
+        self.leftMotor.setInverted( leftInvert.get() )
         self.leftMotor.burnFlash()
 
         self.leftEncoder = self.leftMotor.getEncoder()
@@ -23,7 +29,7 @@ class LauncherIONeo(LauncherIO):
         self.rightMotor.clearFaults()
         self.rightMotor.restoreFactoryDefaults()
         self.rightMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.rightMotor.setInverted( False )
+        self.rightMotor.setInverted( rightInvert.get() )
         self.rightMotor.burnFlash()
 
         self.rightEncoder = self.rightMotor.getEncoder()
