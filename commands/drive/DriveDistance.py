@@ -11,7 +11,7 @@ from wpimath.trajectory import Trajectory, TrajectoryConfig, TrajectoryGenerator
 #from pathplannerlib import PathConstraints, PathPlanner, PathPlannerTrajectory, PathPoint
 
 # Import Subsystems and Commands
-from subsystems import *
+from subsystems import SwerveDrive
 
 class DriveDistance(Command):
     _m_controller: HolonomicDriveController = None
