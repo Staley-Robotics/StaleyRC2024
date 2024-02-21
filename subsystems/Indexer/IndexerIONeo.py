@@ -7,7 +7,7 @@ from util import *
 class IndexerIONeo(IndexerIO):
     def __init__(self, idxCanId:int, lowerSensorId:int, upperSensorId:int):
         # Tunable Settings
-        motorInvert = NTTunableBoolean( "/Config/Intake/Neo/Invert", False, updater=lambda: self.idxMotor.setInverted( motorInvert.get() ), persistent=True )
+        motorInvert = NTTunableBoolean( "/Config/Indexer/Neo/Invert", False, updater=lambda: self.idxMotor.setInverted( motorInvert.get() ), persistent=True )
 
         # Static Variables
         self.actualVelocity = 0.0

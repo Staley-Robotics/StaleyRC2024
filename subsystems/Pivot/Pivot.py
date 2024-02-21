@@ -8,11 +8,11 @@ from .PivotIO import PivotIO
 class Pivot(Subsystem):
     class PivotPositions:
         __priv__ = {
-            0: NTTunableFloat( "/Config/PivotPositions/Upward", 70.0 ),
-            1: NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0 ),
-            2: NTTunableFloat( "/Config/PivotPositions/Amp", -45.0 ),
-            3: NTTunableFloat( "/Config/PivotPositions/Trap", -60.0 ),
-            4: NTTunableFloat( "/Config/PivotPositions/Downward", -70.0 ),
+            0: NTTunableFloat( "/Config/PivotPositions/Upward", 70.0, persistent=True ),
+            1: NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0, persistent=True ),
+            2: NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True ),
+            3: NTTunableFloat( "/Config/PivotPositions/Trap", -60.0, persistent=True ),
+            4: NTTunableFloat( "/Config/PivotPositions/Downward", -70.0, persistent=True ),
         }
         Upward = __priv__[0].get()
         Handoff = __priv__[0].get()

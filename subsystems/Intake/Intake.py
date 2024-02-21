@@ -8,9 +8,9 @@ from .IntakeIO import IntakeIO
 class Intake(Subsystem):
     class IntakeSpeeds:
         __priv__ = {
-            0: NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35 ),
-            1: NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50 ),
-            2: NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0 ),
+            0: NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35, persistent=True ),
+            1: NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50, persistent=True ),
+            2: NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0, persistent=True ),
         }
         Stop = 0
         Load = __priv__[0].get()

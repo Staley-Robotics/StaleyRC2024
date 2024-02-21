@@ -8,11 +8,11 @@ from .IndexerIO import IndexerIO
 class Indexer(Subsystem):
     class IndexerSpeeds:
         __priv__ = {
-            0: NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35 ),
-            1: NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50 ),
-            2: NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0 ),
-            3: NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05 ),
-            4: NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05 )
+            0: NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35, persistent=True ),
+            1: NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True ),
+            2: NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0, persistent=True ),
+            3: NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05, persistent=True ),
+            4: NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05, persistent=True )
         }
         Stop = 0
         Handoff = __priv__[0].get()

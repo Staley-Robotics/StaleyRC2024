@@ -8,14 +8,14 @@ from util import *
 class Launcher(Subsystem):
     class LauncherSpeeds:
         __priv__ = {
-            0: NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 0.95 ),
-            1: NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 0.85 ),
-            2: NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 0.30 ),
-            3: NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 0.20 ),
-            4: NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 0.50 ),
-            5: NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 0.40 ),
-            6: NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -1.0 ),
-            7: NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -1.0 ),
+            0: NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 0.95, persistent=True ),
+            1: NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 0.85, persistent=True ),
+            2: NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 0.30, persistent=True ),
+            3: NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 0.20, persistent=True ),
+            4: NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 0.50, persistent=True ),
+            5: NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 0.40, persistent=True ),
+            6: NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -1.0, persistent=True ),
+            7: NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -1.0, persistent=True ),
         }
 
         Stop = 0
