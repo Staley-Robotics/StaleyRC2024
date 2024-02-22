@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Pivot import Pivot
+from subsystems import Pivot
 from util import *
 
 # Intake Load Command

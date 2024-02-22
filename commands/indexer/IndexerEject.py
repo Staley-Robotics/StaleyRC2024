@@ -7,7 +7,7 @@ from commands2 import Command
 from wpilib import Timer
 
 # Our Imports
-from subsystems.Indexer import Indexer
+from subsystems import Indexer
 from util import *
 
 # Intake Load Command
@@ -29,13 +29,16 @@ class IndexerEject(Command):
         self.indexer.setBrake(False)
 
     def execute(self) -> None:
-        self.indexer.set(Intake.IntakeSpeeds.Eject)
+        self.indexer.set(Indexer.IndexerSpeeds.Eject.get())
 
     def end(self, interrupted:bool) -> None:
         self.timer.stop()
-        self.indexer.set(Intake.IntakeSpeeds.Stop)
+        self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.timer.hasElapsed(2.0)
     
     def runsWhenDisabled(self) -> bool: return False
+
+    def cancel(self) -> None:
+        return super().cancel()

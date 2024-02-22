@@ -5,6 +5,7 @@ import math
 
 # FRC Component Imports
 from commands2 import Command
+from wpilib import DriverStation
 from wpimath import applyDeadband
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.geometry import Rotation2d
@@ -17,18 +18,15 @@ from subsystems import SwerveDrive
 from util import *
 
 # Default Drive Command Class
-class DriveByStick(Command):
+class DriveAndAim(Command):
     def __init__( self,
                   swerveDrive:SwerveDrive,
                   velocityX:typing.Callable[[], float],
-                  velocityY:typing.Callable[[], float],
-                  holonomicX:typing.Callable[[], float] = ( lambda: 0.0 ),
-                  holonomicY:typing.Callable[[], float] = ( lambda: 0.0 ), 
-                  rotate:typing.Callable[[], float] = ( lambda: 0.0 )
+                  velocityY:typing.Callable[[], float]
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
-        self.setName( "DriveByStick" )
+        self.setName( "DriveAndAim" )
         self.addRequirements( swerveDrive )
 
         # Tunables
@@ -51,14 +49,16 @@ class DriveByStick(Command):
         self.drive = swerveDrive
         self.vX = velocityX
         self.vY = velocityY
-        self.hX = holonomicX
-        self.hY = holonomicY
-        self.rO = rotate
 
         # # Slew Rate Limiters
         # self.updateSlewRateLimiterVelocity()
         # self.updateSlewRateLimiterHolonomic()
         # self.updateSlewRateLimiterRotation()
+
+        # Target
+        self.targetBlue = Translation2d( 0.25, 5.50 )
+        self.targetRed = CrescendoUtil.convertTranslationToRedAlliance( self.targetBlue )
+        self.target = self.targetBlue
 
     # def updateSlewRateLimiterVelocity(self):
     #     self.srl_vX = SlewRateLimiter( self.srlV.get() )
@@ -72,55 +72,49 @@ class DriveByStick(Command):
     #     self.srl_rO = SlewRateLimiter( self.srlR.get() )
 
     def initialize(self) -> None:
+        # Get Holonomic PID
         self.tPid = self.drive.getHolonomicDriveController().getThetaController()
+        self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
+        
+        # Update Target to Red Alliance, if necessary
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+            self.target = self.targetRed
+        elif DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
+            self.target = self.targetBlue
 
     def execute(self) -> None:
         # Get Input Values
         x = -self.vX()
         y = -self.vY()
-        hX = -self.hX()
-        hY = -self.hY()
-        r = self.rO()
 
         # Calculate Deadband
         x = applyDeadband( x, self.deadband.get() ) 
         y = applyDeadband( y, self.deadband.get() )
-        hX = applyDeadband( hX, self.deadband.get() )
-        hY = applyDeadband( hY, self.deadband.get() )
-        r = applyDeadband( r, self.deadband.get() )
 
         # Square the Inputs
         x *= abs( x )
         y *= abs( y )
-        hX *= abs( hX )
-        hY *= abs( hY )
-        r *= abs( r )
 
         # Slew Rate Limiter
         #x = self.srl_vX.calculate( x )
         #y = self.srl_vY.calculate( y )
-        #hX = self.srl_hX.calculate( hX )
-        #hY = self.srl_hY.calculate( hY )
-        #r = self.srl_rO.calculate( r )
 
         # Calculate Fine Tuned Controls
         magV = self.ctlFullVelocity.get() if not self.finetuneEnabled.get() else self.ctlFineVelocity.get()
         magH = self.ctlFullHolonomic.get() if not self.finetuneEnabled.get() else self.ctlFineHolonomic.get()
-        magR = self.ctlFullRotation.get() if not self.finetuneEnabled.get() else self.ctlFineRotation.get()           
+        #magR = self.ctlFullRotation.get() if not self.finetuneEnabled.get() else self.ctlFineRotation.get()           
         x *= magV
         y *= magV
-        r *= magR
+        #r *= magR
 
-        # Calculate Rotation via Holonomic or Buttons
-        if abs(hX) > 0.1 or abs(hY) > 0.1:
-            mag = math.sqrt( hX*hX + hY*hY ) * magH
-            robotAngle:float = self.drive.getRobotAngle().radians()
-            goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
-            target = self.tPid.calculate(robotAngle, goalAngle)
-            r = target * mag
-            r = min( max( r, -1.0 ), 1.0 )
-        else:
-            self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
+        # Calculate Rotation To Target
+        robotAngle:float = self.drive.getRobotAngle().radians()
+        robotPose = self.drive.getPose()
+        hX = self.target.X() - robotPose.X()
+        hY = self.target.Y() - robotPose.Y()
+        goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
+        r = self.tPid.calculate(robotAngle, goalAngle)
+        r = min( max( r, -1.0 ), 1.0 )
 
         # Send ChassisSpeeds
         self.drive.runPercentageInputs(x, y, r)

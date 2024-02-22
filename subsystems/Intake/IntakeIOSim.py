@@ -9,7 +9,7 @@ class IntakeIOSim(IntakeIO):
         self.lMotor = FlywheelSim( DCMotor.falcon500(1), 1, 0.004 )
 
         self.brake = False
-        self.setpoint = 0.0
+        self.setpoint = [ 0.0, 0.0 ]
 
         self.uVolts = 0.0
         self.uVelocity = 0.0
@@ -46,23 +46,26 @@ class IntakeIOSim(IntakeIO):
         inputs.sensor = False
 
     def run(self) -> None:
-        volts = min(max( self.getSetpoint() * 12.0, -12.0 ), 12.0)
-        self.uVolts = volts
-        self.lVolts = volts
+        tvolts = min(max( self.getSetpoint()[0] * 12.0, -12.0 ), 12.0)
+        bvolts = min(max( self.getSetpoint()[1] * 12.0, -12.0 ), 12.0)
+        self.uVolts = tvolts
+        self.lVolts = bvolts
         self.uMotor.setInputVoltage( self.uVolts )
         self.lMotor.setInputVoltage( self.lVolts )
 
     def setBrake(self, brake:bool) -> None:
         self.brake = brake
 
-    def setVelocity(self, velocity:float) -> None:
-        self.setpoint = float(velocity)
+    def setVelocity(self, upperVelocity:float, lowerVelocity:float) -> None:
+        self.setpoint = [ float(upperVelocity), float(lowerVelocity) ]
 
     def getVelocity(self) -> float:
-        return ( self.uVelocity + self.lVelocity ) / 2
+        return [ self.uVelocity , self.lVelocity ]
 
     def atSetpoint(self) -> bool:
-        return ( self.getSetpoint() == self.getVelocity() )
+        uBool = ( self.getSetpoint()[0] == self.uVelocity )
+        lBool = ( self.getSetpoint()[1] == self.lVelocity )
+        return [ uBool, lBool ]
     
-    def getSetpoint(self) -> float:
+    def getSetpoint(self) -> [ float, float ]:
         return self.setpoint

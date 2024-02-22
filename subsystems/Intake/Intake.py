@@ -7,22 +7,22 @@ from .IntakeIO import IntakeIO
 
 class Intake(Subsystem):
     class IntakeSpeeds:
-        __priv__ = {
-            0: NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35 ),
-            1: NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50 ),
-            2: NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0 ),
-        }
-        Stop = 0
-        Load = __priv__[0].get()
-        Handoff = __priv__[1].get()
-        Eject = __priv__[2].get()
+        #__priv__ = {
+        #    0: NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35, persistent=True ),
+        #    1: NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50, persistent=True ),
+        #    2: NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0, persistent=True ),
+        #}
+        Stop = NTTunableFloat( "/Config/IntakeSpeeds/Stop", 0.0, persistent=True )
+        Load = NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35, persistent=True )
+        Handoff = NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50, persistent=True )
+        Eject = NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0, persistent=True )
 
     def __init__( self, intake:IntakeIO ):
         self.intake = intake
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
 
-        self.offline = NTTunableBoolean( "/OfflineOverride/Intake", False )
+        self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
     def periodic(self):
         # Logging
@@ -42,10 +42,10 @@ class Intake(Subsystem):
         #??? Don't Need It (Desired State / Current State)
 
     def set(self, speed:float):
-        self.intake.setVelocity( speed )
+        self.intake.setVelocity( speed, speed )
 
     def stop(self) -> None:
-        self.set( self.IntakeSpeeds.Stop )
+        self.set( Intake.IntakeSpeeds.Stop.get() )
 
     # def load(self):
     #     self.set( self.IntakeSpeeds.Load )
@@ -64,4 +64,4 @@ class Intake(Subsystem):
     
     def isRunning(self) -> bool:
         upper, lower = self.intake.getVelocity()
-        return ( upper != self.IntakeSpeeds.Stop or lower != self.IntakeSpeeds.Stop )
+        return ( upper != Intake.IntakeSpeeds.Stop.get() or lower != Intake.IntakeSpeeds.Stop.get() )

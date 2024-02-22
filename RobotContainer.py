@@ -30,8 +30,8 @@ class RobotContainer:
         ssModulesIO = None
         ssGyroIO = None
         ssCamerasIO = None
-        ssIntakeIO = None
         ssIndexerIO = None
+        ssIntakeIO = None
         ssLauncherIO = None
         ssPivotIO = None
         ssElevatorIO = None
@@ -57,12 +57,12 @@ class RobotContainer:
                 SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
                 SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
-            ssIntakeIO = IntakeIOFalcon( 3, 4, 0 )
-            ssIndexerIO = IndexerIONeo( 16, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 20, 9 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 10, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 21, 22 )
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
+            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
+            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
+            ssPivotIO = PivotIOFalcon( 15, 16, 0.0 )
+            ssElevatorIO = ElevatorIONeo( 17, 18 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -73,7 +73,7 @@ class RobotContainer:
         # Link IO Systems to Subsystems
         self.drivetrain:SwerveDrive = SwerveDrive( ssModulesIO, ssGyroIO )
         self.intake:Intake = Intake( ssIntakeIO )
-        self.indexer:Indexer = Indexer( ssIndexerIO )
+        self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
         self.elevator:Elevator = Elevator( ssElevatorIO )
@@ -82,7 +82,7 @@ class RobotContainer:
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
-        wpilib.SmartDashboard.putData( "Indexer", self.indexer )
+        wpilib.SmartDashboard.putData( "Indexer", self.feeder )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
         wpilib.SmartDashboard.putData( "Elevator", self.elevator )
@@ -103,10 +103,21 @@ class RobotContainer:
         
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
-        self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
-        self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
+        # self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
+        # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
+        # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
+        # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
+        # self.m_driver1.rightBumper().whileTrue(
+        #     commands.DriveAndAim(
+        #         self.drivetrain,
+        #         self.m_driver1.getLeftY,
+        #         self.m_driver1.getLeftX
+        #     )
+        # )
+        self.m_driver1.a().whileTrue( IntakeLoad( self.intake ) )
+        self.m_driver1.b().whileTrue( IntakeHandoff( self.intake ) )
+        self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)

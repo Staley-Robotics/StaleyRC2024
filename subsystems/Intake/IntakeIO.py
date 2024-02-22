@@ -33,7 +33,7 @@ class IntakeIO:
     def setBrake(self, brake:bool) -> None:
         pass
 
-    def setVelocity(self, velocity:float) -> None:
+    def setVelocity(self, upperVelocity:float, lowerVelocity:float) -> None:
         pass
 
     def getVelocity(self) -> [float, float]:

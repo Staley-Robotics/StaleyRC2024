@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Indexer import Indexer
+from subsystems import Indexer
 from util import *
 
 # Intake Load Command
@@ -17,19 +17,18 @@ class IndexerHandoff(Command):
         # CommandBase Initiation Configurations
         super().__init__()
         self.indexer = indexer
-        self.indexer.setBrake(False)
 
         self.setName( "IndexerHandoff" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
-        pass
+        self.indexer.setBrake(True)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Handoff)
+        self.indexer.set(Indexer.IndexerSpeeds.Handoff.get())
     
-    def end(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Stop)
+    def end(self, interrupted:bool) -> None:
+        self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool: 
         return self.indexer.hasNote()
