@@ -25,10 +25,10 @@ class IndexerHandoff(Command):
         self.indexer.setBrake(True)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Handoff)
+        self.indexer.set(Indexer.IndexerSpeeds.Handoff.get())
     
     def end(self, interrupted:bool) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Stop)
+        self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool: 
         return self.indexer.hasNote()

@@ -32,8 +32,8 @@ class MyRobot(wpilib.TimedRobot):
         self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
 
         # Setup PDP Logging
-        loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kCTRE )
-        self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
+        # loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kRev )
+        # self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
 
         # Setup System Logging
         loggedSystemStats:LoggedSystemStats = LoggedSystemStats()

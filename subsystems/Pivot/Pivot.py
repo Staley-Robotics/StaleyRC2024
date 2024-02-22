@@ -7,18 +7,12 @@ from .PivotIO import PivotIO
 
 class Pivot(Subsystem):
     class PivotPositions:
-        __priv__ = {
-            0: NTTunableFloat( "/Config/PivotPositions/Upward", 70.0, persistent=True ),
-            1: NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0, persistent=True ),
-            2: NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True ),
-            3: NTTunableFloat( "/Config/PivotPositions/Trap", -60.0, persistent=True ),
-            4: NTTunableFloat( "/Config/PivotPositions/Downward", -70.0, persistent=True ),
-        }
-        Upward = __priv__[0].get()
-        Handoff = __priv__[0].get()
-        Amp = __priv__[0].get()
-        Trap = __priv__[0].get()
-        Downward = __priv__[0].get()
+        Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 70.0, persistent=True )
+        Handoff = NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0, persistent=True )
+        Amp = NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True )
+        Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -60.0, persistent=True )
+        Source = NTTunableFloat( "/Config/PivotPositions/Source", -60.0, persistent=True )
+        Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -70.0, persistent=True )
 
     def __init__(self, pivot:PivotIO):
         self.pivot = pivot

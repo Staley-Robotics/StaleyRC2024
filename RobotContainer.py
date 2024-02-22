@@ -14,7 +14,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = True
+    testing:bool = False
 
     def __init__(self):
         """
@@ -57,12 +57,12 @@ class RobotContainer:
                 SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
                 SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
-            ssIntakeIO = IntakeIOFalcon( 3, 4, 0 )
-            ssIndexerIO = IndexerIONeo( 16, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 20, 9 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 10, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 21, 22 )
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
+            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
+            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
+            ssPivotIO = PivotIOFalcon( 15, 16, 0.0 )
+            ssElevatorIO = ElevatorIONeo( 17, 18 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [

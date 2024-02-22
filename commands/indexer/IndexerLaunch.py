@@ -25,10 +25,10 @@ class IndexerLaunch(Command):
         self.indexer.setBrake(False)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Launch)
+        self.indexer.set(Indexer.IndexerSpeeds.Launch.get())
 
     def end(self, interrupted:bool) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Stop)
+        self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return not self.indexer.hasNote()

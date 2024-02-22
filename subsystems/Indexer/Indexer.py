@@ -7,19 +7,12 @@ from .IndexerIO import IndexerIO
 
 class Indexer(Subsystem):
     class IndexerSpeeds:
-        __priv__ = {
-            0: NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35, persistent=True ),
-            1: NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True ),
-            2: NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0, persistent=True ),
-            3: NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05, persistent=True ),
-            4: NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05, persistent=True )
-        }
-        Stop = 0
-        Handoff = __priv__[0].get()
-        Launch = __priv__[1].get()
-        Eject = __priv__[2].get()
-        SelfIn = __priv__[3].get()
-        SelfOut = __priv__[4].get()
+        Stop = NTTunableFloat( "/Config/IndexerSpeeds/Stop", 0.0, persistent=True )
+        Handoff = NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.35, persistent=True )
+        Launch = NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True )
+        Eject = NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0, persistent=True )
+        SelfIn = NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05, persistent=True )
+        SelfOut = NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05, persistent=True )
 
     def __init__(self, indexer:IndexerIO):
         self.indexer = indexer
@@ -51,7 +44,7 @@ class Indexer(Subsystem):
         self.indexer.setVelocity( speed )
 
     def stop(self) -> None:
-        self.set( self.IndexerSpeeds.Stop )
+        self.set( Indexer.IndexerSpeeds.Stop.get() )
 
     # def handoff(self) -> None:
     #     self.set( self.IndexerSpeeds.Handoff )
@@ -69,4 +62,4 @@ class Indexer(Subsystem):
         return False
     
     def isRunning(self) -> bool:
-        return ( self.indexer.getVelocity() != self.IndexerSpeeds.Stop )
+        return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )

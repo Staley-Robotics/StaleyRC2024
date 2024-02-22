@@ -30,7 +30,6 @@ from .pivot.PivotAim import *
 from .pivot.PivotAmp import *
 from .pivot.PivotBottom import *
 from .pivot.PivotByStick import *
-from .pivot.PivotClimb import *
 from .pivot.PivotHandoff import *
 from .pivot.PivotSource import *
 from .pivot.PivotTop import *

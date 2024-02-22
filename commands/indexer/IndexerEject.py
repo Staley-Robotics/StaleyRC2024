@@ -29,11 +29,11 @@ class IndexerEject(Command):
         self.indexer.setBrake(False)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Eject)
+        self.indexer.set(Indexer.IndexerSpeeds.Eject.get())
 
     def end(self, interrupted:bool) -> None:
         self.timer.stop()
-        self.indexer.set(Indexer.IndexerSpeeds.Stop)
+        self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.timer.hasElapsed(2.0)

@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Launcher import Launcher
+from subsystems import Launcher
 from util import *
 
 # Intake Load Command
@@ -24,10 +24,10 @@ class LauncherSpeaker(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft, Launcher.LauncherSpeeds.SpeakerRight)
+        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft.get(), Launcher.LauncherSpeeds.SpeakerRight.get())
 
     def end(self, interrupted:bool) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.Stop, Launcher.LauncherSpeeds.Stop)
+        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.launcher.hasLaunched()
