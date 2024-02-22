@@ -7,7 +7,7 @@ from commands2 import Command
 from wpilib import Timer
 
 # Our Imports
-from subsystems.Intake import Intake
+from subsystems import Intake
 from util import *
 
 # Intake Load Command

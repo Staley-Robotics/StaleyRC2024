@@ -46,7 +46,7 @@ class LauncherSparkMaxWFeed(Launcher):
         #feeder
         self.feederMotor.set(self.feeder_actual.get())
     
-    def updateInputs(self, inputs: Launcher.LauncherInputs):
+    def updateInputs(self, inputs):
         inputs.lMotorAppliedVolts = self.lMotor.getAppliedOutput() * self.lMotor.getBusVoltage()
         inputs.lMotorurrentAmps = self.lMotor.getOutputCurrent()
         inputs.lMotorTempCelcius = self.lMotor.getMotorTemperature()

@@ -12,7 +12,7 @@ from util import *
 # Intake Load Command
 class IndexerLaunch(Command):
     def __init__( self,
-                  indexer:Intake,
+                  indexer:Indexer,
                 ):
         # CommandBase Initiation Configurations
         super().__init__()

@@ -17,11 +17,12 @@
             "type": "python",
             "module": "robotpy",
             "request": "launch",
+            "program": "~/usr/local/bin/python3.11",
             "args": [
                 "sim"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
         },
         {
             "name": "Deploy to Robot",
@@ -32,7 +33,8 @@
                 "deploy"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+
         }
     ]
 }

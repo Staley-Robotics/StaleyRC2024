@@ -29,7 +29,7 @@ class RobotContainer:
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
-        ### Create Subsystems
+        # Create Subsystems
         # IO Systems
         ssModulesIO = None
         ssGyroIO = None
@@ -61,14 +61,14 @@ class RobotContainer:
                 SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
                 SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
-            ssIntakeIO = IntakeIOFalcon( 3, 4, 0 )
-            ssIndexerIO = IndexerIONeo( 16, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 20, 9 , 3)
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
+            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
+            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
             ssPivotIO = PivotIOFalcon( 15, 10, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 21, 22 )
+            ssElevatorIO = ElevatorIONeo( 16, 17 )
 
-        # Vision
+        Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
@@ -92,7 +92,6 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
 
@@ -101,8 +100,8 @@ class RobotContainer:
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        # # B button go brrrr
-        # self.m_driver1.b().whileTrue( commands.RunLauncher(self.launcher) )
+        # A button go brrrr
+        # self.m_driver1.a().whileTrue( commands.RunLauncher(self.launcher) )
         # # change launcher speeds
         # self.m_driver1.leftBumper().whileTrue(commands.DecrementLauncherSpeed(self.launcher))
         # self.m_driver1.rightBumper().whileTrue(commands.IncrementLauncherSpeed(self.launcher))
@@ -110,21 +109,18 @@ class RobotContainer:
         # self.m_driver1.y().whileTrue(commands.RunFeeder(self.launcher))
         # self.m_driver1.x().whileTrue(commands.RunFeederReversed(self.launcher))
         # #run intake
-        # self.m_driver1.a().whileTrue(commands.RunIntake(self.intake))
-        # self.m_driver1.a().onTrue(commands.EnableEmitter(self.irEmitter))
-        # self.m_driver1.b().onTrue(commands.EnableEmitter(self.irEmitter))
-
-        # self.m_driver1.x().whileTrue(commands.printReciever(self.irSensor))
-
+        self.m_driver1.x().onTrue(IntakeHandoff(self.intake))
+        self.m_driver1.y().onTrue(IntakeEject(self.intake))
+        self.m_driver1.b().onTrue(IntakeLoad(self.intake))
     
-        #default commands
-        # self.pivot.setDefaultCommand(
-        #     commands.PointPivotToAngle(
-        #         self.pivot,
-        #         self.m_driver1.getLeftTriggerAxis,
-        #         self.m_driver1.getRightTriggerAxis
-        #     )
-        # )
+        ## default commands
+        self.pivot.setDefaultCommand(
+            commands.PointPivotToAngle(
+                self.pivot,
+                self.m_driver1.getLeftTriggerAxis,
+                self.m_driver1.getRightTriggerAxis
+            )
+        )
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

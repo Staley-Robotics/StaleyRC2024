@@ -9,18 +9,18 @@ class IntakeIOFalcon(IntakeIO):
         self.desiredVelocity = [ 0.0, 0.0 ]
         
         # Upper Motor
-        self.upperMotor = WPI_TalonFX( upperCanId, "canivore" )
+        self.upperMotor = WPI_TalonFX( upperCanId)#, "canivore" )
         self.upperMotor.clearStickyFaults()
         self.upperMotor.configFactoryDefault()
         self.upperMotor.setNeutralMode( NeutralMode.Coast )
-        self.upperMotor.setInverted( True )
+        self.upperMotor.setInverted( False )
 
-        # Lower Motor
-        self.lowerMotor = WPI_TalonFX( lowerCanId, "canivore" )
+        # Lower Motorubb
+        self.lowerMotor = WPI_TalonFX( lowerCanId)#, "canivore" )
         self.lowerMotor.clearStickyFaults()
         self.lowerMotor.configFactoryDefault()
         self.lowerMotor.setNeutralMode( NeutralMode.Coast )
-        self.lowerMotor.setInverted( True )
+        self.lowerMotor.setInverted( False )
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()
@@ -51,9 +51,9 @@ class IntakeIOFalcon(IntakeIO):
     def setVelocity(self, upperVelocity:float, lowerVelocity:float):
         self.desiredVelocity = [ upperVelocity, lowerVelocity ]
 
-    def getVelocity(self) -> [float, float]:
+    def getVelocity(self):# -> [float, float]:
         return self.actualVelocity
     
-    def getSetpoint(self) -> [float, float]:
+    def getSetpoint(self):# -> [float, float]:
         return self.desiredVelocity
     

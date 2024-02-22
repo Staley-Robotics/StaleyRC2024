@@ -2,7 +2,7 @@ from hal import *
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 
-from subsystems import *
+#from subsystems import *
 
 class Logger:
     tables = {}

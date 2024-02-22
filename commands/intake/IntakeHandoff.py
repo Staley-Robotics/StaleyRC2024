@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Intake import Intake
+from subsystems import Intake
 from util import *
 
 # Intake Load Command
@@ -17,21 +17,20 @@ class IntakeHandoff(Command):
         # CommandBase Initiation Configurations
         super().__init__()
         self.intake = intake
-        self.intake.setBrake(False)
-
         self.setName( "IntakeHandoff" )
         self.addRequirements( intake )
 
     def initialize(self) -> None:
-        pass
+        self.intake.setBrake(False)
 
     def execute(self) -> None:
         self.intake.set(Intake.IntakeSpeeds.Handoff)
     
-    def end(self) -> None:
+    def end(self, interrupted:bool) -> None:
         self.intake.set(Intake.IntakeSpeeds.Stop)
 
-    def isFinished(self) -> bool: 
+    def isFinished(self) -> bool:
+        return False
         return not self.intake.hasNote()
     
     def runsWhenDisabled(self) -> bool: return False
