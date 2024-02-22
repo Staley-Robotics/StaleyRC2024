@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Pivot import Pivot
+from subsystems import Pivot
 from util import *
 
 # Intake Load Command
@@ -24,7 +24,7 @@ class PivotTop(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.pivot.set(self.pivot.PivotPositions.Upward)
+        self.pivot.set(Pivot.PivotPositions.Upward.get())
 
     def end(self, interrupted:bool) -> None:
         pass # May be set to zero in future, but for now: assuming hold position

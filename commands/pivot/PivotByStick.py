@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Pivot import Pivot
+from subsystems import Pivot
 from util import *
 
 # Intake Load Command
@@ -28,9 +28,9 @@ class PivotByStick(Command):
 
     def execute(self) -> None:
         # Describes the normalization function to distribute stick positions evenly across pivot rotations
-        self.position = (self.stick - self.pivot.PivotPositions.Downward)\
+        self.position = (self.stick - Pivot.PivotPositions.Downward.get())\
                         /\
-                        (self.pivot.PivotPositions.Upward - self.pivot.PivotPositions.Downward)
+                        (Pivot.PivotPositions.Upward.get() - Pivot.PivotPositions.Downward.get())
         
         self.pivot.set(self.position)
 

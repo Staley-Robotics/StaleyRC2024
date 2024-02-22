@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Elevator import Elevator
+from subsystems import Elevator
 from util import *
 
 # Intake Load Command
@@ -24,7 +24,7 @@ class ElevatorBottom(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.elevator.setPosition(self.elevator.ElevatorPosition.Bottom)
+        self.elevator.setPosition(Elevator.ElevatorPositions.Bottom.get())
 
     def end(self, interrupted:bool) -> None:
         pass # May be set to zero in future, but for now: assuming hold position

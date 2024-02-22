@@ -43,7 +43,7 @@ class SwerveModuleIONeo(SwerveModuleIO):
     referencePosition:Translation2d = None
     moduleState:SwerveModuleState = None
 
-    def __init__(self, subsystemName, driveId, turnId, sensorId, posX, posY, turnOffset):
+    def __init__(self, subsystemName:str, driveId:int, turnId:int, sensorId:int, posX:float, posY:float, turnOffset:float):
         """
         Initialization
         """

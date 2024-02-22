@@ -6,7 +6,7 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems.Pivot import Pivot
+from subsystems import Pivot
 from util import *
 
 # Intake Load Command
@@ -24,7 +24,7 @@ class PivotSource(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.pivot.set(self.pivot.PivotPositions.Source) # As of writing, PivotPositions has no source value
+        self.pivot.set(Pivot.PivotPositions.Source.get()) # As of writing, PivotPositions has no source value
 
     def end(self, interrupted:bool) -> None:
         pass # May be set to zero in future, but for now: assuming hold position

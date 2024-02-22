@@ -15,6 +15,7 @@ from wpimath import units
 
 # Our Imports
 from .GyroIO import GyroIO
+from util import *
 
 class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
     """
@@ -31,7 +32,8 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         :param startYaw: Starting Yaw in Degrees once the Pigeon 2 is initialized.
         """
         # Initialize WPI_Pigeon2
-        super().__init__( deviceNumber, "canivore" )
+        gyroCanBus = NTTunableString( "/Config/SwerveDrive/Gyro/CanBus", "rio", persistent=True )
+        super().__init__( deviceNumber, gyroCanBus.get() )
 
         # Configure Default / Start Settings
         self.configFactoryDefault()

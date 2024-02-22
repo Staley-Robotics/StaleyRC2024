@@ -29,11 +29,11 @@ class IntakeEject(Command):
         self.intake.setBrake(False)
 
     def execute(self) -> None:
-        self.intake.set(Intake.IntakeSpeeds.Eject)
+        self.intake.set(Intake.IntakeSpeeds.Eject.get())
 
     def end(self, interrupted:bool) -> None:
         self.timer.stop()
-        self.intake.set(Intake.IntakeSpeeds.Stop)
+        self.intake.set(Intake.IntakeSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.timer.hasElapsed(2.0)

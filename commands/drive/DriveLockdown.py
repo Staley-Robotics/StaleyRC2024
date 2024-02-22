@@ -6,10 +6,9 @@ from commands2 import Command
 from wpimath.kinematics import SwerveModuleState
 
 # Import Subsystems and Commands
-from subsystems import *
+from subsystems import SwerveDrive
 
 # Constants
-
 
 class DriveLockdown(Command):
     def __init__(self, swerveDrive:SwerveDrive):

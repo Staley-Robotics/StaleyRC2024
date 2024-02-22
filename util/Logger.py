@@ -1,5 +1,5 @@
 from hal import *
-from ntcore import NetworkTableInstance
+from ntcore import NetworkTableInstance, StructPublisher
 from wpilib import RobotBase
 
 #from subsystems import *

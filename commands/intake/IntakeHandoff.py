@@ -24,10 +24,10 @@ class IntakeHandoff(Command):
         self.intake.setBrake(False)
 
     def execute(self) -> None:
-        self.intake.set(Intake.IntakeSpeeds.Handoff)
+        self.intake.set(Intake.IntakeSpeeds.Handoff.get())
     
     def end(self, interrupted:bool) -> None:
-        self.intake.set(Intake.IntakeSpeeds.Stop)
+        self.intake.set(Intake.IntakeSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return False

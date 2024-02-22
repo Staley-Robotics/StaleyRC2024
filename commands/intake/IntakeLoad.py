@@ -25,10 +25,10 @@ class IntakeLoad(Command):
         self.intake.setBrake(True)
 
     def execute(self) -> None:
-        self.intake.set(Intake.IntakeSpeeds.Load)
+        self.intake.set(Intake.IntakeSpeeds.Load.get())
     
     def end(self, interrupted:bool) -> None:
-        self.intake.set(Intake.IntakeSpeeds.Stop)
+        self.intake.set(Intake.IntakeSpeeds.Stop.get())
 
     def isFinished(self) -> bool: 
         return self.intake.hasNote()
