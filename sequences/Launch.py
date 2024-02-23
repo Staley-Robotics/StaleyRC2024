@@ -6,7 +6,7 @@ from util import *
 
 from subsystems import Intake, Indexer
 
-class Handoff(commands2.ParallelRaceGroup):
+class Handoff(commands2.SequentialCommandGroup):
     def __init__(self, intake:Intake, indexer:Indexer):
         super().__init__()
 

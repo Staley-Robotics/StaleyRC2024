@@ -13,7 +13,7 @@ class PivotIOFalcon(PivotIO):
         pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
         pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
-        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", False, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
+        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
 
         # Tunables
         self.pivot_kP = NTTunableFloat('Pivot/PID_kP', 0.2, updater=self.resetPid, persistent=True)
@@ -36,7 +36,7 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.configFactoryDefault()
         self.pivotMotor.setSensorPhase( pivotPhase.get() )
         self.pivotMotor.setInverted( pivotInvert.get() )
-        self.pivotMotor.setNeutralMode( NeutralMode.Brake )
+        self.pivotMotor.setNeutralMode( NeutralMode.Coast )
         self.pivotMotor.configFeedbackNotContinuous( True )
         self.pivotMotor.configNeutralDeadband( 0.005 )
         self.resetPid()

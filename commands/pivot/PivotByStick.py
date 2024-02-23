@@ -30,8 +30,10 @@ class PivotByStick(Command):
 
     def execute(self) -> None:
         # Describes the normalization function to distribute stick positions evenly across pivot rotations
-        self.position = (applyDeadband(self.stick(), 0.04) - Pivot.PivotPositions.Downward.get())/(Pivot.PivotPositions.Upward.get() - Pivot.PivotPositions.Downward.get())
-        
+        #self.position = (applyDeadband(self.stick(), 0.04) - Pivot.PivotPositions.Downward.get())/(Pivot.PivotPositions.Upward.get() - Pivot.PivotPositions.Downward.get())
+        self.position = self.stick() * (Pivot.PivotPositions.Upward.get() + Pivot.PivotPositions.Downward.get())
+
+
         self.pivot.set(self.position)
 
     def end(self, interrupted:bool) -> None:

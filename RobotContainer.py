@@ -65,8 +65,8 @@ class RobotContainer:
             ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
             ssIndexerIO = IndexerIONeo( 12, 1, 2 )
             ssLauncherIO = LauncherIONeo( 13, 14 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 10, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 16, 17 )
+            ssPivotIO = PivotIOFalcon( 15, 16, 48.691 )
+            ssElevatorIO = ElevatorIONeo( 17, 18 )
 
         Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -142,12 +142,12 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
-        self.pivot.setDefaultCommand(
-            commands.PivotByStick(
-                self.pivot,
-                self.m_driver1.getLeftY
-            )
-        )
+        # self.pivot.setDefaultCommand(
+        #     commands.PivotByStick(
+        #         self.pivot,
+        #         self.m_driver1.getLeftY
+        #     )
+        # )
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

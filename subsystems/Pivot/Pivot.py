@@ -7,12 +7,12 @@ from .PivotIO import PivotIO
 
 class Pivot(Subsystem):
     class PivotPositions:
-        Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 70.0, persistent=True )
-        Handoff = NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0, persistent=True )
+        Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 55.041, persistent=True )
+        Handoff = NTTunableFloat( "/Config/PivotPositions/Handoff", 32.168, persistent=True )
         Amp = NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True )
         Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -60.0, persistent=True )
         Source = NTTunableFloat( "/Config/PivotPositions/Source", -60.0, persistent=True )
-        Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -70.0, persistent=True )
+        Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -52.031, persistent=True )
 
     def __init__(self, pivot:PivotIO):
         self.pivot = pivot
@@ -34,6 +34,7 @@ class Pivot(Subsystem):
             self.pivot.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:
             self.pivot.run()
+            # self.pivot.pivotMotor.set(0)
 
         # Post Run Logging
         #??? Don't Need It (Desired State / Current State)
