@@ -30,6 +30,7 @@ class LauncherSpeaker(Command):
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
+        return False
         return self.launcher.hasLaunched()
     
     def runsWhenDisabled(self) -> bool: return False

@@ -100,6 +100,7 @@ class RobotContainer:
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+        ## Driving
         # self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
         # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
@@ -111,9 +112,15 @@ class RobotContainer:
         #         self.m_driver1.getLeftX
         #     )
         # )
-        self.m_driver1.a().whileTrue( IntakeLoad( self.intake ) )
-        self.m_driver1.b().whileTrue( IntakeHandoff( self.intake ) )
-        self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+        ## Mechanisms
+        #Intake
+        self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
+        self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
+        # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+        #Indexer
+        self.m_driver1.b().whileTrue( IndexerHandoff( self.feeder ))
+        #Launcher
+        self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
 
 
         # Configure Driver 2 Button Mappings
@@ -133,6 +140,12 @@ class RobotContainer:
                 self.m_driver1.getRightY,
                 self.m_driver1.getRightX,
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
+            )
+        )
+        self.pivot.setDefaultCommand(
+            commands.PivotByStick(
+                self.pivot,
+                self.m_driver1.getLeftY
             )
         )
     

@@ -1,5 +1,254 @@
 [
   {
+    "name": "/Config/Crescendo/FieldWidth",
+    "type": "double",
+    "value": 8.17,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Upward",
+    "type": "double",
+    "value": 70.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Handoff",
+    "type": "double",
+    "value": 30.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Amp",
+    "type": "double",
+    "value": -45.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Trap",
+    "type": "double",
+    "value": -60.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Source",
+    "type": "double",
+    "value": -60.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/PivotPositions/Downward",
+    "type": "double",
+    "value": -70.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Speaker/Stop",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Speaker/Left",
+    "type": "double",
+    "value": 0.95,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Speaker/Right",
+    "type": "double",
+    "value": 0.85,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Amp/Left",
+    "type": "double",
+    "value": 0.3,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Amp/Right",
+    "type": "double",
+    "value": 0.2,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Trap/Left",
+    "type": "double",
+    "value": 0.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Trap/Right",
+    "type": "double",
+    "value": 0.4,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Source/Left",
+    "type": "double",
+    "value": -1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LauncherSpeeds/Source/Right",
+    "type": "double",
+    "value": -1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IntakeSpeeds/Stop",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IntakeSpeeds/Load",
+    "type": "double",
+    "value": 0.35,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IntakeSpeeds/Handoff",
+    "type": "double",
+    "value": 0.35,
+    "properties": {
+      "persistent": true,
+      "retained": true
+    }
+  },
+  {
+    "name": "/Config/IntakeSpeeds/Eject",
+    "type": "double",
+    "value": -1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/ElevatorPositions/Bottom",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/ElevatorPositions/Amp",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/ElevatorPositions/Climb",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/ElevatorPositions/Trap",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/ElevatorPositions/Top",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/Stop",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/Handoff",
+    "type": "double",
+    "value": 0.35,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/Launch",
+    "type": "double",
+    "value": 0.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/Eject",
+    "type": "double",
+    "value": -1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/SelfIn",
+    "type": "double",
+    "value": 0.05,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/IndexerSpeeds/SelfOut",
+    "type": "double",
+    "value": -0.05,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
     "name": "/Config/Constants/Launcher/lFlywheelPort",
     "type": "double",
     "value": 14.0,
@@ -118,6 +367,70 @@
     "name": "/Config/Pivot/PID_kFF",
     "type": "double",
     "value": 0.2,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Pivot/Speed Multiplier",
+    "type": "double",
+    "value": 0.01,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/Gyro/CanBus",
+    "type": "string",
+    "value": "rio",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/SwerveDrive",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/Intake",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/Indexer",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/Launcher",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/Pivot",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/Vision",
+    "type": "boolean",
+    "value": false,
     "properties": {
       "persistent": true
     }

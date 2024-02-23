@@ -20,7 +20,7 @@ class PivotIOFalcon(PivotIO):
         self.pivot_kI = NTTunableFloat('Pivot/PID_kI', 0.0, updater=self.resetPid, persistent=True)
         self.pivot_Iz = NTTunableFloat('Pivot/PID_Izone', 0.0, updater=self.resetPid, persistent=True)
         self.pivot_kD = NTTunableFloat('Pivot/PID_kD', 0.0, updater=self.resetPid, persistent=True)
-        self.pivot_kF = NTTunableFloat('Pivot/PID_kFF', 0.2, updater=self.resetPid, persistent=True)
+        self.pivot_kF = NTTunableFloat('Pivot/PID_kFF', 0.0, updater=self.resetPid, persistent=True)
 
         # Encoder
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )

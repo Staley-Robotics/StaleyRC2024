@@ -17,7 +17,6 @@
             "type": "python",
             "module": "robotpy",
             "request": "launch",
-            "program": "~/usr/local/bin/python3.11",
             "args": [
                 "sim"
             ],

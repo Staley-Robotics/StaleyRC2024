@@ -4,7 +4,6 @@ from .pivot.PivotAim import *
 from .pivot.PivotTop import *
 from .pivot.PivotSource import *
 from .pivot.PivotAmp import *
-from .pivot.PivotClimb import *
 from .pivot.PivotTrap import *
 from .pivot.PivotBottom import *
 from .pivot.PivotToPosition import *
@@ -22,6 +21,7 @@ from .intake.IntakeHandoff import *
 from .intake.IntakeLoad import *
 from .RunLauncher import *
 from .drive.DrivePathWpiTraj import *
+from .drive.DriveAndAim import *
 from .drive.DriveLockdown import *
 from .drive.DriveByStick import *
 from .drive.DriveToPose import *
