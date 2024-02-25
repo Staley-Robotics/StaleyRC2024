@@ -39,6 +39,7 @@ class RobotContainer:
         ssLauncherIO = None
         ssPivotIO = None
         ssElevatorIO = None
+        ssLedIO = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -54,6 +55,7 @@ class RobotContainer:
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
             ssElevatorIO = ElevatorIOSim()
+            #ssLedIO = LedIOSim() -- doesn't exist yet
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
@@ -67,6 +69,7 @@ class RobotContainer:
             ssLauncherIO = LauncherIONeo( 13, 14 , 3)
             ssPivotIO = PivotIOFalcon( 15, 16, 48.691 )
             ssElevatorIO = ElevatorIONeo( 17, 18 )
+            ssLedIO = LedIOActual( 9 )
 
         Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -82,6 +85,7 @@ class RobotContainer:
         self.pivot:Pivot = Pivot( ssPivotIO )
         self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
+        self.led = LED( ssLedIO )
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -90,6 +94,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
         wpilib.SmartDashboard.putData( "Elevator", self.elevator )
+        wpilib.SmartDashboard.putData( "LED", self.led )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )

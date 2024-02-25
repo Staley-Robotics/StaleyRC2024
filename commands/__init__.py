@@ -14,6 +14,7 @@ from .launcher.LauncherTrap import *
 from .launcher.LauncherAmp import *
 from .launcher.LauncherSpeaker import *
 from .LauncherUtils import *
+from .LEDUtils import *
 from .irTesting import *
 from .RunPivotOpenLoop import *
 from .intake.IntakeEject import *
