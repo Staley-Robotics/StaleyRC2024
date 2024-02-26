@@ -112,20 +112,44 @@ class Mechanism2DToStick:
     #     if round(_inputX, 1) != 0 or round(_inputY, 1) != 0: # only moves the hand if the joystick has moved enough
     #         self.wrist.setAngle(direction)
 
-    def rotateHand(self):
-        """
-        Rotates the hand controlled by triggers.
+    # def rotateHand(self): #old version
+    #     """
+    #     Rotates the hand controlled by triggers.
         
-        Right trigger will turn the hand clockwise.
-        Left trigger will turn the hand counterclockwise.
-        """
-        right_trigger_input = self.m_driver1.getRightTriggerAxis()
-        left_trigger_input = self.m_driver1.getLeftTriggerAxis()
+    #     Right trigger will turn the hand clockwise.
+    #     Left trigger will turn the hand counterclockwise.
+    #     """
+    #     right_trigger_input = self.m_driver1.getRightTriggerAxis()
+    #     left_trigger_input = self.m_driver1.getLeftTriggerAxis()
 
-        speed = 5 * (left_trigger_input - right_trigger_input)
+    #     speed = 5 * (left_trigger_input - right_trigger_input)
 
-        self.hand.setAngle(self.hand.getAngle() + speed)
+    #     self.hand.setAngle(self.hand.getAngle() + speed)
 
+    def handToAngle(self):
+        """Sets heading of hand to the direction of the right stick"""
+        # print(f"INPUT X: {_inputX} \n")
+        _inputX = self.m_driver1.getLeftTriggerAxis()
+        _inputY = self.m_driver1.getRightTriggerAxis()
+
+
+        robotInputY = (_inputX * math.sin(self.theta)) + (_inputY * math.sin(self.theta + (self.PI / 2)))
+        robotInputX = (_inputX * math.cos(self.theta)) + (_inputY * math.cos(self.theta + (self.PI / 2)))
+
+
+        
+        direction = math.degrees(math.atan(_inputX/_inputY)) - self.wrist.getAngle()
+
+        if _inputY > 0: # this code allows the mech's wrist to rotate past 180 degrees.
+            direction += 180
+
+        print("H_direction:", direction) #telemetry
+        if round(_inputX, 1) != 0 or round(_inputY, 1) != 0:
+            self.hand.setAngle(direction)
+
+    def update(self):
+        self.wristToAngle()
+        self.handToAngle()
 
     def get(self):
         """

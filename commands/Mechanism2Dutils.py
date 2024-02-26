@@ -1,6 +1,5 @@
 from typing import Callable, Optional
 import commands2
-from commands2.subsystem import Subsystem
 from wpiutil import SendableBuilder
 
 from subsystems import Mechanism2D

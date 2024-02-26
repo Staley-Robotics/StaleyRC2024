@@ -77,6 +77,7 @@ class RobotContainer:
         # wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         # wpilib.SmartDashboard.putData( "Mech2D", self.mech.get())
         wpilib.SmartDashboard.putData("Mech2DToStick", self.mech.get())
+        wpilib.SmartDashboard.putData("LEDs", self.lIgHtS)
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
@@ -103,14 +104,30 @@ class RobotContainer:
         # self.m_driver1.y().whileTrue(commands.DecrementAngleIncrement(self.mech))
 
         # -----MECHANISM2D STICK CONTROL-----
-        self.m_driver1.start().whileFalse(commands.wristToAngle(self.mech))
+        self.m_driver1.start().whileFalse(commands.updateMech(self.mech))
+        # self.m_driver1.start().whileFalse(commands.wristToAngle(self.mech))
         # self.m_driver1.start().whileFalse(commands.handtoAngle(self.mech))
-        self.m_driver1.start().whileFalse(commands.rotateAngle(self.mech))
+        # self.m_driver1.start().whileFalse(commands.handToAngle(self.mech))
 
         # -----LED BUTTON CONTROL-----
+
+        #normal controls
         self.m_driver1.b().whileTrue(commands.cycleColors(self.lIgHtS))
         self.m_driver1.a().whileTrue(commands.defaultColor(self.lIgHtS))
         self.m_driver1.rightStick().whileTrue(commands.DiStrAcTiON(self.lIgHtS)) #for some reason right stick is actually the left stick in sim ¯\_(ツ)_/¯
+        self.m_driver1.x().toggleOnTrue(commands.rainbow(self.lIgHtS)) # toggles
+        self.m_driver1.y().whileTrue(commands.rainbowReset(self.lIgHtS)) # Reset only if necessary
+
+        #custom led strip controls
+
+        # self.m_driver1.b().whileTrue(commands.addColor(self.lIgHtS, 255, 0, 0)) #adds red
+        # self.m_driver1.a().whileTrue(commands.addColor(self.lIgHtS, 0, 255, 0)) #adds green
+        # self.m_driver1.x().whileTrue(commands.addColor(self.lIgHtS, 0, 0, 255)) #adds blue
+        # self.m_driver1.y().whileTrue(commands.addColor(self.lIgHtS, 255, 255, 0)) #adds yellow
+        # self.m_driver1.leftStick().whileTrue(commands.rainbow(self.lIgHtS))
+        # self.m_driver1.rightStick().whileTrue(commands.rainbowReset(self.lIgHtS))
+        
+        
 
         '''
         self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
@@ -124,8 +141,8 @@ class RobotContainer:
         #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
 
         # End Game Notifications
-        self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
-        self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
+        # self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
+        # self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
 
         '''
         # Configure Default Commands

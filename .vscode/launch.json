@@ -24,16 +24,17 @@
             "justMyCode": true
         },
         {
-            "name": "Deploy Robot",
+            "name": "Deploy to Robot",
             "type": "python",
             "module": "robotpy",
             "request": "launch",
             "args": [
-                "sim"
+                "deploy"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true
-        },
+            "justMyCode": true,
+
+        }
     ]
 }
 
