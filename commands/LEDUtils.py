@@ -12,10 +12,10 @@ class runLedRainbow(commands2.Command):
     
     def execute(self):
         self.led.rainbow(self.iteration)
-        self.iteration = (self.iteration+1)%255
+        self.iteration = (self.iteration+1)
     
     def end(self, interrupted: bool):
-        self.led.reset()
+        self.led.setColor('default')
     
     def isFinished(self) -> bool:
         return False

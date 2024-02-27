@@ -7,7 +7,9 @@ class LedIO:
     @wpiutil.wpistruct.make_wpistruct(name="LedIOInputs")
     @dataclasses.dataclass
     class LedIOInputs:
-        current_color:list[float] = [0,0,0]
+        light1_r:float = 0
+        light1_g:float = 0
+        light1_b:float = 0
 
     def __init__(self):
         pass

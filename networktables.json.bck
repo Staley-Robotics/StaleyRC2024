@@ -148,8 +148,7 @@
     "type": "double",
     "value": 0.35,
     "properties": {
-      "persistent": true,
-      "retained": true
+      "persistent": true
     }
   },
   {
@@ -392,7 +391,8 @@
     "type": "boolean",
     "value": false,
     "properties": {
-      "persistent": true
+      "persistent": true,
+      "retained": true
     }
   },
   {
@@ -429,6 +429,14 @@
   },
   {
     "name": "/DisableSubsystem/Vision",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/DisableSubsystem/LED",
     "type": "boolean",
     "value": false,
     "properties": {

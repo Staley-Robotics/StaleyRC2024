@@ -4,7 +4,7 @@ import wpimath.units
 from util import *
 from subsystems import LedIO 
 
-class LedIOActual(LedIO):
+class LedIOSim(LedIO):
     
     def __init__(self, PWMPort:int):
         # Tunables
@@ -13,6 +13,7 @@ class LedIOActual(LedIO):
         self.m_led = wpilib.AddressableLED(PWMPort)
 
         # Some other init stufs
+        self.m_led.setSyncTime(wpimath.units.microseconds(10))
 
         self.m_ledLength = 22 # Num of LEDs on strip
 
@@ -41,9 +42,7 @@ class LedIOActual(LedIO):
 
 
     def updateInputs(self, inputs:LedIO.LedIOInputs):
-        inputs.light1_r = self.currentColor[0].r
-        inputs.light1_g = self.currentColor[0].g
-        inputs.light1_b = self.currentColor[0].b
+        inputs.current_color = self.currentColor
 
     def setColor(self, color_sqnc_name:str):
         '''

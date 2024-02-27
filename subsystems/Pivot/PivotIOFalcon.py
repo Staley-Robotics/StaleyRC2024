@@ -26,7 +26,7 @@ class PivotIOFalcon(PivotIO):
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
         self.pivotEncoder.configFactoryDefault()
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero )
-        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Unsigned_0_to_360 )
+        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get() )
         if not RobotBase.isSimulation():
             self.pivotEncoder.setPosition( self.pivotEncoder.getAbsolutePosition() - encoderOffset )
@@ -51,17 +51,19 @@ class PivotIOFalcon(PivotIO):
         self.desiredPosition = self.actualPosition
 
     def updateInputs(self, inputs:PivotIO.PivotIOInputs):
-        self.actualPosition = self.pivotMotor.getSelectedSensorPosition()
 
         inputs.motorAppliedVolts = self.pivotMotor.getMotorOutputVoltage()
-        inputs.motorCurrentAmps =self.pivotMotor.getOutputCurrent()
-        inputs.motorPosition = self.actualPosition
+        inputs.motorCurrentAmps = self.pivotMotor.getOutputCurrent()
+        inputs.motorPosition = self.pivotMotor.getSelectedSensorPosition()
         inputs.motorVelocity = self.pivotMotor.getSelectedSensorVelocity()
         inputs.motorTempCelcius = self.pivotMotor.getTemperature()
 
         inputs.encoderPositionAbs = self.pivotEncoder.getAbsolutePosition()
         inputs.encoderPositionRel = self.pivotEncoder.getPosition()
         inputs.encoderVelocity = self.pivotEncoder.getVelocity()
+
+        self.actualPosition = inputs.encoderPositionRel
+
 
     def resetPid(self):
         self.pivotMotor.config_kP( 0, self.pivot_kP.get() )
@@ -71,7 +73,8 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get() )
 
     def run(self):
-        self.pivotMotor.set( ControlMode.Position, self.desiredPosition )
+        pos = self.desiredPosition / 360 * 4096
+        self.pivotMotor.set( ControlMode.Position, pos )
 
     def setPosition(self, degrees:float) -> None:
         self.desiredPosition = degrees

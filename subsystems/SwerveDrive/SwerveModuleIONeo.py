@@ -77,6 +77,7 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turnMotor.restoreFactoryDefaults() # Revert to Factory Defaults
         self.turnMotor.setInverted( True )  # WPI_TalonFX.setInverted
         self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )  # WPI_TalonFX.setNeutralMode
+        # self.turnMotor.setSmartCurrentLimit(40)
         # WPI_TalonFX.configNeutralDeadband(0.001)  - No equivilant (must be done via CAN or USB)
         
         self.turnMotorEncoder = self.turnMotor.getEncoder() # WPI_TalonFX.configRemoteFeedbackFilter()

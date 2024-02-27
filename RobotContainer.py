@@ -39,7 +39,7 @@ class RobotContainer:
         ssLauncherIO = None
         ssPivotIO = None
         ssElevatorIO = None
-        ssLedIO = None
+        #ssLedIO = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -54,22 +54,22 @@ class RobotContainer:
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssElevatorIO = ElevatorIOSim()
-            #ssLedIO = LedIOSim() -- doesn't exist yet
+            #ssElevatorIO = ElevatorIOSim()
+            ssLedIO = LedIOSim( 9 )
         else:
             ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ), #211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,  5.361 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25,  298.828 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
-            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 16, 48.691 )
-            ssElevatorIO = ElevatorIONeo( 17, 18 )
-            ssLedIO = LedIOActual( 9 )
+            ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
+            ssIndexerIO = IndexerIONeo( 22, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 23, 24 , 3)
+            ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
+            #ssElevatorIO = ElevatorIONeo( 27, 28 )
+            ssLedIO = LedIOActual( 0 )
 
         Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -83,8 +83,8 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        self.elevator:Elevator = Elevator( ssElevatorIO )
-        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
+        #self.elevator:Elevator = Elevator( ssElevatorIO )
+        # self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
 
         # Add Subsystems to SmartDashboard
@@ -93,12 +93,13 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Indexer", self.feeder )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
-        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
+        #wpilib.SmartDashboard.putData( "Elevator", self.elevator )
         wpilib.SmartDashboard.putData( "LED", self.led )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
         # Add Commands to SmartDashboard
         #nothing rn
@@ -117,15 +118,22 @@ class RobotContainer:
         #         self.m_driver1.getLeftX
         #     )
         # )
+
         ## Mechanisms
         #Intake
-        self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
-        self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
-        # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
-        #Indexer
-        self.m_driver1.b().whileTrue( IndexerHandoff( self.feeder ))
-        #Launcher
-        self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
+        # self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
+        # self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
+        # # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+        # #Indexer
+        # self.m_driver1.b().whileTrue( IndexerHandoff( self.feeder ))
+        # #Launcher
+        # self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
+
+        # self.m_driver1.a().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Handoff.get) )
+        # self.m_driver1.b().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Source.get) )
+        # self.m_driver1.x().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Upward.get) )
+
+        # self.m_driver1.a().whileTrue( runLedRainbow(self.led) )
 
 
         # Configure Driver 2 Button Mappings

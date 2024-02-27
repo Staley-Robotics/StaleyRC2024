@@ -7,13 +7,13 @@ import wpimath.units
 
 from commands2 import Subsystem
 
-from subsystems import LedIO
+from .LedIO import LedIO
 
 from util import *
 
 class LED(Subsystem):
     class LEDColors:
-        defaultColor = (255, 0, 0)
+        defaultColor:list = (255, 0, 0)
     
     def __init__(self, led:LedIO) -> None:
         self.led = led
@@ -28,7 +28,7 @@ class LED(Subsystem):
         self.ledLogger.set(self.ledInputs)
 
         # Run Subsystem
-        if  wpilib.RobotBase.isDisabled() or self.offline.get():
+        if self.offline.get():#wpilib.RobotBase.isDisabled() or self.offline.get():
             #logic copied from launcher -- doesn't actually disable?
             self.defaultColor()
 

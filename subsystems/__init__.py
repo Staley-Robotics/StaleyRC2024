@@ -7,6 +7,7 @@ from .Launcher.LauncherIO import *
 from .Launcher.Launcher import *
 from .Launcher.LauncherIONeo import *
 from .LED.LED import *
+from .LED.LedIOSim import *
 from .LED.LedIOActual import *
 from .LED.LedIO import *
 from .SwerveDrive.SwerveModuleIO import *

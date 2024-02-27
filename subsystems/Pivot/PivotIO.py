@@ -17,6 +17,8 @@ class PivotIO:
         encoderPositionRel: float = 0.0
         encoderVelocity: float = 0.0
 
+        setPosition: float = 0.0
+
     def __init__(self):
         pass
 

@@ -13,7 +13,7 @@ from util import *
 class PivotToPosition(Command):
     def __init__( self,
                   pivot:Pivot,
-                  position:float,
+                  position:typing.Callable=lambda:(0.0),
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
@@ -26,7 +26,7 @@ class PivotToPosition(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.pivot.set(self.position)
+        self.pivot.set(self.position())
 
     def end(self, interrupted:bool) -> None:
         pass # May be set to zero in future, but for now: assuming hold position
