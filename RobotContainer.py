@@ -44,12 +44,12 @@ class RobotContainer:
                 SwerveModuleIOSim("BL", -0.25,  0.25 ),
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOSim()
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssElevatorIO = ElevatorIOSim()
+            #ssElevatorIO = ElevatorIOSim()
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
@@ -58,11 +58,11 @@ class RobotContainer:
                 SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
-            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 16, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 17, 18 )
+            ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
+            ssIndexerIO = IndexerIONeo( 22, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 23, 24 , 3)
+            ssPivotIO = PivotIOFalcon( 25, 26, 0.0 )
+            #ssElevatorIO = ElevatorIONeo( 17, 18 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -76,7 +76,7 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        self.elevator:Elevator = Elevator( ssElevatorIO )
+        #self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
 
         # Add Subsystems to SmartDashboard
@@ -85,10 +85,9 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Indexer", self.feeder )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
-        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
+        #wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
 

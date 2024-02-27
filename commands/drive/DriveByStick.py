@@ -32,20 +32,25 @@ class DriveByStick(Command):
         self.addRequirements( swerveDrive )
 
         # Tunables
-        self.deadband = NTTunableFloat( "/CmdConfig/DriveByStick/Deadband", 0.04 )
+        self.deadband = NTTunableFloat( "/Config/Driver1/Deadband", 0.04, persistent=True )
 
-        self.finetuneEnabled = NTTunableBoolean( "/CmdConfig/DriveByStick/Control/FineEnabled", False )
-        self.ctlFineVelocity = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Velocity", 0.4 )
-        self.ctlFineHolonomic = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Holonomic", 0.4 )
-        self.ctlFineRotation = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Fine/Rotation", 0.4 )
+        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 3.7, persistent=True )
+        self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 2 * math.pi, persistent=True )
+        self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
+        self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 1.0, persistent=True )
 
-        self.ctlFullVelocity = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Velocity", 0.8 )
-        self.ctlFullHolonomic = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Holonomic", 0.8 )
-        self.ctlFullRotation = NTTunableFloat( "/CmdConfig/DriveByStick/Control/Full/Rotation", 0.8 )
+        self.srlV = NTTunableFloat( "/Config/Driver1/SrlVelocity", 3.0, self.updateSlewRateLimiterVelocity )
+        self.srlH = NTTunableFloat( "/Config/Driver1/SrlHolonomic", 3.0, self.updateSlewRateLimiterHolonomic )
+        self.srlR = NTTunableFloat( "/Config/Driver1/SrlRotation", 3.0, self.updateSlewRateLimiterRotation )
 
-        # self.srlV = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Velocity", 3.0, self.updateSlewRateLimiterVelocity )
-        # self.srlH = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Holonomic", 3.0, self.updateSlewRateLimiterHolonomic )
-        # self.srlR = NTTunableFloat( "/CmdConfig/DriveByStick/SlewRateLimiter/Rotation", 3.0, self.updateSlewRateLimiterRotation )
+        self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
+        self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
+        self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
+        self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", False, persistent=False )        
+        
+        self.isAimingSpeaker = NTTunableBoolean( "/Driver1/isAimingSpeaker", False, persistent=False )
+        self.isAimingAmp = NTTunableBoolean( "/Driver1/isAimingAmp", False, persistent=False )
+        self.isAimingStage = NTTunableBoolean( "/Driver1/isAimingStage", False, persistent=False )
 
         # This Command Global Properties
         self.drive = swerveDrive
@@ -55,24 +60,42 @@ class DriveByStick(Command):
         self.hY = holonomicY
         self.rO = rotate
 
-        # # Slew Rate Limiters
-        # self.updateSlewRateLimiterVelocity()
-        # self.updateSlewRateLimiterHolonomic()
-        # self.updateSlewRateLimiterRotation()
+        # Slew Rate Limiters
+        self.updateSlewRateLimiterVelocity()
+        self.updateSlewRateLimiterHolonomic()
+        self.updateSlewRateLimiterRotation()
 
-    # def updateSlewRateLimiterVelocity(self):
-    #     self.srl_vX = SlewRateLimiter( self.srlV.get() )
-    #     self.srl_vY = SlewRateLimiter( self.srlV.get() )
+    def updateSlewRateLimiterVelocity(self):
+        self.srl_vX = SlewRateLimiter( self.srlV.get() )
+        self.srl_vY = SlewRateLimiter( self.srlV.get() )
 
-    # def updateSlewRateLimiterHolonomic(self):
-    #     self.srl_hX = SlewRateLimiter( self.srlH.get() )
-    #     self.srl_hY = SlewRateLimiter( self.srlH.get() )
+    def updateSlewRateLimiterHolonomic(self):
+        self.srl_hX = SlewRateLimiter( self.srlH.get() )
+        self.srl_hY = SlewRateLimiter( self.srlH.get() )
 
-    # def updateSlewRateLimiterRotation(self):
-    #     self.srl_rO = SlewRateLimiter( self.srlR.get() )
+    def updateSlewRateLimiterRotation(self):
+        self.srl_rO = SlewRateLimiter( self.srlR.get() )
 
     def initialize(self) -> None:
+        # Holonomic PID
         self.tPid = self.drive.getHolonomicDriveController().getThetaController()
+
+        # Verify Max Speeds
+        linear, angular = self.drive.getVelocityConfig()
+        velocLinear = min( max( self.velocLinear.get(), 0.0 ), linear )
+        velocAngular = min( max( self.velocAngular.get(), 0.0 ), angular )
+        if self.velocLinear.get() != velocLinear:
+            self.velocLinear.set( velocLinear )
+        if self.velocAngular.get() != velocAngular:
+            self.velocAngular.set( velocAngular )
+        
+        # Verify Half Speeds
+        halfLinear = min( max( self.halfSpeedLinear.get(), 0.0 ), 1.0 )
+        halfAngular = min( max( self.halfSpeedAngular.get(), 0.0 ), 1.0)
+        if self.halfSpeedLinear.get() != halfLinear:
+            self.halfSpeedLinear.set( halfLinear )
+        if self.halfSpeedAngular.get() != halfAngular:
+            self.halfSpeedAngular.set( halfAngular )
 
     def execute(self) -> None:
         # Get Input Values
@@ -89,41 +112,85 @@ class DriveByStick(Command):
         hY = applyDeadband( hY, self.deadband.get() )
         r = applyDeadband( r, self.deadband.get() )
 
+        # Apply Clamped Values
+        x = min( max( x, -1.0), 1.0 )
+        y = min( max( y, -1.0 ), 1.0 )
+        hX = min( max( hX, -1.0 ), 1.0 )
+        hY = min( max( hY, -1.0 ), 1.0 )
+        r = min( max( r, -1.0 ), 1.0 )
+
         # Square the Inputs
-        x *= abs( x )
-        y *= abs( y )
-        hX *= abs( hX )
-        hY *= abs( hY )
-        r *= abs( r )
+        if self.isSqrInputs.get():
+            x *= abs( x )
+            y *= abs( y )
+            hX *= abs( hX )
+            hY *= abs( hY )
+            r *= abs( r )
 
         # Slew Rate Limiter
-        #x = self.srl_vX.calculate( x )
-        #y = self.srl_vY.calculate( y )
-        #hX = self.srl_hX.calculate( hX )
-        #hY = self.srl_hY.calculate( hY )
-        #r = self.srl_rO.calculate( r )
+        if self.isSrl.get():
+            x = self.srl_vX.calculate( x )
+            y = self.srl_vY.calculate( y )
+            hX = self.srl_hX.calculate( hX )
+            hY = self.srl_hY.calculate( hY )
+            r = self.srl_rO.calculate( r )
 
-        # Calculate Fine Tuned Controls
-        magV = self.ctlFullVelocity.get() if not self.finetuneEnabled.get() else self.ctlFineVelocity.get()
-        magH = self.ctlFullHolonomic.get() if not self.finetuneEnabled.get() else self.ctlFineHolonomic.get()
-        magR = self.ctlFullRotation.get() if not self.finetuneEnabled.get() else self.ctlFineRotation.get()           
-        x *= magV
-        y *= magV
-        r *= magR
+        # Calculate Half Speed Controls
+        magH = 1.0
+        if self.isHalfSpeed.get():
+            x *= self.halfSpeedLinear.get()
+            y *= self.halfSpeedLinear.get()
+            r *= self.halfSpeedAngular.get()
+            magH = self.halfSpeedAngular.get()
 
-        # Calculate Rotation via Holonomic or Buttons
-        if abs(hX) > 0.1 or abs(hY) > 0.1:
+        # Calculate Rotation via Holonomic or Buttons\
+        robotPose = self.drive.getPose()
+        #robotAngle:float = robotPose.rotation().radians()
+        robotAngle:float = self.drive.getRobotAngle().radians()
+        if self.isAimingSpeaker.get():
+            speaker = CrescendoUtil.getSpeakerTarget()
+            tX = speaker.X() - robotPose.X()
+            tY = speaker.Y() - robotPose.Y()
+            goalAngle:float = Rotation2d( x=tX, y=tY ).radians()
+            r = self.tPid.calculate(robotAngle, goalAngle)
+            r = min( max( r, -1.0 ), 1.0 )
+        # elif self.isAimingAmp.get():
+        #     pass
+        # elif self.isAimingStage.get():
+        #     pass
+        elif abs(hX) > 0.1 or abs(hY) > 0.1:
             mag = math.sqrt( hX*hX + hY*hY ) * magH
-            robotAngle:float = self.drive.getRobotAngle().radians()
             goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
             r = min( max( r, -1.0 ), 1.0 )
         else:
+            goalAngle:float = robotAngle
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
 
+        # Determine Velocities
+        veloc_x = x * self.velocLinear.get()
+        veloc_y = y * self.velocLinear.get()
+        veloc_r = r * self.velocAngular.get()
+
+        # Determine when ChassisSpeeds capability to use
+        if self.isFieldRelative.get():
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                vx = veloc_x,
+                vy = veloc_y,
+                omega = veloc_r, # radians per second
+                robotAngle = self.drive.getRobotAngle()
+            )
+        else:
+            speeds = ChassisSpeeds(
+                vx = veloc_x,
+                vy = veloc_y,
+                omega = veloc_r
+            )
+
         # Send ChassisSpeeds
-        self.drive.runPercentageInputs(x, y, r)
+        self.drive.runChassisSpeeds(speeds)
+
 
     def end(self, interrupted:bool) -> None: pass
     def isFinished(self) -> bool: return False
