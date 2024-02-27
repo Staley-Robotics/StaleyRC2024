@@ -38,7 +38,7 @@ class Pivot(Subsystem):
 
         # Post Run Logging
         self.pivotMeasuredLogger.putNumber( "Setpoint", self.pivot.getSetpoint() )
-        self.pivotMeasuredLogger.putNumber( "Meassured", self.pivot.getPosition() )
+        self.pivotMeasuredLogger.putNumber( "Measured", self.pivot.getPosition() )
             
     def set(self, position:float):
         pos = min( max( position, Pivot.PivotPositions.Downward.get() ), Pivot.PivotPositions.Upward.get() )
