@@ -44,25 +44,25 @@ class RobotContainer:
                 SwerveModuleIOSim("BL", -0.25,  0.25 ),
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOSim()
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssElevatorIO = ElevatorIOSim()
+            #ssElevatorIO = ElevatorIOSim()
         else:
             ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ),#211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   5.361 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 298.828 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOFalcon( 10, 11, 0 )
-            ssIndexerIO = IndexerIONeo( 12, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 13, 14 , 3)
-            ssPivotIO = PivotIOFalcon( 15, 16, 0.0 )
-            ssElevatorIO = ElevatorIONeo( 17, 18 )
+            ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
+            ssIndexerIO = IndexerIONeo( 22, 1, 2 )
+            ssLauncherIO = LauncherIONeo( 23, 24, 3)
+            ssPivotIO = PivotIOFalcon( 25, 26, 0.0 )
+            #ssElevatorIO = ElevatorIONeo( 17, 18 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -76,7 +76,7 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        self.elevator:Elevator = Elevator( ssElevatorIO )
+        #self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
 
         # Add Subsystems to SmartDashboard
@@ -85,10 +85,9 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Indexer", self.feeder )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
-        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
+        #wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
 
@@ -107,13 +106,13 @@ class RobotContainer:
         # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
         # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
-        # self.m_driver1.rightBumper().whileTrue(
-        #     commands.DriveAndAim(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
+        self.m_driver1.rightBumper().whileTrue(
+            commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
         self.m_driver1.a().whileTrue( IntakeLoad( self.intake ) )
         self.m_driver1.b().whileTrue( IntakeHandoff( self.intake ) )
         self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )

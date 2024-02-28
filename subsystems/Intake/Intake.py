@@ -21,6 +21,7 @@ class Intake(Subsystem):
         self.intake = intake
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
+        self.intakeMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Intake" )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
@@ -39,7 +40,8 @@ class Intake(Subsystem):
             self.intake.run()
 
         # Post Run Logging
-        #??? Don't Need It (Desired State / Current State)
+        self.intakeMeasuredLogger.putNumberArray( "Setpoint", self.intake.getSetpoint() )
+        self.intakeMeasuredLogger.putNumberArray( "Measured", self.intake.getVelocity() )
 
     def set(self, speed:float):
         self.intake.setVelocity( speed, speed )

@@ -7,17 +7,18 @@ from .PivotIO import PivotIO
 
 class Pivot(Subsystem):
     class PivotPositions:
-        Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 70.0, persistent=True )
+        Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 55.0, persistent=True )
         Handoff = NTTunableFloat( "/Config/PivotPositions/Handoff", 30.0, persistent=True )
-        Amp = NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True )
-        Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -60.0, persistent=True )
-        Source = NTTunableFloat( "/Config/PivotPositions/Source", -60.0, persistent=True )
-        Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -70.0, persistent=True )
+        Amp = NTTunableFloat( "/Config/PivotPositions/Amp", -40.0, persistent=True )
+        Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -30.0, persistent=True )
+        Source = NTTunableFloat( "/Config/PivotPositions/Source", 25.0, persistent=True )
+        Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -45.0, persistent=True )
 
     def __init__(self, pivot:PivotIO):
         self.pivot = pivot
         self.pivotInputs = pivot.PivotIOInputs
         self.pivotLogger = NetworkTableInstance.getDefault().getStructTopic( "/Pivot", PivotIO.PivotIOInputs ).publish()
+        self.pivotMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Pivot" )
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/Pivot", False, persistent=True )
 
@@ -36,10 +37,12 @@ class Pivot(Subsystem):
             self.pivot.run()
 
         # Post Run Logging
-        #??? Don't Need It (Desired State / Current State)
+        self.pivotMeasuredLogger.putNumber( "Setpoint", self.pivot.getSetpoint() )
+        self.pivotMeasuredLogger.putNumber( "Measured", self.pivot.getPosition() )
             
     def set(self, position:float):
-        self.pivot.setPosition( position )
+        pos = min( max( position, Pivot.PivotPositions.Downward.get() ), Pivot.PivotPositions.Upward.get() )
+        self.pivot.setPosition( pos )
 
     def stop(self):
         self.set( self.pivot.getPosition() )
