@@ -1,10 +1,7 @@
-import typing
-
 import commands2
 import commands2.button
 import commands2.cmd
 import wpilib
-import wpimath
 from wpilib.interfaces import GenericHID
 
 from subsystems import *
@@ -13,7 +10,6 @@ from sequences import *
 from autonomous import *
 from util import *
 
-#NOTE: swerve sections commented out for other prototyping
 class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
@@ -29,115 +25,92 @@ class RobotContainer:
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
 
-        # Create Subsystems
+        ### Create Subsystems
         # IO Systems
-        ssModulesIO = None
-        ssGyroIO = None
-        ssCamerasIO = None
-        ssIndexerIO = None
-        ssIntakeIO = None
-        ssLauncherIO = None
-        ssPivotIO = None
-        #ssElevatorIO = None
-        ssLedIO = None
+        modulesIO = None
+        gyroIO = None
+        camerasIO = None
+        intakeIO = None
+        indexerIO = None
+        launcherIO = None
+        pivotIO = None
+        elevatorIO = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
-            ssModulesIO = [
-                SwerveModuleIOSim("FL",  0.25,  0.25 ), 
-                SwerveModuleIOSim("FR",  0.25, -0.25 ), 
-                SwerveModuleIOSim("BL", -0.25,  0.25 ),
-                SwerveModuleIOSim("BR", -0.25, -0.25 ) 
+            modulesIO = [
+                SwerveModuleSim("FL",  0.25,  0.25 ), 
+                SwerveModuleSim("FR",  0.25, -0.25 ), 
+                SwerveModuleSim("BL", -0.25,  0.25 ),
+                SwerveModuleSim("BR", -0.25, -0.25 ) 
             ]
-            ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOSim()
-            ssIndexerIO = IndexerIOSim()
-            ssLauncherIO = LauncherIOSim()
-            ssPivotIO = PivotIOSim()
-            #ssElevatorIO = ElevatorIOSim()
-            ssLedIO = LedIOSim( 9 )
+            gyroIO = GyroPigeon2( 10, "rio", 0 )
+            intakeIO = IntakeIOSim()
+            indexerIO = IndexerIOSim()
+            launcherIO = LauncherIOSim()
+            pivotIO = PivotIOSim()
+            elevatorIO = ElevatorIOSim()
         else:
-            ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,  5.361 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25,  298.828 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
+            modulesIO = [
+                SwerveModuleNeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
+                SwerveModuleNeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
+                SwerveModuleNeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
+                SwerveModuleNeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
             ]
-            ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
-            ssIndexerIO = IndexerIONeo( 22, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 23, 24 , 3)
-            ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
-            #ssElevatorIO = ElevatorIONeo( 27, 28 )
-            ssLedIO = LedIOActual( 0 )
+            gyroIO = GyroPigeon2( 10, "rio", 0 )
+            intakeIO = IntakeIOFalcon( 3, 4 )
+            indexerIO = IndexerIONeo( 16 )
+            launcherIO = LauncherIONeo( 20, 9 )
+            pivotIO = PivotIOFalcon( 15, 10 )
+            elevatorIO = ElevatorIONeo( 21, 22 )
 
         # Vision
-        ssCamerasIO:typing.Tuple[VisionCamera] = [
+        camerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
 
         # Link IO Systems to Subsystems
-        self.drivetrain:SwerveDrive = SwerveDrive( ssModulesIO, ssGyroIO )
-        self.intake:Intake = Intake( ssIntakeIO )
-        self.feeder:Indexer = Indexer( ssIndexerIO )
-        self.launcher:Launcher = Launcher( ssLauncherIO )
-        self.pivot:Pivot = Pivot( ssPivotIO )
-        #self.elevator:Elevator = Elevator( ssElevatorIO )
-        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
-        self.led = LED( ssLedIO )
+        self.drivetrain:SwerveDrive = SwerveDrive( modulesIO, gyroIO )
+        self.intake:Intake = Intake( intakeIO )
+        self.indexer:Indexer = Indexer( indexerIO )
+        self.launcher:Launcher = Launcher( launcherIO )
+        self.pivot:Pivot = Pivot( pivotIO )
+        self.elevator:Elevator = Elevator( elevatorIO )
+        self.vision = Vision( camerasIO, self.drivetrain.getOdometry )
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
-        wpilib.SmartDashboard.putData( "Indexer", self.feeder )
+        wpilib.SmartDashboard.putData( "Indexer", self.indexer )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
-        #wpilib.SmartDashboard.putData( "Elevator", self.elevator )
-        wpilib.SmartDashboard.putData( "LED", self.led )
+        wpilib.SmartDashboard.putData( "Elevator", self.elevator )
 
         # Add Commands to SmartDashboard
+        wpilib.SmartDashboard.putData( "Command", SampleCommand1() )
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        # Add Commands to SmartDashboard
-        #nothing rn
-
+        # Configure and Add Autonomous Mode to SmartDashboard
+        self.m_chooser = wpilib.SendableChooser()
+        self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
+        self.m_chooser.addOption("2 - DriveCharacterization", DriveCharacterization( self.drivetrain, True, 1.0 ) )
+        self.m_chooser.addOption("3 - Drive Under Stage", AutoUnderStage( self.drivetrain ) )
+        self.m_chooser.addOption("4 - Drive Under Stage (PP)", AutoUnderStagePP( self.drivetrain ) )
+        self.m_chooser.addOption("5 - Autonomous Command", SampleAuto1() )
+        wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
+        
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
-        ## Driving
-        # self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
-        # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
-        # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
-        self.m_driver1.rightBumper().whileTrue(
-            commands.DriveAimSpeaker(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
-        )
-
-        ## Controller Configs for testing
-        #Intake
-        # self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
-        # self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
-        # # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
-        # #Indexer
-        # self.m_driver1.b().whileTrue( IndexerHandoff( self.feeder ))
-        # #Launcher
-        # self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
-
-        # Pivot
-        # self.m_driver1.a().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Handoff.get) )
-        # self.m_driver1.b().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Source.get) )
-        # self.m_driver1.x().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Upward.get) )
-
-        # self.m_driver1.a().whileTrue( runLedRainbow(self.led) )
+        self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
+        self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
+        self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
+        self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
 
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
+        #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
 
         # End Game Notifications
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
@@ -154,6 +127,19 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
+        self.pivot.setDefaultCommand(
+            commands.RunPivotOpenLoop(
+            self.pivot,
+            self.m_driver1.getRightTriggerAxis,
+            self.m_driver1.getLeftTriggerAxis
+            )
+        )
+
+    def getAutonomousCommand(self) -> commands2.Command:
+        """
+        :returns: the autonomous command that has been selected from the ShuffleBoard
+        """
+        return self.m_chooser.getSelected()
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],

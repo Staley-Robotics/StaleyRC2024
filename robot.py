@@ -45,15 +45,17 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.setCurrentThreadPriority(True, 10)
 
     def autonomousInit(self):
-        self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
+        pass
+        '''self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
 
         if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.schedule()
+            self.m_autonomousCommand.schedule()'''
 
     def autonomousPeriodic(self): pass
     def autonomousExit(self):
-        if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.cancel()
+        pass
+        '''if self.m_autonomousCommand != None:
+            self.m_autonomousCommand.cancel()'''
 
     def teleopInit(self): pass
     def teleopPeriodic(self): pass

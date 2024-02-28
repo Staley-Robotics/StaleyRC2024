@@ -59,9 +59,9 @@ class IntakeIOFalcon(IntakeIO):
     def setVelocity(self, upperVelocity:float, lowerVelocity:float):
         self.desiredVelocity = [ upperVelocity, lowerVelocity ]
 
-    def getVelocity(self) -> [float, float]:
+    def getVelocity(self):# -> [float, float]:
         return self.actualVelocity
     
-    def getSetpoint(self) -> [float, float]:
+    def getSetpoint(self):# -> [float, float]:
         return self.desiredVelocity
     

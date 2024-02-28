@@ -21,7 +21,7 @@
                 "sim"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
         },
         {
             "name": "Deploy to Robot",
@@ -32,7 +32,8 @@
                 "deploy"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+
         }
     ]
 }
