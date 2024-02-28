@@ -1,0 +1,106 @@
+[
+  {
+    "name": "/Config/Mechanism2D/elevatorMinimunLength",
+    "type": "double",
+    "value": 2.012942458870021,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2D/angleIncrement",
+    "type": "double",
+    "value": 30.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2D/angleIncrementIncrement",
+    "type": "double",
+    "value": 1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2D/wristAngle",
+    "type": "double",
+    "value": 48.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2DStick/elevatorMinimunLength",
+    "type": "double",
+    "value": 2.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2DToStick/wristVector",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2DToStick/wristAngleStart",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Mechanism2DStick/wristAngleStart",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/XboxController/rightStick/xInput",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/XboxController/rightStick/yInput",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/XboxController/leftStick/xInput",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/XboxController/leftStick/yInput",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/LEDs/rainbowFirstPixelHue",
+    "type": "double",
+    "value": 45.0,
+    "properties": {
+      "persistent": true
+    }
+  }
+]
