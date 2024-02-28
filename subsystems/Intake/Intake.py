@@ -62,7 +62,7 @@ class Intake(Subsystem):
         self.intake.setBrake( brake )
 
     def hasNote(self) -> bool:
-        return False
+        return self.intake.getSensorIsBroken()
     
     def isRunning(self) -> bool:
         upper, lower = self.intake.getVelocity()

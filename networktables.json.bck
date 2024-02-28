@@ -8,6 +8,22 @@
     }
   },
   {
+    "name": "/Config/Crescendo/Speaker/X",
+    "type": "double",
+    "value": 0.25,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Crescendo/Speaker/Y",
+    "type": "double",
+    "value": 5.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
     "name": "/Config/PivotPositions/Upward",
     "type": "double",
     "value": 70.0,
@@ -379,14 +395,6 @@
     }
   },
   {
-    "name": "/Config/SwerveDrive/Gyro/CanBus",
-    "type": "string",
-    "value": "rio",
-    "properties": {
-      "persistent": true
-    }
-  },
-  {
     "name": "/DisableSubsystem/SwerveDrive",
     "type": "boolean",
     "value": false,
@@ -439,6 +447,102 @@
     "name": "/DisableSubsystem/LED",
     "type": "boolean",
     "value": false,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/Velocity/Physical",
+    "type": "double",
+    "value": 4.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/Velocity/Driver",
+    "type": "double",
+    "value": 3.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/Velocity/Code",
+    "type": "double",
+    "value": 4.25,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/AngularVelocity/Physical",
+    "type": "double",
+    "value": 6.283185307179586,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/AngularVelocity/Driver",
+    "type": "double",
+    "value": 6.283185307179586,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/SwerveDrive/AngularVelocity/Code",
+    "type": "double",
+    "value": 6.283185307179586,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Driver1/Deadband",
+    "type": "double",
+    "value": 0.04,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Driver1/VelocityLinear",
+    "type": "double",
+    "value": 3.7,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Driver1/VelocityAngular",
+    "type": "double",
+    "value": 6.283185307179586,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Driver1/HalfSpeedLinear",
+    "type": "double",
+    "value": 0.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Config/Driver1/HalfSpeedAngular",
+    "type": "double",
+    "value": 1.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Driver1/isSquaredInputs",
+    "type": "boolean",
+    "value": true,
     "properties": {
       "persistent": true
     }

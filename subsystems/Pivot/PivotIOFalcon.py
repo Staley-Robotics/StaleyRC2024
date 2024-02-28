@@ -13,7 +13,7 @@ class PivotIOFalcon(PivotIO):
         pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
         pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "canivore1", persistent=False )
-        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", False, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
+        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
         encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
 
@@ -28,7 +28,6 @@ class PivotIOFalcon(PivotIO):
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
         self.pivotEncoder.configFactoryDefault()
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero )
-        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get() )
         if not RobotBase.isSimulation():
@@ -78,8 +77,6 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get() )
 
     def run(self):
-        pos = self.desiredPosition / 360 * 4096
-        self.pivotMotor.set( ControlMode.Position, pos )
         pos = self.desiredPosition / 360 * 4096
         self.pivotMotor.set( ControlMode.Position, pos )
 

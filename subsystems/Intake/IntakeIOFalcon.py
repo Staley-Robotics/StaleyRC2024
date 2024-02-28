@@ -30,6 +30,9 @@ class IntakeIOFalcon(IntakeIO):
         self.lowerMotor.setNeutralMode( NeutralMode.Coast )
         self.lowerMotor.setInverted( lowerInvert.get() )
 
+        # IR sensor
+        self.irSensor = wpilib.DigitalInput(sensorId)
+
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()
         inputs.upperAppliedVolts = self.upperMotor.getMotorOutputVoltage() # * self.leftMotor.getBusVoltage()
@@ -45,7 +48,7 @@ class IntakeIOFalcon(IntakeIO):
         inputs.lowerVelocity = self.actualVelocity[1]
         inputs.lowerTempCelcius = self.lowerMotor.getTemperature()
 
-        inputs.sensor = False
+        inputs.sensor = self.irSensor.get()
 
     def run(self):
         self.upperMotor.set( self.desiredVelocity[0] )
@@ -64,4 +67,8 @@ class IntakeIOFalcon(IntakeIO):
     
     def getSetpoint(self):# -> [float, float]:
         return self.desiredVelocity
+
+    def getSensorIsBroken(self) -> bool:
+        #inverts bc i think backwards apparently
+        return not self.irSensor.get()
     
