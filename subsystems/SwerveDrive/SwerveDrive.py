@@ -28,7 +28,6 @@ from ntcore import *
 from util import *
 from .SwerveModuleIO import SwerveModuleIO
 from .GyroIO import GyroIO
-from .GyroIOPigeon2 import GyroIOPigeon2
 
 class SwerveDrive(Subsystem):
     """
@@ -61,9 +60,16 @@ class SwerveDrive(Subsystem):
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/SwerveDrive", False, persistent=True )
         
+        self.maxVelocPhysical = NTTunableFloat( "SwerveDrive/Velocity/Physical", 4.50, persistent=True )
+        self.maxVelocDriver = NTTunableFloat( "SwerveDrive/Velocity/Driver", 3.50, persistent=True )
+        self.maxVelocCode = NTTunableFloat( "SwerveDrive/Velocity/Code", 4.25, persistent=True )
+
+        self.maxAngVelocPhysical = NTTunableFloat( "SwerveDrive/AngularVelocity/Physical", 2 * math.pi, persistent=True )
+        self.maxAngVelocDriver = NTTunableFloat( "SwerveDrive/AngularVelocity/Driver", 2 * math.pi, persistent=True )
+        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, persistent=True )
+
         self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
         self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-        self.fieldRelative = NTTunableBoolean( "SwerveDrive/fieldRelative", True )
 
         self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController )
         self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController )
@@ -195,14 +201,6 @@ class SwerveDrive(Subsystem):
         SwerveDrive Simulation Periodic Loop
         """
         self.gyro.simulationPeriodic( self.getRotationVelocity() )
-        
-    def isFieldRelative(self) -> bool:
-        """
-        Get the Field Relative Drive State of this SwerveDrive
-
-        :returns: boolean
-        """
-        return self.fieldRelative.get()
 
     def syncGyro(self) -> None:
         print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
@@ -415,6 +413,9 @@ class SwerveDrive(Subsystem):
         self.charSettingsVolts.set(volts)
         self.charSettingsRotation.set(rotation)
 
+    def getVelocityConfig(self) -> [float,float]:
+        return [ self.maxVelocCode.get(), self.maxAngVelocCode.get() ]
+
     """
     DriveTime Functions
     """
@@ -428,9 +429,13 @@ class SwerveDrive(Subsystem):
         """
         Runs this SwerveDrive in x,y velocities and r rotations based on the maximum velocity characterized
         """
-        veloc_x = x * self.maxVelocity.get()
-        veloc_y = y * self.maxVelocity.get()
-        veloc_r = r * self.maxAngularVelocity.get()
+        x = min( max( x, -1.0 ), 1.0 )
+        y = min( max( y, -1.0 ), 1.0 )
+        r = min( max( r, -1.0 ), 1.0 )
+
+        veloc_x = x * self.maxVelocDriver.get()
+        veloc_y = y * self.maxVelocDriver.get()
+        veloc_r = r * self.maxAngVelocDriver.get()
 
         if self.isFieldRelative():
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -467,7 +472,7 @@ class SwerveDrive(Subsystem):
         This method will optomize the SwerveModuleState prior to use to minimize the turning to less than 90 degrees
         """
         # Update Desired State for each Swerve Module
-        optStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.maxVelocity.get())
+        optStates = SwerveDrive4Kinematics.desaturateWheelSpeeds(states, self.maxVelocPhysical.get())
         for x in range(len(self.modules)):
             optimalState:SwerveModuleState = SwerveModuleState.optimize(
                 optStates[x],

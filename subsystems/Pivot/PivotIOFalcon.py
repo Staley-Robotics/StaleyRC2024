@@ -9,9 +9,11 @@ class PivotIOFalcon(PivotIO):
     
     def __init__(self, motorId:int, encoderId:int, encoderOffset:float=0.0):
         # Tunable Settings
-        pivotCanBus = NTTunableString( "/Config/Pivot/Falcon/Motor/CanBus", "rio", persistent=True )
+        pivotCanBus = NTTunableString( "/Config/Pivot/Falcon/Motor/CanBus", "canivore1", persistent=False )
         pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
         pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
+        encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "canivore1", persistent=False )
+        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", False, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
         encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
 
@@ -21,11 +23,13 @@ class PivotIOFalcon(PivotIO):
         self.pivot_Iz = NTTunableFloat('Pivot/PID_Izone', 0.0, updater=self.resetPid, persistent=True)
         self.pivot_kD = NTTunableFloat('Pivot/PID_kD', 0.0, updater=self.resetPid, persistent=True)
         self.pivot_kF = NTTunableFloat('Pivot/PID_kFF', 0.0, updater=self.resetPid, persistent=True)
+        self.pivot_kF = NTTunableFloat('Pivot/PID_kFF', 0.0, updater=self.resetPid, persistent=True)
 
         # Encoder
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
         self.pivotEncoder.configFactoryDefault()
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero )
+        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get() )
         if not RobotBase.isSimulation():
@@ -47,12 +51,14 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.configSelectedFeedbackSensor( FeedbackDevice.None_, 1 )
 
         # Stored Positions
-        self.actualPosition = self.pivotMotor.getSelectedSensorPosition()
+        self.actualPosition = self.pivotEncoder.getPosition()
         self.desiredPosition = self.actualPosition
 
     def updateInputs(self, inputs:PivotIO.PivotIOInputs):
 
         inputs.motorAppliedVolts = self.pivotMotor.getMotorOutputVoltage()
+        inputs.motorCurrentAmps = self.pivotMotor.getOutputCurrent()
+        inputs.motorPosition = self.pivotMotor.getSelectedSensorPosition()
         inputs.motorCurrentAmps = self.pivotMotor.getOutputCurrent()
         inputs.motorPosition = self.pivotMotor.getSelectedSensorPosition()
         inputs.motorVelocity = self.pivotMotor.getSelectedSensorVelocity()
@@ -73,6 +79,8 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get() )
 
     def run(self):
+        pos = self.desiredPosition / 360 * 4096
+        self.pivotMotor.set( ControlMode.Position, pos )
         pos = self.desiredPosition / 360 * 4096
         self.pivotMotor.set( ControlMode.Position, pos )
 

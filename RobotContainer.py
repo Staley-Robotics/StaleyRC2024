@@ -49,7 +49,7 @@ class RobotContainer:
                 SwerveModuleIOSim("BL", -0.25,  0.25 ),
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
-            ssGyroIO = GyroIOPigeon2( 10, 0 )
+            ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOSim()
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
@@ -111,13 +111,13 @@ class RobotContainer:
         # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
         # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
-        # self.m_driver1.rightBumper().whileTrue(
-        #     commands.DriveAndAim(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
+        self.m_driver1.rightBumper().whileTrue(
+            commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
 
         ## Mechanisms
         #Intake

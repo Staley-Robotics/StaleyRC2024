@@ -65,19 +65,23 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
 
         ### Turn Sensor
-        self.turnSensor = WPI_CANCoder( sensorId ) #, "canivore1")
-        self.turnSensor.configFactoryDefault()
-        self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
-        self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
-        self.turnSensor.configSensorDirection(False)
-        if not RobotBase.isSimulation(): self.turnSensor.setPosition(self.turnSensor.getAbsolutePosition() - turnOffset)
+        self.turnSensor = WPI_CANCoder( sensorId, "canivore1" )
+        self.turnSensor.configFactoryDefault(250)
+        self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, 250)
+        self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360, 250)
+        self.turnSensor.configSensorDirection(False, 250)
+        if not RobotBase.isSimulation():
+            absPos = self.turnSensor.getAbsolutePosition()
+            self.turnSensor.setPosition(absPos - turnOffset, 250)
 
         ### Turn Motor
-        self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )    
+        self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )
+        self.turnMotor.setCANTimeout(250)
         self.turnMotor.restoreFactoryDefaults() # Revert to Factory Defaults
         self.turnMotor.setInverted( True )  # WPI_TalonFX.setInverted
         self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )  # WPI_TalonFX.setNeutralMode
-        # self.turnMotor.setSmartCurrentLimit(40)
+        self.turnMotor.setSmartCurrentLimit( 30 )
+        self.turnMotor.setClosedLoopRampRate( 0.05 )
         # WPI_TalonFX.configNeutralDeadband(0.001)  - No equivilant (must be done via CAN or USB)
         
         self.turnMotorEncoder = self.turnMotor.getEncoder() # WPI_TalonFX.configRemoteFeedbackFilter()
@@ -89,17 +93,21 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turnMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
         self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
         self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
-        #self.turnMotorPid.setOutputRange( -0.15, 0.15 )
+        self.turnMotorPid.setOutputRange( -0.85, 0.85 )
         self.updateTurnPIDController()     
 
         # Save Turn Motor Config
         self.turnMotor.burnFlash()
+        self.turnMotor.setCANTimeout(0)
 
         ### Drive Motor
         self.driveMotor = CANSparkMax( driveId, CANSparkMax.MotorType.kBrushless )
+        self.driveMotor.setCANTimeout(250)
         self.driveMotor.restoreFactoryDefaults()
         self.driveMotor.setInverted( True )
         self.driveMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
+        self.driveMotor.setSmartCurrentLimit( 30 )
+        self.driveMotor.setClosedLoopRampRate( 0.05 )
         
         self.driveMotorEncoder = self.driveMotor.getEncoder()
         #self.driveMotorEncoder.setInverted(False)
@@ -107,10 +115,12 @@ class SwerveModuleIONeo(SwerveModuleIO):
 
         self.driveMotorPid = self.driveMotor.getPIDController()
         self.driveMotorPid.setFeedbackDevice( self.driveMotorEncoder ) # WPI_TalonFX.configSelectedFeedbackSensor()    
+        self.driveMotorPid.setOutputRange( -0.95, 0.95 )
         self.updateDrivePIDController()
 
         # Save Drive Motor Config
         self.driveMotor.burnFlash()
+        self.driveMotor.setCANTimeout(0)
 
         ### Swerve Module Information
         self.referencePosition = Translation2d( posX, posY )
