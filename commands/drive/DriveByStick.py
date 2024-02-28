@@ -115,16 +115,16 @@ class DriveByStick(Command):
         # Apply Clamped Values
         x = min( max( x, -1.0), 1.0 )
         y = min( max( y, -1.0 ), 1.0 )
-        hX = min( max( hX, -1.0 ), 1.0 )
-        hY = min( max( hY, -1.0 ), 1.0 )
+        #hX = min( max( hX, -1.0 ), 1.0 )
+        #hY = min( max( hY, -1.0 ), 1.0 )
         r = min( max( r, -1.0 ), 1.0 )
 
         # Square the Inputs
         if self.isSqrInputs.get():
             x *= abs( x )
             y *= abs( y )
-            hX *= abs( hX )
-            hY *= abs( hY )
+            #hX *= abs( hX )
+            #hY *= abs( hY )
             r *= abs( r )
 
         # Slew Rate Limiter
@@ -143,35 +143,23 @@ class DriveByStick(Command):
             r *= self.halfSpeedAngular.get()
             magH = self.halfSpeedAngular.get()
 
-        # Calculate Rotation via Holonomic or Buttons\
-        robotPose = self.drive.getPose()
-        #robotAngle:float = robotPose.rotation().radians()
-        robotAngle:float = self.drive.getRobotAngle().radians()
-        if self.isAimingSpeaker.get():
-            speaker = CrescendoUtil.getSpeakerTarget()
-            tX = speaker.X() - robotPose.X()
-            tY = speaker.Y() - robotPose.Y()
-            goalAngle:float = Rotation2d( x=tX, y=tY ).radians()
-            r = self.tPid.calculate(robotAngle, goalAngle)
-            r = min( max( r, -1.0 ), 1.0 )
-        # elif self.isAimingAmp.get():
-        #     pass
-        # elif self.isAimingStage.get():
-        #     pass
-        elif abs(hX) > 0.1 or abs(hY) > 0.1:
-            mag = math.sqrt( hX*hX + hY*hY ) * magH
-            goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
-            target = self.tPid.calculate(robotAngle, goalAngle)
-            r = target * mag
-            r = min( max( r, -1.0 ), 1.0 )
-        else:
-            goalAngle:float = robotAngle
-            self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
-
+        
         # Determine Velocities
         veloc_x = x * self.velocLinear.get()
         veloc_y = y * self.velocLinear.get()
         veloc_r = r * self.velocAngular.get()
+        
+        # Calculate / Redetermine veloc_r (Rotation via Holonomic or Buttons)
+        if abs(hX) > 0.1 or abs(hY) > 0.1:
+            mag = min( max( math.sqrt( hX*hX + hY*hY ), 0), 1 )
+            mag = mag * magH
+            robotAngle:float = self.drive.getRobotAngle().radians()
+            goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
+            target = self.tPid.calculate(robotAngle, goalAngle)
+            r = target * mag
+            veloc_r = r # min( max( r, -1.0), 1.0 )
+        else:
+            self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
 
         # Determine when ChassisSpeeds capability to use
         if self.isFieldRelative.get():

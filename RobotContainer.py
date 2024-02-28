@@ -106,13 +106,13 @@ class RobotContainer:
         # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
         # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
         # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
-        # self.m_driver1.rightBumper().whileTrue(
-        #     commands.DriveAndAim(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
+        self.m_driver1.rightBumper().whileTrue(
+            commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
         self.m_driver1.a().whileTrue( IntakeLoad( self.intake ) )
         self.m_driver1.b().whileTrue( IntakeHandoff( self.intake ) )
         self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )

@@ -12,20 +12,22 @@ from util import *
 
 # Toggle: Half Speed
 class ToggleHalfSpeed(InstantCommand):
-    finetuneEnabled = NTTunableBoolean( "/CmdConfig/DriveByStick/Control/FineEnabled", False )
+    halfSpeed = NTTunableBoolean( "/Driver1/isHalfspeed", False )
 
     def __init__(self, DriveSubsystem:SwerveDrive) -> None:
         super().__init__(
-            toRun=lambda: self.finetuneEnabled.set( not self.finetuneEnabled.get() )
+            toRun=lambda: self.halfSpeed.set( not self.halfSpeed.get() )
         )
 
     def runsWhenDisabled(self) -> bool: return True
 
 # Toggle: Field Relative
 class ToggleFieldRelative(InstantCommand):
+    fieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", False )
+
     def __init__(self, DriveSubsystem:SwerveDrive) -> None:
         super().__init__(
-            toRun=lambda: DriveSubsystem.fieldRelative.set( not DriveSubsystem.fieldRelative.get() )
+            toRun=lambda: self.fieldRelative.set( not self.fieldRelative.get() )
         )
     
     def runsWhenDisabled(self) -> bool: return True
