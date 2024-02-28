@@ -38,8 +38,8 @@ class RobotContainer:
         ssIntakeIO = None
         ssLauncherIO = None
         ssPivotIO = None
-        ssElevatorIO = None
-        #ssLedIO = None
+        #ssElevatorIO = None
+        ssLedIO = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -71,7 +71,7 @@ class RobotContainer:
             #ssElevatorIO = ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
 
-        Vision
+        # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
@@ -84,7 +84,7 @@ class RobotContainer:
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
         #self.elevator:Elevator = Elevator( ssElevatorIO )
-        # self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
+        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
 
         # Add Subsystems to SmartDashboard
@@ -119,7 +119,7 @@ class RobotContainer:
             )
         )
 
-        ## Mechanisms
+        ## Controller Configs for testing
         #Intake
         # self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
         # self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
@@ -129,16 +129,15 @@ class RobotContainer:
         # #Launcher
         # self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
 
+        # Pivot
         # self.m_driver1.a().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Handoff.get) )
         # self.m_driver1.b().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Source.get) )
         # self.m_driver1.x().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Upward.get) )
 
         # self.m_driver1.a().whileTrue( runLedRainbow(self.led) )
 
-
         # Configure Driver 2 Button Mappings
         #self.m_driver2 = commands2.button.CommandXboxController(1)
-        #self.m_driver2.a().whileTrue( sequences.SampleSequence() )
 
         # End Game Notifications
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
@@ -155,12 +154,6 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
-        # self.pivot.setDefaultCommand(
-        #     commands.PivotByStick(
-        #         self.pivot,
-        #         self.m_driver1.getLeftY
-        #     )
-        # )
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],
