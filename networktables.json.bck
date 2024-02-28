@@ -395,6 +395,14 @@
     }
   },
   {
+    "name": "/Config/SwerveDrive/Gyro/CanBus",
+    "type": "string",
+    "value": "rio",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
     "name": "/DisableSubsystem/SwerveDrive",
     "type": "boolean",
     "value": false,

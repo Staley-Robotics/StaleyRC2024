@@ -29,6 +29,7 @@ class PivotIOFalcon(PivotIO):
         self.pivotEncoder.configFactoryDefault()
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
+        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get() )
         if not RobotBase.isSimulation():
             self.pivotEncoder.setPosition( self.pivotEncoder.getAbsolutePosition() - encoderOffset )
@@ -77,6 +78,8 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get() )
 
     def run(self):
+        pos = self.desiredPosition / 360 * 4096
+        self.pivotMotor.set( ControlMode.Position, pos )
         pos = self.desiredPosition / 360 * 4096
         self.pivotMotor.set( ControlMode.Position, pos )
 
