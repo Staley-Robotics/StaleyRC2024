@@ -21,6 +21,7 @@ class Launcher(Subsystem):
         self.launcher = launcher
         self.launcherInputs = launcher.LauncherIOInputs
         self.launcherLogger = NetworkTableInstance.getDefault().getStructTopic( "/Launcher", LauncherIO.LauncherIOInputs ).publish()
+        self.launcherMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Launcher" )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Launcher", False, persistent=True )
 
@@ -39,7 +40,8 @@ class Launcher(Subsystem):
             self.launcher.run()
 
         # Post Run Logging
-        #??? Don't Need It (Desired State / Current State)
+        self.launcherMeasuredLogger.putNumberArray( "Setpoint", self.launcher.getSetpoint() )
+        self.launcherMeasuredLogger.putNumberArray( "Measured", self.launcher.getVelocity() )
 
     def set(self, leftSpeed:float, rightSpeed:float):
         self.launcher.setVelocity( leftSpeed, rightSpeed )

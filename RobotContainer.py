@@ -52,15 +52,15 @@ class RobotContainer:
             #ssElevatorIO = ElevatorIOSim()
         else:
             ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  96.837 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   6.240 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 299.954 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.293 )  #65.654)
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ),#211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,   5.361 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25, 298.828 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 1, 2 )
-            ssLauncherIO = LauncherIONeo( 23, 24 , 3)
+            ssLauncherIO = LauncherIONeo( 23, 24, 3)
             ssPivotIO = PivotIOFalcon( 25, 26, 0.0 )
             #ssElevatorIO = ElevatorIONeo( 17, 18 )
 

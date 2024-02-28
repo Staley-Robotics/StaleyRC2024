@@ -9,10 +9,10 @@ class PivotIOFalcon(PivotIO):
     
     def __init__(self, motorId:int, encoderId:int, encoderOffset:float=0.0):
         # Tunable Settings
-        pivotCanBus = NTTunableString( "/Config/Pivot/Falcon/Motor/CanBus", "rio", persistent=True )
+        pivotCanBus = NTTunableString( "/Config/Pivot/Falcon/Motor/CanBus", "canivore1", persistent=False )
         pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
         pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
-        encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
+        encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "canivore1", persistent=False )
         encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", False, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
 
         # Tunables

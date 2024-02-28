@@ -18,6 +18,7 @@ class Indexer(Subsystem):
         self.indexer = indexer
         self.indexerInputs = indexer.IndexerIOInputs()
         self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
+        self.indexerMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Indexer" )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Indexer", False, persistent=True )
 
@@ -38,7 +39,8 @@ class Indexer(Subsystem):
             self.indexer.run()
 
         # Post Run Logging
-        #??? Don't Need It (Desired State / Current State)
+        self.indexerMeasuredLogger.putNumber( "Measured", self.indexer.getVelocity() )
+        self.indexerMeasuredLogger.putNumber( "Setpoint", self.indexer.getSetpoint() )
 
     def set(self, speed:float):
         self.indexer.setVelocity( speed )
