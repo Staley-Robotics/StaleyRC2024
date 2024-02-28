@@ -48,3 +48,6 @@ class IntakeIO:
     
     def getSetpoint(self) -> float:
         return [ 0.0, 0.0 ]
+    
+    def getSensorIsBroken(self) -> float:
+        return False

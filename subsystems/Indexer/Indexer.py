@@ -61,7 +61,7 @@ class Indexer(Subsystem):
         self.indexer.setBrake(brake)
 
     def hasNote(self) -> bool:
-        return False
+        return self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()
     
     def isRunning(self) -> bool:
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )

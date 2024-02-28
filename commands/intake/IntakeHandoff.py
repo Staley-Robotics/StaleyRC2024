@@ -30,7 +30,6 @@ class IntakeHandoff(Command):
         self.intake.set(Intake.IntakeSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
-        return False
         return not self.intake.hasNote()
     
     def runsWhenDisabled(self) -> bool: return False

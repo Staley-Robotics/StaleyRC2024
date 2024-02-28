@@ -65,7 +65,7 @@ class RobotContainer:
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
-            ssIndexerIO = IndexerIONeo( 22, 1, 2 )
+            ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIONeo( 23, 24 , 3)
             ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
             #ssElevatorIO = ElevatorIONeo( 27, 28 )
@@ -121,12 +121,14 @@ class RobotContainer:
 
         ## Controller Configs for testing
         #Intake
-        # self.m_driver1.y().whileTrue( IntakeLoad( self.intake ) )
-        # self.m_driver1.x().whileTrue( IntakeHandoff( self.intake ) )
-        # # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
-        # #Indexer
-        # self.m_driver1.b().whileTrue( IndexerHandoff( self.feeder ))
-        # #Launcher
+        self.m_driver1.y().onTrue( IntakeLoad( self.intake ) )
+        self.m_driver1.x().onTrue( IntakeHandoff( self.intake ) )
+        # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+        #Indexer
+        self.m_driver1.b().onTrue( IndexerHandoff( self.feeder ))
+        self.m_driver1.a().onTrue( IndexerLaunch( self.feeder ))
+        
+        #Launcher
         # self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))
 
         # Pivot
@@ -134,6 +136,7 @@ class RobotContainer:
         # self.m_driver1.b().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Source.get) )
         # self.m_driver1.x().onTrue( PivotToPosition(self.pivot, Pivot.PivotPositions.Upward.get) )
 
+        # LED
         # self.m_driver1.a().whileTrue( runLedRainbow(self.led) )
 
         # Configure Driver 2 Button Mappings

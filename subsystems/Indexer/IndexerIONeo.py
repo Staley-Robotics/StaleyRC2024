@@ -7,7 +7,7 @@ from util import *
 class IndexerIONeo(IndexerIO):
     def __init__(self, idxCanId:int, lowerSensorId:int, upperSensorId:int):
         # Tunable Settings
-        motorInvert = NTTunableBoolean( "/Config/Indexer/Neo/Invert", False, updater=lambda: self.idxMotor.setInverted( motorInvert.get() ), persistent=True )
+        motorInvert = NTTunableBoolean( "/Config/Indexer/Neo/Invert", True, updater=lambda: self.idxMotor.setInverted( motorInvert.get() ), persistent=True )
 
         # Static Variables
         self.actualVelocity = 0.0
@@ -22,6 +22,10 @@ class IndexerIONeo(IndexerIO):
         self.idxMotor.burnFlash()
 
         self.idxEncoder = self.idxMotor.getEncoder()
+
+        # ir Sensors
+        self.upperSensor = wpilib.DigitalInput( upperSensorId )
+        self.lowerSensor = wpilib.DigitalInput( lowerSensorId )
         
     def updateInputs(self, inputs: IndexerIO.IndexerIOInputs) -> None:
         self.actualVelocity = self.idxEncoder.getVelocity()
@@ -31,8 +35,8 @@ class IndexerIONeo(IndexerIO):
         inputs.velocity = self.actualVelocity
         inputs.tempCelcius = self.idxMotor.getMotorTemperature()
 
-        inputs.sensorHandoff = False
-        inputs.sensorLaunch = False
+        inputs.sensorHandoff = self.lowerSensor.get()
+        inputs.sensorLaunch = self.upperSensor.get()
 
     def run(self) -> None:
         self.idxMotor.set( self.desiredVelocity )
@@ -49,3 +53,9 @@ class IndexerIONeo(IndexerIO):
     
     def getSetpoint(self) -> float:
         return self.desiredVelocity
+
+    def getUpperSensorIsBroken(self) -> bool:
+        return not self.upperSensor.get()
+    
+    def getLowerSensorIsBroken(self) -> bool:
+        return not self.lowerSensor.get()

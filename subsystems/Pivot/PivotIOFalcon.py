@@ -13,7 +13,7 @@ class PivotIOFalcon(PivotIO):
         pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
         pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "canivore1", persistent=False )
-        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", False, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
+        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
         encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
         encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
 

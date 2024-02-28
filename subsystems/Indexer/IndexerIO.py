@@ -42,3 +42,9 @@ class IndexerIO:
     
     def getSetpoint(self) -> bool:
         return 0.0
+    
+    def getUpperSensorIsBroken(self) -> bool:
+        return False
+    
+    def getLowerSensorIsBroken(self) -> bool:
+        return False
