@@ -24,7 +24,7 @@ class ElevatorBottom(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.elevator.setPosition(Elevator.ElevatorPositions.Bottom.get())
+        self.elevator.set(Elevator.ElevatorPositions.Bottom.get())
 
     def end(self, interrupted:bool) -> None:
         pass # May be set to zero in future, but for now: assuming hold position

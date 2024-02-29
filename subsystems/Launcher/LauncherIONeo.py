@@ -34,6 +34,11 @@ class LauncherIONeo(LauncherIO):
 
         self.rightEncoder = self.rightMotor.getEncoder()
 
+        # IR Sensor
+        self.irSensor = wpilib.DigitalInput(sensorId)
+        self.lastSensor = self.irSensor.get()
+        self.sensorCount = 0
+
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
         self.actualVelocity[0] = self.leftEncoder.getVelocity()
         inputs.leftAppliedVolts = self.leftMotor.getAppliedOutput() * self.leftMotor.getBusVoltage()
@@ -49,7 +54,7 @@ class LauncherIONeo(LauncherIO):
         inputs.rightVelocity = self.actualVelocity[1]
         inputs.rightTempCelcius = self.rightMotor.getMotorTemperature()
 
-        inputs.sensor = False
+        inputs.sensor = self.irSensor.get()
 
     def run(self):
         self.leftMotor.set( self.desiredVelocity[0] )
@@ -63,3 +68,16 @@ class LauncherIONeo(LauncherIO):
     
     def getSetpoint(self):
         return self.desiredVelocity
+    
+    def hasLaunched(self):
+        currentSensor = self.irSensor.get()
+        
+        if currentSensor == self.lastSensor:
+            if self.sensorCount == 2:
+                self.sensorCount = 0
+        else:
+            if currentSensor:
+                self.sensorCount += 1
+
+        self.lastSensor = currentSensor
+        return self.sensorCount == 2

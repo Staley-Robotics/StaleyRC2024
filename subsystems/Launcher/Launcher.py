@@ -7,7 +7,7 @@ from util import *
 
 class Launcher(Subsystem):
     class LauncherSpeeds:
-        Stop = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Stop", 0.0, persistent=True )
+        Stop = NTTunableFloat( "/Config/LauncherSpeeds/Stop", 0.0, persistent=True )
         SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 0.95, persistent=True )
         SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 0.85, persistent=True )
         AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 0.30, persistent=True )
@@ -66,8 +66,9 @@ class Launcher(Subsystem):
         return ( left != Launcher.LauncherSpeeds.Stop.get() or right != Launcher.LauncherSpeeds.Stop.get())
 
     def hasLaunched(self) -> bool:
-        pass
+        return self.launcher.hasLaunched()
 
     def atSpeed(self, errorRange:float = 0) -> bool:
         status = self.launcher.atSetpoint(errorRange)
+        print( status )
         return ( status[0] and status[1] )

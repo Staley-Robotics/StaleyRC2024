@@ -45,4 +45,7 @@ class LauncherIO:
     
     def getSetpoint(self) -> [float, float]:
         return [0.0, 0.0]
+    
+    def hasLaunched(self) -> bool:
+        return False
 
