@@ -8,7 +8,7 @@ class LauncherIONeo(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
         leftInvert = NTTunableBoolean( "/Config/Launcher/Neo/LeftInvert", False, updater=lambda: self.leftMotor.setInverted( leftInvert.get() ), persistent=True )
-        rightInvert = NTTunableBoolean( "/Config/Launcher/Neo/RightInvert", False, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=True )
+        rightInvert = NTTunableBoolean( "/Config/Launcher/Neo/RightInvert", True, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=False )
 
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
@@ -40,20 +40,21 @@ class LauncherIONeo(LauncherIO):
         self.sensorCount = 0
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
-        self.actualVelocity[0] = self.leftEncoder.getVelocity()
-        inputs.leftAppliedVolts = self.leftMotor.getAppliedOutput() * self.leftMotor.getBusVoltage()
+        v0 = self.leftMotor.getAppliedOutput()
+        inputs.leftAppliedVolts = v0 * self.leftMotor.getBusVoltage()
         inputs.leftCurrentAmps = self.leftMotor.getOutputCurrent()
         inputs.leftPosition = self.leftEncoder.getPosition()
-        inputs.leftVelocity = self.actualVelocity[0]
+        inputs.leftVelocity = self.leftEncoder.getVelocity()
         inputs.leftTempCelcius = self.leftMotor.getMotorTemperature()
 
-        self.actualVelocity[1] = self.rightEncoder.getVelocity()
-        inputs.rightAppliedVolts = self.rightMotor.getAppliedOutput() * self.rightMotor.getBusVoltage()
+        v1 = self.rightMotor.getAppliedOutput()
+        inputs.rightAppliedVolts = v1 * self.rightMotor.getBusVoltage()
         inputs.rightCurrentAmps = self.rightMotor.getOutputCurrent()
         inputs.rightPosition = self.rightEncoder.getPosition()
-        inputs.rightVelocity = self.actualVelocity[1]
+        inputs.rightVelocity = self.rightEncoder.getVelocity()
         inputs.rightTempCelcius = self.rightMotor.getMotorTemperature()
 
+        self.actualVelocity = [ v0, v1 ]
         inputs.sensor = self.irSensor.get()
 
     def run(self):

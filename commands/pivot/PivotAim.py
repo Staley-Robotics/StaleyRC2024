@@ -32,6 +32,7 @@ class PivotAim(Command):
         pass # May be set to zero in future, but for now: assuming hold position
 
     def isFinished(self) -> bool:
+        return False
         return self.pivot.atSetpoint()
     
     def runsWhenDisabled(self) -> bool: return False

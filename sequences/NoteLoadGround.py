@@ -14,7 +14,7 @@ class NoteLoadGround(commands2.SequentialCommandGroup):
             commands2.ParallelCommandGroup(
                 IntakeLoad(intake),
                 PivotHandoff(pivot),
-                ElevatorBottom(elevator)
+                #ElevatorBottom(elevator)
             )
         )
         self.addCommands(

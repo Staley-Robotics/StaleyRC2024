@@ -19,7 +19,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = True
+    testing:bool = False
 
     def __init__(self):
         """
@@ -103,8 +103,10 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        # Add Commands to SmartDashboard
-        #nothing rn
+        # Configure and Add Autonomous Mode to SmartDashboard
+        self.m_chooser = wpilib.SendableChooser()
+        self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
+        wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
@@ -131,43 +133,44 @@ class RobotContainer:
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
         
-        # Safety and Other Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IntakeEject", IntakeEject(self.intake) ).withPosition(0, 1)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerEject", IndexerEject(self.feeder) ).withPosition(0, 2)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotBottom", PivotBottom(self.pivot) ).withPosition(1, 2)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotTop", PivotTop(self.pivot) ).withPosition(1, 1)
+        # # Safety and Other Commands
+        cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
+        cTab.add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
+        # cTab.add( "IntakeEject", IntakeEject(self.intake) ).withPosition(0, 1)
+        # cTab.add( "IndexerEject", IndexerEject(self.feeder) ).withPosition(0, 2)
+        # cTab.add( "PivotBottom", PivotBottom(self.pivot) ).withPosition(1, 2)
+        # cTab.add( "PivotTop", PivotTop(self.pivot) ).withPosition(1, 1)
 
-        # Intake to Ready to Launch Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IntakeLoad", IntakeLoad(self.intake) ).withPosition(3, 0)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "ElevatorHandoff", ElevatorBottom(self.elevator) ).withPosition(4, 0)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotHandoff", PivotHandoff(self.pivot) ).withPosition(5, 0)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerHandoff", IndexerHandoff(self.feeder) ).withPosition(6, 0)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IntakeHandoff", IntakeHandoff(self.intake) ).withPosition(7, 0)
+        # # Intake to Ready to Launch Commands
+        cTab.add( "IntakeLoad", IntakeLoad(self.intake) ).withPosition(3, 0)
+        cTab.add( "ElevatorHandoff", ElevatorBottom(self.elevator) ).withPosition(4, 0)
+        cTab.add( "PivotHandoff", PivotHandoff(self.pivot) ).withPosition(5, 0)
+        cTab.add( "IndexerHandoff", IndexerHandoff(self.feeder) ).withPosition(6, 0)
+        cTab.add( "IntakeHandoff", IntakeHandoff(self.intake) ).withPosition(7, 0)
 
-        # Launch to Speaker Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "ElevatorSpeaker", ElevatorBottom(self.elevator) ).withPosition(3, 1)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotSpeaker", PivotToPosition(self.pivot) ).withPosition(4, 1)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "LauncherSpeaker", LauncherSpeaker(self.launcher) ).withPosition(5, 1)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerSpeaker", IndexerLaunch(self.feeder) ).withPosition(6, 1)
+        # # Launch to Speaker Commands
+        # cTab.add( "ElevatorSpeaker", ElevatorBottom(self.elevator) ).withPosition(3, 1)
+        # cTab.add( "PivotSpeaker", PivotToPosition(self.pivot) ).withPosition(4, 1)
+        # cTab.add( "LauncherSpeaker", LauncherSpeaker(self.launcher) ).withPosition(5, 1)
+        # cTab.add( "IndexerSpeaker", IndexerLaunch(self.feeder) ).withPosition(6, 1)
 
-        # Launch to Amp Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "ElevatorAmp", ElevatorAmp(self.elevator) ).withPosition(3, 2)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotAmp", PivotAmp(self.pivot) ).withPosition(4, 2)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "LauncherAmp", LauncherAmp(self.launcher) ).withPosition(5, 2)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerAmp", IndexerLaunch(self.feeder) ).withPosition(6, 2)
+        # # Launch to Amp Commands
+        # cTab.add( "ElevatorAmp", ElevatorAmp(self.elevator) ).withPosition(3, 2)
+        # cTab.add( "PivotAmp", PivotAmp(self.pivot) ).withPosition(4, 2)
+        # cTab.add( "LauncherAmp", LauncherAmp(self.launcher) ).withPosition(5, 2)
+        # cTab.add( "IndexerAmp", IndexerLaunch(self.feeder) ).withPosition(6, 2)
         
-        # Launch to Trap Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "ElevatorTrap", ElevatorTrap(self.elevator) ).withPosition(3, 3)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotTrap", PivotTrap(self.pivot) ).withPosition(4, 3)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "LauncherTrap", LauncherTrap(self.launcher) ).withPosition(5, 3)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerTrap", IndexerLaunch(self.feeder) ).withPosition(6, 3)
+        # # Launch to Trap Commands
+        # cTab.add( "ElevatorTrap", ElevatorTrap(self.elevator) ).withPosition(3, 3)
+        # cTab.add( "PivotTrap", PivotTrap(self.pivot) ).withPosition(4, 3)
+        # cTab.add( "LauncherTrap", LauncherTrap(self.launcher) ).withPosition(5, 3)
+        # cTab.add( "IndexerTrap", IndexerLaunch(self.feeder) ).withPosition(6, 3)
         
-        # Source to Launch Commands
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "ElevatorSource", ElevatorSource(self.elevator) ).withPosition(3, 4)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "PivotSource", PivotSource(self.pivot) ).withPosition(4, 4)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "IndexerSource", IndexerSource(self.feeder) ).withPosition(5, 4)
-        wpilib.shuffleboard.Shuffleboard.getTab("Commands").add( "LauncherSource", LauncherSource(self.launcher) ).withPosition(6, 4)
+        # # Source to Launch Commands
+        # cTab.add( "ElevatorSource", ElevatorSource(self.elevator) ).withPosition(3, 4)
+        # cTab.add( "PivotSource", PivotSource(self.pivot) ).withPosition(4, 4)
+        # cTab.add( "IndexerSource", IndexerSource(self.feeder) ).withPosition(5, 4)
+        # cTab.add( "LauncherSource", LauncherSource(self.launcher) ).withPosition(6, 4)
         
         # End Game Notifications
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
@@ -230,3 +233,9 @@ class RobotContainer:
                 and DriverStation.getMatchTime() <= round( getAlertTime(), 2 )
             )
         ).onTrue( rumbleSequence )
+
+    def getAutonomousCommand(self) -> commands2.Command:
+        """
+        :returns: the autonomous command that has been selected from the ShuffleBoard
+        """
+        return self.m_chooser.getSelected()

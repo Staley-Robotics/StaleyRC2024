@@ -64,5 +64,8 @@ class Indexer(Subsystem):
     def hasNote(self) -> bool:
         return self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()
     
+    def hasReleasedNote(self) -> bool:
+        return not( self.indexer.getLowerSensorIsBroken() or self.indexer.getUpperSensorIsBroken() )
+    
     def isRunning(self) -> bool:
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )

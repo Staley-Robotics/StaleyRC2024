@@ -68,7 +68,6 @@ class Launcher(Subsystem):
     def hasLaunched(self) -> bool:
         return self.launcher.hasLaunched()
 
-    def atSpeed(self, errorRange:float = 0) -> bool:
+    def atSpeed(self, errorRange:float = 0.02) -> bool:
         status = self.launcher.atSetpoint(errorRange)
-        print( status )
         return ( status[0] and status[1] )

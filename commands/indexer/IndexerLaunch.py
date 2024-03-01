@@ -31,6 +31,6 @@ class IndexerLaunch(Command):
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
-        return not self.indexer.hasNote()
+        return self.indexer.hasReleasedNote()
     
     def runsWhenDisabled(self) -> bool: return False

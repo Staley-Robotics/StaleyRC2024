@@ -11,7 +11,6 @@ from .Intake.Intake import *
 from .Intake.IntakeIO import *
 from .Intake.IntakeIOFalcon import *
 from .Intake.IntakeIOSim import *
-from .Intake.IntakeTalon_FX import *
 from .Launcher.Launcher import *
 from .Launcher.LauncherIO import *
 from .Launcher.LauncherIONeo import *

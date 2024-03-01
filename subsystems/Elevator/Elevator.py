@@ -16,7 +16,7 @@ class Elevator(Subsystem):
     def __init__(self, elevator:ElevatorIO):
         self.elevator = elevator
         self.elevatorInputs = elevator.ElevatorIOInputs
-        self.elevatorLogger = NetworkTableInstance.getDefault().getStructTopic( "/Pivot", ElevatorIO.ElevatorIOInputs ).publish()
+        self.elevatorLogger = NetworkTableInstance.getDefault().getStructTopic( "/Elevator", ElevatorIO.ElevatorIOInputs ).publish()
         self.pivotMeasuredLogger = NetworkTableInstance.getDefault().getTable("/Logging/Elevator")
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/Elevator", False, persistent=True )

@@ -26,28 +26,28 @@ class PivotIOFalcon(PivotIO):
 
         # Encoder
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
-        self.pivotEncoder.configFactoryDefault()
-        self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero )
-        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
-        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180 )
-        self.pivotEncoder.configSensorDirection( encoderDirection.get() )
+        self.pivotEncoder.configFactoryDefault( 250 )
+        self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero, 250 )
+        self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180, 250 )
+        self.pivotEncoder.configSensorDirection( encoderDirection.get(), 250 )
         if not RobotBase.isSimulation():
-            self.pivotEncoder.setPosition( self.pivotEncoder.getAbsolutePosition() - encoderOffset )
+            absPos = self.pivotEncoder.getAbsolutePosition()
+            self.pivotEncoder.setPosition( absPos - encoderOffset, 1000 )
         
         # Motor
         self.pivotMotor = WPI_TalonFX( motorId, pivotCanBus.get() )
-        self.pivotMotor.configFactoryDefault()
+        self.pivotMotor.configFactoryDefault( 250 )
         self.pivotMotor.setSensorPhase( pivotPhase.get() )
         self.pivotMotor.setInverted( pivotInvert.get() )
         self.pivotMotor.setNeutralMode( NeutralMode.Coast )
-        self.pivotMotor.configFeedbackNotContinuous( True )
-        self.pivotMotor.configNeutralDeadband( 0.005 )
+        self.pivotMotor.configFeedbackNotContinuous( True, 250 )
+        self.pivotMotor.configNeutralDeadband( 0.005, 250 )
         self.resetPid()
         
         # Link Encoder to Motor
-        self.pivotMotor.configRemoteFeedbackFilter( self.pivotEncoder, 0 )
-        self.pivotMotor.configSelectedFeedbackSensor( RemoteFeedbackDevice.RemoteSensor0, 0  )
-        self.pivotMotor.configSelectedFeedbackSensor( FeedbackDevice.None_, 1 )
+        self.pivotMotor.configRemoteFeedbackFilter( self.pivotEncoder, 0, 250 )
+        self.pivotMotor.configSelectedFeedbackSensor( RemoteFeedbackDevice.RemoteSensor0, 0, 250  )
+        self.pivotMotor.configSelectedFeedbackSensor( FeedbackDevice.None_, 1, 250 )
 
         # Stored Positions
         self.actualPosition = self.pivotEncoder.getPosition()
@@ -71,15 +71,13 @@ class PivotIOFalcon(PivotIO):
 
 
     def resetPid(self):
-        self.pivotMotor.config_kP( 0, self.pivot_kP.get() )
-        self.pivotMotor.config_kI( 0, self.pivot_kI.get() )
-        self.pivotMotor.config_kD( 0, self.pivot_kD.get() )
-        self.pivotMotor.config_kF( 0, self.pivot_kF.get() )
-        self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get() )
+        self.pivotMotor.config_kP( 0, self.pivot_kP.get(), 250 )
+        self.pivotMotor.config_kI( 0, self.pivot_kI.get(), 250 )
+        self.pivotMotor.config_kD( 0, self.pivot_kD.get(), 250 )
+        self.pivotMotor.config_kF( 0, self.pivot_kF.get(), 250 )
+        self.pivotMotor.config_IntegralZone( 0, self.pivot_Iz.get(), 250 )
 
     def run(self):
-        pos = self.desiredPosition / 360 * 4096
-        self.pivotMotor.set( ControlMode.Position, pos )
         pos = self.desiredPosition / 360 * 4096
         self.pivotMotor.set( ControlMode.Position, pos )
 
@@ -89,9 +87,9 @@ class PivotIOFalcon(PivotIO):
     def getPosition(self) -> float:
         return self.actualPosition
     
-    def atSetpoint(self, errorRange:float=0.0) -> bool:
-        atPos = self.pivotMotor.getClosedLoopError() < errorRange
-        return atPos
+    # def atSetpoint(self, errorRange:float=0.0) -> bool:
+    #     atPos = self.pivotMotor.getClosedLoopError() < errorRange
+    #     return atPos
     
     def getSetpoint(self) -> float:
         return self.desiredPosition
