@@ -26,7 +26,7 @@ robotpy-cscore==2024.3.1.0
 robotpy-halsim-ds-socket==2024.3.1.0
 robotpy-halsim-ws==2024.3.1.0
 robotpy-navx==2024.1.0
-robotpy-pathplannerlib==2024.2.2
+robotpy-pathplannerlib==2024.2.3
 robotpy-playingwithfusion==2024.1.0
 
 
