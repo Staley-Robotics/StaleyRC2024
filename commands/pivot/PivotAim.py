@@ -20,6 +20,8 @@ class PivotAim(Command):
         self.pivot = pivot
         self.getPose = getPose
 
+        self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
+        
         self.setName( "PivotAim" )
         self.addRequirements( pivot )
 
@@ -34,6 +36,7 @@ class PivotAim(Command):
         distance = pose.translation().distance( target )
         posRad = math.atan( distance / (height-pivotHeight) )
         pos = math.degrees( posRad )
+        pos += self.aimAdjust.get()
 
         self.pivot.set(pos) # Assumed that the calculation for pivot @ distance from target is done elsewhere
 
