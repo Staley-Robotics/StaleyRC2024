@@ -32,6 +32,7 @@ robotpy-playingwithfusion==2024.1.0
 
 ### Rev Robotics
 robotpy-rev==2024.2.1
+robotpy-urcl==2024.0.1
 
 ### CTRE
 robotpy-ctre==2024.1.2 #phoenix5
