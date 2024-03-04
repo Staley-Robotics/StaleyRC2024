@@ -101,7 +101,13 @@ class RobotContainer:
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
+
+        wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
+        wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
+        wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
+        wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -111,11 +117,7 @@ class RobotContainer:
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
         ## Driving
-        # self.m_driver1.a().toggleOnTrue( DemoSwerveDriveTimedPath( self.drivetrain ) )
-        # self.m_driver1.b().toggleOnTrue( DemoSwerveDrivePoses( self.drivetrain ) )
-        # self.m_driver1.x().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 2, 0, Rotation2d(0) ) ) )
-        # self.m_driver1.y().onTrue( DriveDistance( self.drivetrain, distance = lambda: Pose2d( 0, 2, Rotation2d(0) ) ) ) 
-        self.m_driver1.rightBumper().whileTrue(
+        self.m_driver1.a().whileTrue(
             commands.DriveAimSpeaker(
                 self.drivetrain,
                 self.m_driver1.getLeftY,
@@ -129,24 +131,31 @@ class RobotContainer:
             sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
         # All Stop / Commands Reset
-        self.m_driver1.leftBumper().onTrue(
+        self.m_driver1.b().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+
+        self.m_driver1.leftBumper().onTrue(
+            commands.ToggleFieldRelative()
+        )
+        self.m_driver1.rightBumper().onTrue(
+            commands.ToggleHalfSpeed()
         )
         
         # # Safety and Other Commands
-        cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
-        cTab.add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
+        # cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
+        # cTab.add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
         # cTab.add( "IntakeEject", IntakeEject(self.intake) ).withPosition(0, 1)
         # cTab.add( "IndexerEject", IndexerEject(self.feeder) ).withPosition(0, 2)
         # cTab.add( "PivotBottom", PivotBottom(self.pivot) ).withPosition(1, 2)
         # cTab.add( "PivotTop", PivotTop(self.pivot) ).withPosition(1, 1)
 
         # # Intake to Ready to Launch Commands
-        cTab.add( "IntakeLoad", IntakeLoad(self.intake) ).withPosition(3, 0)
-        cTab.add( "ElevatorHandoff", ElevatorBottom(self.elevator) ).withPosition(4, 0)
-        cTab.add( "PivotHandoff", PivotHandoff(self.pivot) ).withPosition(5, 0)
-        cTab.add( "IndexerHandoff", IndexerHandoff(self.feeder) ).withPosition(6, 0)
-        cTab.add( "IntakeHandoff", IntakeHandoff(self.intake) ).withPosition(7, 0)
+        # cTab.add( "IntakeLoad", IntakeLoad(self.intake) ).withPosition(3, 0)
+        # cTab.add( "ElevatorHandoff", ElevatorBottom(self.elevator) ).withPosition(4, 0)
+        # cTab.add( "PivotHandoff", PivotHandoff(self.pivot) ).withPosition(5, 0)
+        # cTab.add( "IndexerHandoff", IndexerHandoff(self.feeder) ).withPosition(6, 0)
+        # cTab.add( "IntakeHandoff", IntakeHandoff(self.intake) ).withPosition(7, 0)
 
         # # Launch to Speaker Commands
         # cTab.add( "ElevatorSpeaker", ElevatorBottom(self.elevator) ).withPosition(3, 1)
@@ -185,6 +194,14 @@ class RobotContainer:
                 self.m_driver1.getRightY,
                 self.m_driver1.getRightX,
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
+            )
+        )
+
+        self.pivot.setDefaultCommand(
+            sequences.PivotDefault(
+                self.pivot,
+                self.drivetrain.getPose,
+                self.feeder.hasNote
             )
         )
     

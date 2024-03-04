@@ -25,15 +25,19 @@ class PivotIOFalcon(PivotIO):
         self.pivot_kF = NTTunableFloat('Pivot/PID_kFF', 0.0, updater=self.resetPid, persistent=True)
 
         # Encoder
+        self.pivotEncoderOffset = encoderOffset
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
         self.pivotEncoder.configFactoryDefault( 250 )
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero, 250 )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180, 250 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get(), 250 )
-        if not RobotBase.isSimulation():
-            absPos = self.pivotEncoder.getAbsolutePosition()
-            self.pivotEncoder.setPosition( absPos - encoderOffset, 1000 )
-        
+        self.syncEncoder()
+
+        # # Does this solve Encoder Reboot concerns?
+        # self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition, 250 )
+        # self.pivotEncoder.configMagnetOffset( encoderOffset )
+        # self.syncEncoder()
+
         # Motor
         self.pivotMotor = WPI_TalonFX( motorId, pivotCanBus.get() )
         self.pivotMotor.configFactoryDefault( 250 )
@@ -93,3 +97,9 @@ class PivotIOFalcon(PivotIO):
     
     def getSetpoint(self) -> float:
         return self.desiredPosition
+
+    def syncEncoder(self) -> None:
+        newPos = self.pivotEncoder.getAbsolutePosition()
+        if not RobotBase.isSimulation():
+            newPos -= self.pivotEncoderOffset
+        self.pivotEncoder.setPosition( newPos, 250 )

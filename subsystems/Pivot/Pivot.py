@@ -58,4 +58,7 @@ class Pivot(Subsystem):
     #     self.set( self.PivotPositions.Trap )
 
     def atSetpoint(self) -> bool:
-        return self.pivot.atSetpoint( 1.0 )
+        return self.pivot.atSetpoint( 0.5 )
+    
+    def syncEncoder(self):
+        self.pivot.syncEncoder()

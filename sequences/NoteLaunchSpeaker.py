@@ -5,7 +5,7 @@ from subsystems import Indexer, Pivot, Elevator, Launcher
 from util import *
 
 class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
-    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator):
+    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator, getPose:typing.Callable[[],Pose2d]):
         super().__init__()
         self.setName( "NoteLaunchSpeaker" )
 
@@ -16,7 +16,9 @@ class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
         )
         self.addCommands(
             commands2.ParallelRaceGroup(
-                PivotAim(pivot,30.0),
+                commands2.RepeatCommand(
+                    PivotAim(pivot,getPose)
+                ),
                 commands2.ParallelCommandGroup(
                     LauncherSpeaker(launcher),
                     commands2.SequentialCommandGroup(
