@@ -94,10 +94,12 @@ class LauncherIONeo(LauncherIO):
         self.rightPid.setIZone( self.launcher_Iz.get(), 0 )
 
     def run(self):
-        #self.leftMotor.set( self.desiredVelocity[0] )
-        #self.rightMotor.set( self.desiredVelocity[1] )
-        self.leftPid.setReference( self.desiredVelocity[0], CANSparkMax.ControlType.kVelocity, 0 )
-        self.rightPid.setReference( self.desiredVelocity[1], CANSparkMax.ControlType.kVelocity, 0 )
+        if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
+            self.leftMotor.set( self.desiredVelocity[0] )
+            self.rightMotor.set( self.desiredVelocity[1] )
+        else:
+            self.leftPid.setReference( self.desiredVelocity[0], CANSparkMax.ControlType.kVelocity, 0 )
+            self.rightPid.setReference( self.desiredVelocity[1], CANSparkMax.ControlType.kVelocity, 0 )
 
     def setVelocity(self, leftVelocity:float, rightVelocity:float ):
         self.desiredVelocity = [ leftVelocity, rightVelocity ]
