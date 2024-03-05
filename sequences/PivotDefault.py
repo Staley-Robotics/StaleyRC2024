@@ -9,7 +9,7 @@ class PivotDefault(commands2.ConditionalCommand):
         super().__init__(
             PivotAim(pivot, getPose),
             PivotHandoff(pivot),
-            hasNote()
+            hasNote
         )
 
     def initialize(self):

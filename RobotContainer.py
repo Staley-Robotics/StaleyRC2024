@@ -74,7 +74,7 @@ class RobotContainer:
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
-            VisionCameraLimelight( "limelight-one" ),
+            #VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
 
@@ -128,7 +128,7 @@ class RobotContainer:
         ## Controller Configs for testing
         # Note Action
         self.m_driver1.x().onTrue(
-            sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+            sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose )
         )
         # All Stop / Commands Reset
         self.m_driver1.b().onTrue(

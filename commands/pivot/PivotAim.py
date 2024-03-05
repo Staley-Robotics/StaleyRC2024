@@ -21,6 +21,7 @@ class PivotAim(Command):
         self.getPose = getPose
 
         self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
+        self.calcAim = NTTunableFloat( "/PivotCalc", 0.0 )
         
         self.setName( "PivotAim" )
         self.addRequirements( pivot )
@@ -34,13 +35,14 @@ class PivotAim(Command):
         pivotHeight = CrescendoUtil.getRobotPivotHeight()
 
         distance = pose.translation().distance( target )
-        posRad = math.atan( distance / (height-pivotHeight) )
+        posRad = math.atan( (height-pivotHeight) / distance )
         pos = math.degrees( posRad )
         pos += self.aimAdjust.get()
-
+        self.calcAim.set( pos )
         self.pivot.set(pos) # Assumed that the calculation for pivot @ distance from target is done elsewhere
 
     def end(self, interrupted:bool) -> None:
+        self.calcAim.set( 0.0 )
         pass # May be set to zero in future, but for now: assuming hold position
 
     def isFinished(self) -> bool:

@@ -1,4 +1,4 @@
-from phoenix5 import WPI_TalonFX, NeutralMode, RemoteFeedbackDevice, FeedbackDevice, ControlMode
+from phoenix5 import WPI_TalonFX, NeutralMode, RemoteFeedbackDevice, FeedbackDevice, ControlMode, SupplyCurrentLimitConfiguration, StatorCurrentLimitConfiguration
 from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
 from wpilib import RobotBase
 
@@ -28,15 +28,11 @@ class PivotIOFalcon(PivotIO):
         self.pivotEncoderOffset = encoderOffset
         self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
         self.pivotEncoder.configFactoryDefault( 250 )
-        self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToZero, 250 )
+        self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition, 250 )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180, 250 )
         self.pivotEncoder.configSensorDirection( encoderDirection.get(), 250 )
-        self.syncEncoder()
-
-        # # Does this solve Encoder Reboot concerns?
-        # self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition, 250 )
-        # self.pivotEncoder.configMagnetOffset( encoderOffset )
-        # self.syncEncoder()
+        self.pivotEncoder.configMagnetOffset( encoderOffset, 250 )        
+        #self.syncEncoder()
 
         # Motor
         self.pivotMotor = WPI_TalonFX( motorId, pivotCanBus.get() )
@@ -47,6 +43,12 @@ class PivotIOFalcon(PivotIO):
         self.pivotMotor.configFeedbackNotContinuous( True, 250 )
         self.pivotMotor.configNeutralDeadband( 0.005, 250 )
         self.resetPid()
+        
+        # # Falcon Current Limit???
+        # supplyCurrentCfg = SupplyCurrentLimitConfiguration( True, 40, 40, 1.0 )
+        # self.pivotMotor.configSupplyCurrentLimit( supplyCurrentCfg, 250 )
+        # statorCurrentCfg = StatorCurrentLimitConfiguration( True, 40, 40, 1.0 )
+        # self.pivotMotor.configStatorCurrentLimit( statorCurrentCfg, 250 )
         
         # Link Encoder to Motor
         self.pivotMotor.configRemoteFeedbackFilter( self.pivotEncoder, 0, 250 )
@@ -100,6 +102,6 @@ class PivotIOFalcon(PivotIO):
 
     def syncEncoder(self) -> None:
         newPos = self.pivotEncoder.getAbsolutePosition()
-        if not RobotBase.isSimulation():
-            newPos -= self.pivotEncoderOffset
+        #if not RobotBase.isSimulation():
+        #    newPos -= self.pivotEncoderOffset
         self.pivotEncoder.setPosition( newPos, 250 )
