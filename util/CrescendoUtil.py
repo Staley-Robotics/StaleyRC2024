@@ -6,6 +6,8 @@ from .NTTunableFloat import *
 fieldWidth = NTTunableFloat( "Crescendo/FieldWidth", 8.17, persistent=True )
 speakerTargetX = NTTunableFloat( "Crescendo/Speaker/X", 0.25, persistent=True )
 speakerTargetY = NTTunableFloat( "Crescendo/Speaker/Y", 5.50, persistent=True )
+speakerTargetH = NTTunableFloat( "Crescendo/Speaker/H", 2.0431, persistent=True )
+robotPivotH = NTTunableFloat( "Crescendo/RobotPivot/H", 0.25, persistent=True )
 
 class CrescendoUtil:
     @staticmethod
@@ -22,6 +24,14 @@ class CrescendoUtil:
             target = CrescendoUtil.convertTranslationToRedAlliance( target )
         return target
     
+    @staticmethod
+    def getSpeakerHeight():
+        return speakerTargetH.get()
+
+    @staticmethod
+    def getRobotPivotHeight():
+        return robotPivotH.get()
+
     @staticmethod
     def getAmpTarget():
         return Translation2d(0,0)

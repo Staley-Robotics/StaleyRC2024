@@ -38,10 +38,10 @@ class ElevatorIO:
         pass
 
     def getPosition(self) -> float:
-        pass
+        return 0.0
 
     def atSetpoint(self) -> bool:
-        pass
+        return True
     
     def getSetpoint(self) -> float:
-        pass
+        return 0.0

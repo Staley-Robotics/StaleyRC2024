@@ -10,7 +10,7 @@ from subsystems import Launcher
 from util import *
 
 # Intake Load Command
-class LauncherReceive(Command):
+class LauncherSource(Command):
     def __init__( self,
                   launcher:Launcher,
                 ):
@@ -18,7 +18,7 @@ class LauncherReceive(Command):
         super().__init__()
         self.launcher = launcher
 
-        self.setName( "LauncherReceive" )
+        self.setName( "LauncherSource" )
         self.addRequirements( launcher )
 
     def initialize(self) -> None: pass
@@ -30,6 +30,6 @@ class LauncherReceive(Command):
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
-        return not self.launcher.hasLaunched()
+        return self.launcher.hasLaunched()
     
     def runsWhenDisabled(self) -> bool: return False
