@@ -1,4 +1,3 @@
-from rev import *
 from phoenix5 import *
 
 from .LauncherIO import LauncherIO
