@@ -67,14 +67,15 @@ class RobotContainer:
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
-            ssLauncherIO = LauncherIONeo( 23, 24 , 3 )
+            #ssLauncherIO = LauncherIONeo( 23, 24 , 3 )
+            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
             ssElevatorIO = ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
-            #VisionCameraLimelight( "limelight-one" ),
+            VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
 
