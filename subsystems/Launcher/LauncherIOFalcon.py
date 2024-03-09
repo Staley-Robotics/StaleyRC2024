@@ -64,14 +64,14 @@ class LauncherIOFalcon(LauncherIO):
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
         v0 = self.leftMotor.getSelectedSensorVelocity()
-        inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage() * self.leftMotor.getBusVoltage()
+        inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()# * self.leftMotor.getBusVoltage()
         inputs.leftCurrentAmps = self.leftMotor.getOutputCurrent()
         inputs.leftPosition = self.leftMotor.getSelectedSensorPosition()
         inputs.leftVelocity = v0
         inputs.leftTempCelcius = self.leftMotor.getTemperature()
 
         v1 = self.rightMotor.getSelectedSensorVelocity()
-        inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage() * self.rightMotor.getBusVoltage()
+        inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage()# * self.rightMotor.getBusVoltage()
         inputs.rightCurrentAmps = self.rightMotor.getOutputCurrent()
         inputs.rightPosition = self.rightMotor.getSelectedSensorPosition()
         inputs.rightVelocity = v1
