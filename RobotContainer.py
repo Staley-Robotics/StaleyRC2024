@@ -8,6 +8,9 @@ import wpilib.shuffleboard
 import wpimath
 from wpilib.interfaces import GenericHID
 
+from pathplannerlib.auto import NamedCommands, AutoBuilder
+from pathplannerlib.path import PathPlannerPath
+
 from subsystems import *
 from commands import *
 from sequences import *
@@ -90,6 +93,9 @@ class RobotContainer:
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
 
+        # Register Pathplanner Commands
+        NamedCommands.registerCommand('AutoPivot', PivotAim(self.pivot, self.drivetrain.getPose)) 
+
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
@@ -113,6 +119,7 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
+        self.m_chooser.addOption("PathPlanner", AutoBuilder.followPath( PathPlannerPath.fromPathFile('Example Path') ) )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
