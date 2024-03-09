@@ -20,7 +20,7 @@ class LED(Subsystem):
         self.ledInputs = led.LedIOInputs
         self.ledLogger = NetworkTableInstance.getDefault().getStructTopic( "/LED", LedIO.LedIOInputs ).publish()
 
-        self.offline = NTTunableBoolean( "/DisableSubsystem/LED", False, persistent=True )
+        self.offline = NTTunableBoolean( "/DisableSubsystem/LED", False, persistent=False )
 
     def periodic(self) -> None:
         #logging
@@ -30,7 +30,7 @@ class LED(Subsystem):
         # Run Subsystem
         if self.offline.get():#wpilib.RobotBase.isDisabled() or self.offline.get():
             #logic copied from launcher -- doesn't actually disable?
-            self.defaultColor()
+            pass
 
         self.led.refresh()
     

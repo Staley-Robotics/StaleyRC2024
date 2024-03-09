@@ -69,7 +69,7 @@ class RobotContainer:
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             #ssLauncherIO = LauncherIONeo( 23, 24 , 3 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
-            ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
+            ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
             ssElevatorIO = ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
 
@@ -103,12 +103,12 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
+        #wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -134,6 +134,9 @@ class RobotContainer:
         # All Stop / Commands Reset
         self.m_driver1.b().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver1.y().whileTrue(
+            commands.LauncherSpeaker( self.launcher )
         )
 
         self.m_driver1.leftBumper().onTrue(
