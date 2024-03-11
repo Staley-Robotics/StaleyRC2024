@@ -142,7 +142,7 @@ class RobotContainer:
         self.m_driver1.b().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
-        self.m_driver1.y().whileTrue(
+        self.m_driver1.y().onTrue(
             commands.LauncherSpeaker( self.launcher )
         )
 

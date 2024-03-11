@@ -83,8 +83,11 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turnMotor.enableVoltageCompensation( 12.0 )
         self.turnMotor.setSmartCurrentLimit( 30 )
         self.turnMotor.setClosedLoopRampRate( 0.05 )
+        self.turnMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.turnMotorEncoder = self.turnMotor.getEncoder()
+        self.turnMotorEncoder.setMeasurementPeriod(10)
+        self.turnMotorEncoder.setAverageDepth(2)
         self.updateTurnEncoderConversions()
         
         self.turnMotorPid = self.turnMotor.getPIDController()
@@ -108,8 +111,13 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.driveMotor.enableVoltageCompensation( 12.0 )
         self.driveMotor.setSmartCurrentLimit( 30 )
         self.driveMotor.setClosedLoopRampRate( 0.05 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus0, 20 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus1, 20 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.driveMotorEncoder = self.driveMotor.getEncoder()
+        self.driveMotorEncoder.setMeasurementPeriod(10)
+        self.driveMotorEncoder.setAverageDepth(2)
         self.updateDriveEncoderConversions()
 
         self.driveMotorPid = self.driveMotor.getPIDController()
@@ -132,26 +140,22 @@ class SwerveModuleIONeo(SwerveModuleIO):
         """
         # Drive Motor Data
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
-        if inputs.driveTempCelcius != 0:
-            inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
-            inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
-            #inputs.driveRadPosition = inputs.driveMtrsPosition / self.wheelRadius.get()
-            #inputs.driveRadPerSecVelocity = inputs.driveMtrsPerSecVelocity / self.wheelRadius.get()
-            inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
+        inputs.drivePosition = self.driveMotorEncoder.getPosition()
+        inputs.driveVelocity = self.driveMotorEncoder.getVelocity()
+        inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
+        inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         
+        # Turn Encoder Data
+        inputs.turnCanCoderRelative = self.turnSensor.getPosition()
+        inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
+
         # Turn Motor Data
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
-        if inputs.turnTempCelcius != 0:
-            inputs.turnCanCoderRelative = self.turnSensor.getPosition()
-            inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
-            inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
-            inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
-            #inputs.turnRadPosition = units.degreesToRadians( inputs.turnDegPosition )
-            #inputs.turnRadPerSecVelocity = units.degreesToRadians( inputs.turnDegPerSecVelocity )
-            inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
-            inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
-            
-
+        inputs.turnPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnVelocity = self.turnMotorEncoder.getVelocity()
+        inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
+        inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
+        
         self.moduleState = SwerveModuleState(
             speed=inputs.driveMtrsPerSecVelocity,
             angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )

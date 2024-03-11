@@ -7,10 +7,10 @@ from util import *
 class LauncherIOFalcon(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
-        leftInvert = NTTunableBoolean( "/Config/Launcher/Falcon/LeftInvert", False, updater=lambda: self.leftMotor.setInverted( leftInvert.get() ), persistent=True )
-        rightInvert = NTTunableBoolean( "/Config/Launcher/Falcon/RightInvert", True, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=True )
-        leftCanBus = NTTunableString( "/Config/Launcher/Falcon/LeftCanBus", "canivore1", persistent=True )
-        rightCanBus = NTTunableString( "/Config/Launcher/Falcon/RightCanBus", "canivore1", persistent=True )
+        leftInvert = NTTunableBoolean( "/Config/Launcher/Falcon/LeftInvert", False, updater=lambda: self.leftMotor.setInverted( leftInvert.get() ), persistent=False )
+        rightInvert = NTTunableBoolean( "/Config/Launcher/Falcon/RightInvert", True, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=False )
+        leftCanBus = NTTunableString( "/Config/Launcher/Falcon/LeftCanBus", "canivore1", persistent=False )
+        rightCanBus = NTTunableString( "/Config/Launcher/Falcon/RightCanBus", "canivore1", persistent=False )
 
         self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 1.0, updater=self.resetPid, persistent=True)
         self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.0, updater=self.resetPid, persistent=True)
@@ -23,13 +23,13 @@ class LauncherIOFalcon(LauncherIO):
         self.desiredVelocity = [ 0.0, 0.0 ]
 
         # Left Motor
-        self.leftMotor = WPI_TalonFX( leftCanId, leftCanBus.get() )
+        self.leftMotor = WPI_TalonFX( leftCanId, "canivore1" )
         self.leftMotor.clearStickyFaults( 250 )
         self.leftMotor.configFactoryDefault( 250 )
         self.leftMotor.setNeutralMode( NeutralMode.Coast )
-        self.leftMotor.setInverted( leftInvert.get() )
+        self.leftMotor.setInverted( False )
 
-        self.leftMotor.configVoltageCompSaturation( 12.0, 250 )
+        self.leftMotor.configVoltageCompSaturation( 9.0, 250 )
         self.leftMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
@@ -39,13 +39,13 @@ class LauncherIOFalcon(LauncherIO):
         #self.leftMotor.configStatorCurrentLimit( statorCurrentCfg, 250 )
 
         # Right Motor
-        self.rightMotor = WPI_TalonFX( rightCanId, rightCanBus.get() )
+        self.rightMotor = WPI_TalonFX( rightCanId, "canivore1" )
         self.rightMotor.clearStickyFaults( 250 )
         self.rightMotor.configFactoryDefault( 250 )
         self.rightMotor.setNeutralMode( NeutralMode.Coast )
-        self.rightMotor.setInverted( rightInvert.get() )
+        self.rightMotor.setInverted( True )
         
-        self.rightMotor.configVoltageCompSaturation( 12.0, 250 )
+        self.rightMotor.configVoltageCompSaturation( 9.0, 250 )
         self.rightMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
@@ -64,14 +64,14 @@ class LauncherIOFalcon(LauncherIO):
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
         v0 = self.leftMotor.getSelectedSensorVelocity()
-        inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()# * self.leftMotor.getBusVoltage()
+        inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()
         inputs.leftCurrentAmps = self.leftMotor.getOutputCurrent()
         inputs.leftPosition = self.leftMotor.getSelectedSensorPosition()
         inputs.leftVelocity = v0
         inputs.leftTempCelcius = self.leftMotor.getTemperature()
 
         v1 = self.rightMotor.getSelectedSensorVelocity()
-        inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage()# * self.rightMotor.getBusVoltage()
+        inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage()
         inputs.rightCurrentAmps = self.rightMotor.getOutputCurrent()
         inputs.rightPosition = self.rightMotor.getSelectedSensorPosition()
         inputs.rightVelocity = v1
