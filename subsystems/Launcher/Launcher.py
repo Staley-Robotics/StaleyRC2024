@@ -18,6 +18,7 @@ class Launcher(Subsystem):
         SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -1.0, persistent=True )
         SourceRight = NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -1.0, persistent=True )
         
+        Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 0.25, persistent=True )
         Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
         ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 100.0, persistent=True )
 

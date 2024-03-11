@@ -18,7 +18,7 @@ class NoteLoadSource(commands2.SequentialCommandGroup):
         )
         self.addCommands(
             commands2.ParallelCommandGroup(
-                LauncherReceive(launcher),
+                LauncherSource(launcher),
                 IndexerSource(indexer)
             )
         )
