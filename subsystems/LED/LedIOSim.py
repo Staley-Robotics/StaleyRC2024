@@ -4,6 +4,8 @@ import wpimath.units
 from util import *
 from subsystems import LedIO 
 
+#NOTE: this is just LedIOActual renamed atm
+
 class LedIOSim(LedIO):
     
     def __init__(self, PWMPort:int):

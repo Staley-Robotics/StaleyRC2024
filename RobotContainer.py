@@ -40,6 +40,7 @@ class RobotContainer:
         ssPivotIO = None
         #ssElevatorIO = None
         ssLedIO = None
+        ssClimberIO = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -70,6 +71,7 @@ class RobotContainer:
             ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
             #ssElevatorIO = ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
+            ssClimberIO = ClimberIOTalon( 0, 1 ) #wrong
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -86,6 +88,7 @@ class RobotContainer:
         #self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
+        self.climber = Climber( ssClimberIO )
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -95,6 +98,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
         #wpilib.SmartDashboard.putData( "Elevator", self.elevator )
         wpilib.SmartDashboard.putData( "LED", self.led )
+        wpilib.SmartDashboard.putData( "Climber", self.climber )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
@@ -120,13 +124,15 @@ class RobotContainer:
         )
 
         ## Controller Configs for testing
+        #Climber
+        self.m_driver1.a().whileTrue( ClimbByStickMono( self.climber, self.m_driver1.getRightTriggerAxis ) )
         #Intake
-        self.m_driver1.y().onTrue( IntakeLoad( self.intake ) )
-        self.m_driver1.x().onTrue( IntakeHandoff( self.intake ) )
-        # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
-        #Indexer
-        self.m_driver1.b().onTrue( IndexerHandoff( self.feeder ))
-        self.m_driver1.a().onTrue( IndexerLaunch( self.feeder ))
+        # self.m_driver1.y().onTrue( IntakeLoad( self.intake ) )
+        # self.m_driver1.x().onTrue( IntakeHandoff( self.intake ) )
+        # # self.m_driver1.x().whileTrue( IntakeEject( self.intake ) )
+        # #Indexer
+        # self.m_driver1.b().onTrue( IndexerHandoff( self.feeder ))
+        # self.m_driver1.a().onTrue( IndexerLaunch( self.feeder ))
         
         #Launcher
         # self.m_driver1.a().whileTrue( LauncherSpeaker( self.launcher ))

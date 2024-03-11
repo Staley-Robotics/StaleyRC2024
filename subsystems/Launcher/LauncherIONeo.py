@@ -1,5 +1,4 @@
 from rev import *
-
 from .LauncherIO import LauncherIO
 
 from util import *

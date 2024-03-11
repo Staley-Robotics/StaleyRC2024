@@ -6,6 +6,9 @@ from .Launcher.LauncherIOSim import *
 from .Launcher.LauncherIO import *
 from .Launcher.Launcher import *
 from .Launcher.LauncherIONeo import *
+from .Climber.Climber import *
+from .Climber.ClimberIOTalon import *
+from .Climber.ClimberIO import *
 from .LED.LED import *
 from .LED.LedIOSim import *
 from .LED.LedIOActual import *
