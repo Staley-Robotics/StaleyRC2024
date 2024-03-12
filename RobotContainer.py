@@ -73,10 +73,9 @@ class RobotContainer:
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
-            #ssLauncherIO = LauncherIONeo( 23, 24 , 3 )
-            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
+            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
-            ssElevatorIO = ElevatorIONeo( 27, 28 )
+            ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
             ssClimberIO = ClimberIOTalon( 0, 1 ) #wrong
 
@@ -92,8 +91,7 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        #self.elevator:Elevator = Elevator( ssElevatorIO )
-        self.elevator:Elevator = Elevator( ElevatorIO() )
+        self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
         self.climber = Climber( ssClimberIO )
