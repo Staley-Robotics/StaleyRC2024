@@ -2,7 +2,7 @@
 Taken from Andy in github
 """
 
-import wpilib
+from wpilib import RobotState
 import wpimath.units
 
 from commands2 import Subsystem
@@ -17,7 +17,7 @@ class LED(Subsystem):
     
     def __init__(self, led:LedIO) -> None:
         self.led = led
-        self.ledInputs = led.LedIOInputs
+        self.ledInputs = led.LedIOInputs()
         self.ledLogger = NetworkTableInstance.getDefault().getStructTopic( "/LED", LedIO.LedIOInputs ).publish()
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/LED", False, persistent=True )
@@ -28,9 +28,10 @@ class LED(Subsystem):
         self.ledLogger.set(self.ledInputs)
 
         # Run Subsystem
-        if self.offline.get() or DriverStation.isDisabled():
+        if self.offline.get() or RobotState.isDisabled():
             #logic copied from Launcher -- doesn't actually disable?
-            self.defaultColor()
+            #self.defaultColor()
+            pass
 
         self.led.refresh()
     
