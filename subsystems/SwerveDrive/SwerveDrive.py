@@ -26,6 +26,7 @@ from ntcore import *
 
 from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
+from pathplannerlib.controller import PPHolonomicDriveController
 
 # Our Imports
 from util import *
@@ -162,6 +163,8 @@ class SwerveDrive(Subsystem):
             self # Reference to this subsystem to set requirements
         )
 
+        PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
+
         # NT Publishing
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
             self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
@@ -245,6 +248,17 @@ class SwerveDrive(Subsystem):
         Should Path Planning Be Flipped
         """
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
+
+    def ppAutoTarget(self):
+        target = -1
+        # target = -1 -> None
+        # target = 0 -> Speaker
+        # target = 1 -> Amp
+        # target = 2 -> Source
+        # target = 3 -> Stage Left
+        # target = 4 -> Stage Center
+        # target = 5 -> Stage Right
+        return None
 
     def syncGyro(self) -> None:
         print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
