@@ -29,7 +29,7 @@ class LauncherIOFalcon(LauncherIO):
         self.leftMotor.setNeutralMode( NeutralMode.Coast )
         self.leftMotor.setInverted( False )
 
-        self.leftMotor.configVoltageCompSaturation( 9.0, 250 )
+        self.leftMotor.configVoltageCompSaturation( 11.0, 250 )
         self.leftMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
@@ -45,7 +45,7 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.setNeutralMode( NeutralMode.Coast )
         self.rightMotor.setInverted( True )
         
-        self.rightMotor.configVoltageCompSaturation( 9.0, 250 )
+        self.rightMotor.configVoltageCompSaturation( 11.0, 250 )
         self.rightMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
@@ -63,23 +63,21 @@ class LauncherIOFalcon(LauncherIO):
         self.sensorCount = 0
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
-        v0 = self.leftMotor.getSelectedSensorVelocity()
         inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()
         inputs.leftCurrentAmps = self.leftMotor.getOutputCurrent()
         inputs.leftPosition = self.leftMotor.getSelectedSensorPosition()
-        inputs.leftVelocity = v0
+        inputs.leftVelocity = self.leftMotor.getSelectedSensorVelocity()
         inputs.leftTempCelcius = self.leftMotor.getTemperature()
 
-        v1 = self.rightMotor.getSelectedSensorVelocity()
         inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage()
         inputs.rightCurrentAmps = self.rightMotor.getOutputCurrent()
         inputs.rightPosition = self.rightMotor.getSelectedSensorPosition()
-        inputs.rightVelocity = v1
+        inputs.rightVelocity = self.rightMotor.getSelectedSensorVelocity()
         inputs.rightTempCelcius = self.rightMotor.getTemperature()
 
-        self.actualVelocity = [ v0, v1 ]
         inputs.sensor = self.irSensor.get()
-        inputs.sensorCount = self.sensorCount
+
+        self.actualVelocity = [ inputs.leftVelocity, inputs.rightVelocity ]
 
     def resetPid(self):
         self.leftMotor.config_kP( 0, self.launcher_kP.get(), 250 )
@@ -107,6 +105,9 @@ class LauncherIOFalcon(LauncherIO):
 
         self.leftMotor.set( controlMode, self.desiredVelocity[0] )
         self.rightMotor.set( controlMode, self.desiredVelocity[1] )
+
+    def getSensorCount(self) -> int:
+        return self.sensorCount
 
     def setVelocity(self, leftVelocity:float, rightVelocity:float ):
         self.desiredVelocity = [ leftVelocity, rightVelocity ]

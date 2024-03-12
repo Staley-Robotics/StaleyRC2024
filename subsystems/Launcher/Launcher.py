@@ -47,6 +47,7 @@ class Launcher(Subsystem):
         # Post Run Logging
         self.launcherMeasuredLogger.putNumberArray( "Setpoint", self.launcher.getSetpoint() )
         self.launcherMeasuredLogger.putNumberArray( "Measured", self.launcher.getVelocity() )
+        self.launcherMeasuredLogger.putNumber( "SensorCount", self.launcher.getSensorCount() )
 
     def set(self, leftSpeed:float, rightSpeed:float):
         self.launcher.setVelocity( leftSpeed, rightSpeed )
