@@ -76,21 +76,19 @@ class SwerveModuleIOSim(SwerveModuleIO):
         self.turnRelativePositionDeg += units.radiansToDegrees( self.turnSim.getAngularVelocity() * loopTime )
 
         # Drive Motor Data
-        inputs.driveRadPosition = self.driveRelativePosition
-        inputs.driveRadPerSecVelocity = self.driveSim.getAngularVelocity()
-        inputs.driveMtrsPosition =  self.driveRelativePosition * self.wheelRadius.get()
-        inputs.driveMtrsPerSecVelocity = self.driveSim.getAngularVelocity() * self.wheelRadius.get()
+        inputs.drivePosition =  self.driveRelativePosition * self.wheelRadius.get()
+        inputs.driveVelocity = self.driveSim.getAngularVelocity() * self.wheelRadius.get()
         inputs.driveAppliedVolts = self.driveAppliedVolts
         inputs.driveCurrentAmps = abs( self.driveSim.getCurrentDraw() )
         inputs.driveTempCelcius = 0.0
 
-        # Turn Motor Data
+        # Turn Encoder Data
         inputs.turnCanCoderRelative = 0.0
         inputs.turnCanCoderAbsolute = self.turnAbsolutePosition
-        inputs.turnDegPerSecVelocity = units.radiansToDegrees( self.turnSim.getAngularVelocity() )
-        inputs.turnDegPosition = self.turnRelativePositionDeg
-        inputs.turnRadPerSecVelocity = self.turnSim.getAngularVelocity()
-        inputs.turnRadPosition = self.turnRelativePositionRad
+        
+        # Turn Motor Data
+        inputs.turnVelocity = units.radiansToDegrees( self.turnSim.getAngularVelocity() )
+        inputs.turnPosition = self.turnRelativePositionDeg
         inputs.turnAppliedVolts = self.turnAppliedVolts
         inputs.turnCurrentAmps = abs( self.turnSim.getCurrentDraw() )
         inputs.turnTempCelcius = 0.0

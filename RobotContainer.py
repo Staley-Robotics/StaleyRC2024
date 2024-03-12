@@ -1,4 +1,6 @@
+import os
 import typing
+from pathlib import Path
 
 import commands2
 import commands2.button
@@ -7,6 +9,9 @@ import wpilib
 import wpilib.shuffleboard
 import wpimath
 from wpilib.interfaces import GenericHID
+
+from pathplannerlib.auto import NamedCommands, AutoBuilder
+from pathplannerlib.path import PathPlannerPath
 
 from subsystems import *
 from commands import *
@@ -68,15 +73,15 @@ class RobotContainer:
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
-            ssLauncherIO = LauncherIONeo( 23, 24 , 3 )
-            ssPivotIO = PivotIOFalcon( 25, 26, -48.691 )
-            ssElevatorIO = ElevatorIONeo( 27, 28 )
+            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
+            ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
+            ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
             ssClimberIO = ClimberIOTalon( 0, 1 ) #wrong
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
-            #VisionCameraLimelight( "limelight-one" ),
+            VisionCameraLimelight( "limelight-one" ),
             VisionCameraLimelight( "limelight-two" )
         ]
 
@@ -86,11 +91,13 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        #self.elevator:Elevator = Elevator( ssElevatorIO )
-        self.elevator:Elevator = Elevator( ElevatorIO() )
+        self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
         self.climber = Climber( ssClimberIO )
+
+        # Register Pathplanner Commands
+        NamedCommands.registerCommand('AutoPivot', PivotAim(self.pivot, self.drivetrain.getPose)) 
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -106,16 +113,21 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
+        #wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
-        wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
+        #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
+        p = Path( "deploy/pathplanner/autos" )
+        for e1 in os.scandir( p ):
+            if not e1.is_dir() and e1.name.endswith(".auto"):
+                f = e1.name.removesuffix(".auto")
+                self.m_chooser.addOption( f, AutoBuilder.buildAuto( f ) )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
@@ -137,6 +149,9 @@ class RobotContainer:
         # All Stop / Commands Reset
         self.m_driver1.b().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver1.y().onTrue(
+            commands.LauncherSpeaker( self.launcher )
         )
 
         self.m_driver1.leftBumper().onTrue(
@@ -206,6 +221,12 @@ class RobotContainer:
                 self.pivot,
                 self.drivetrain.getPose,
                 self.feeder.hasNote
+            )
+        )
+        
+        self.feeder.setDefaultCommand(
+            commands.IndexerDefault(
+                self.feeder
             )
         )
     

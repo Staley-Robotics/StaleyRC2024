@@ -35,14 +35,14 @@ class IntakeIOFalcon(IntakeIO):
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()
-        inputs.upperAppliedVolts = self.upperMotor.getMotorOutputVoltage() # * self.leftMotor.getBusVoltage()
+        inputs.upperAppliedVolts = self.upperMotor.getMotorOutputVoltage()
         inputs.upperCurrentAmps = self.upperMotor.getOutputCurrent()
         inputs.upperPosition = self.upperMotor.getSelectedSensorPosition()
         inputs.upperVelocity = self.actualVelocity[0]
         inputs.upperTempCelcius = self.upperMotor.getTemperature()
 
         self.actualVelocity[1] = self.lowerMotor.getSelectedSensorVelocity()
-        inputs.lowerAppliedVolts = self.lowerMotor.getMotorOutputVoltage() # * self.rightMotor.getBusVoltage()
+        inputs.lowerAppliedVolts = self.lowerMotor.getMotorOutputVoltage()
         inputs.lowerCurrentAmps = self.lowerMotor.getOutputCurrent()
         inputs.lowerPosition = self.lowerMotor.getSelectedSensorPosition()
         inputs.lowerVelocity = self.actualVelocity[1]

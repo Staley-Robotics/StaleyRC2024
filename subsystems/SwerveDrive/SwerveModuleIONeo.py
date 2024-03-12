@@ -76,23 +76,25 @@ class SwerveModuleIONeo(SwerveModuleIO):
 
         ### Turn Motor
         self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )
-        self.turnMotor.setCANTimeout(250)
-        self.turnMotor.restoreFactoryDefaults() # Revert to Factory Defaults
-        self.turnMotor.setInverted( True )  # WPI_TalonFX.setInverted
-        self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )  # WPI_TalonFX.setNeutralMode
+        self.turnMotor.setCANTimeout( 250 )
+        self.turnMotor.restoreFactoryDefaults() 
+        self.turnMotor.setInverted( True )  
+        self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast ) 
+        self.turnMotor.enableVoltageCompensation( 12.0 )
         self.turnMotor.setSmartCurrentLimit( 30 )
         self.turnMotor.setClosedLoopRampRate( 0.05 )
-        # WPI_TalonFX.configNeutralDeadband(0.001)  - No equivilant (must be done via CAN or USB)
+        self.turnMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
         
-        self.turnMotorEncoder = self.turnMotor.getEncoder() # WPI_TalonFX.configRemoteFeedbackFilter()
-        #self.turnMotorEncoder.setInverted(True) # WPI_TalonFX.setSensorPhase()
+        self.turnMotorEncoder = self.turnMotor.getEncoder()
+        self.turnMotorEncoder.setMeasurementPeriod(10)
+        self.turnMotorEncoder.setAverageDepth(2)
         self.updateTurnEncoderConversions()
         
         self.turnMotorPid = self.turnMotor.getPIDController()
-        self.turnMotorPid.setFeedbackDevice( self.turnMotorEncoder ) # WPI_TalonFX.configSelectedFeedbackSensor()  ### Should this be the CAN Coder?
-        self.turnMotorPid.setPositionPIDWrappingEnabled( True ) #WPI_TalonFX.configFeedbackNotContinous()
-        self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) #-180 ) #math.pi )
-        self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 ) # 180 ) #math.pi ) 
+        self.turnMotorPid.setFeedbackDevice( self.turnMotorEncoder )
+        self.turnMotorPid.setPositionPIDWrappingEnabled( True ) 
+        self.turnMotorPid.setPositionPIDWrappingMinInput( 0 ) 
+        self.turnMotorPid.setPositionPIDWrappingMaxInput( 360 )  
         self.turnMotorPid.setOutputRange( -0.85, 0.85 )
         self.updateTurnPIDController()     
 
@@ -102,19 +104,24 @@ class SwerveModuleIONeo(SwerveModuleIO):
 
         ### Drive Motor
         self.driveMotor = CANSparkMax( driveId, CANSparkMax.MotorType.kBrushless )
-        self.driveMotor.setCANTimeout(250)
+        self.driveMotor.setCANTimeout( 250 )
         self.driveMotor.restoreFactoryDefaults()
         self.driveMotor.setInverted( True )
         self.driveMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
+        self.driveMotor.enableVoltageCompensation( 12.0 )
         self.driveMotor.setSmartCurrentLimit( 30 )
         self.driveMotor.setClosedLoopRampRate( 0.05 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus0, 20 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus1, 20 )
+        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.driveMotorEncoder = self.driveMotor.getEncoder()
-        #self.driveMotorEncoder.setInverted(False)
+        self.driveMotorEncoder.setMeasurementPeriod(10)
+        self.driveMotorEncoder.setAverageDepth(2)
         self.updateDriveEncoderConversions()
 
         self.driveMotorPid = self.driveMotor.getPIDController()
-        self.driveMotorPid.setFeedbackDevice( self.driveMotorEncoder ) # WPI_TalonFX.configSelectedFeedbackSensor()    
+        self.driveMotorPid.setFeedbackDevice( self.driveMotorEncoder )
         self.driveMotorPid.setOutputRange( -0.95, 0.95 )
         self.updateDrivePIDController()
 
@@ -133,32 +140,28 @@ class SwerveModuleIONeo(SwerveModuleIO):
         """
         # Drive Motor Data
         inputs.driveTempCelcius = self.driveMotor.getMotorTemperature()
-        if inputs.driveTempCelcius != 0:
-            inputs.driveMtrsPosition = self.driveMotorEncoder.getPosition()
-            inputs.driveMtrsPerSecVelocity = self.driveMotorEncoder.getVelocity()
-            #inputs.driveRadPosition = inputs.driveMtrsPosition / self.wheelRadius.get()
-            #inputs.driveRadPerSecVelocity = inputs.driveMtrsPerSecVelocity / self.wheelRadius.get()
-            inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
+        inputs.drivePosition = self.driveMotorEncoder.getPosition()
+        inputs.driveVelocity = self.driveMotorEncoder.getVelocity()
+        inputs.driveAppliedVolts = self.driveMotor.getAppliedOutput() * self.driveMotor.getBusVoltage()
+        inputs.driveCurrentAmps = self.driveMotor.getOutputCurrent()
         
+        # Turn Encoder Data
+        inputs.turnCanCoderRelative = self.turnSensor.getPosition()
+        inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
+
         # Turn Motor Data
         inputs.turnTempCelcius = self.turnMotor.getMotorTemperature()
-        if inputs.turnTempCelcius != 0:
-            inputs.turnCanCoderRelative = self.turnSensor.getPosition()
-            inputs.turnCanCoderAbsolute = self.turnSensor.getAbsolutePosition()
-            inputs.turnDegPosition = self.turnMotorEncoder.getPosition()
-            inputs.turnDegPerSecVelocity = self.turnMotorEncoder.getVelocity()
-            #inputs.turnRadPosition = units.degreesToRadians( inputs.turnDegPosition )
-            #inputs.turnRadPerSecVelocity = units.degreesToRadians( inputs.turnDegPerSecVelocity )
-            inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
-            inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
-            
-
+        inputs.turnPosition = self.turnMotorEncoder.getPosition()
+        inputs.turnVelocity = self.turnMotorEncoder.getVelocity()
+        inputs.turnAppliedVolts = self.turnMotor.getAppliedOutput() * self.turnMotor.getBusVoltage()
+        inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
+        
         self.moduleState = SwerveModuleState(
-            speed=inputs.driveMtrsPerSecVelocity,
+            speed=inputs.driveVelocity,
             angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
         self.modulePosition =  SwerveModulePosition(
-            distance=inputs.driveMtrsPosition,
+            distance=inputs.drivePosition,
             angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
 

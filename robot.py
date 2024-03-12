@@ -1,5 +1,6 @@
 import wpilib
 import wpiutil.log
+from urcl import URCL
 import hal
 import commands2
 import ntcore
@@ -23,26 +24,30 @@ class MyRobot(wpilib.TimedRobot):
             hal.tInstances.kFramework_Timed
         )
 
+        # Disable Watchdog Warning
+        wpilib.Watchdog( 0.05, lambda: None).suppressTimeoutMessage(True)
+
+        # Rev Raw Logging
+        URCL.start()
+
         # Setup Console Logging
-        # loggedConsole:LoggedConsole = None
-        # if wpilib.RobotBase.isReal():
-        #     loggedConsole = LoggedConsoleRIO()
-        # else:
-        #     loggedConsole = LoggedConsoleSIM()
-        # self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
+        loggedConsole:LoggedConsole = None
+        if wpilib.RobotBase.isReal():
+            loggedConsole = LoggedConsoleRIO()
+        else:
+            loggedConsole = LoggedConsoleSIM()
+        self.addPeriodic( loggedConsole.periodic, 0.25, 0.016 )
 
         # Setup PDP Logging
-        # loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kRev )
-        # self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
+        loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kRev )
+        self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
 
         # Setup System Logging
-        # loggedSystemStats:LoggedSystemStats = LoggedSystemStats()
-        # self.addPeriodic( loggedSystemStats.periodic, 0.10, 0.018 )
+        loggedSystemStats:LoggedSystemStats = LoggedSystemStats()
+        self.addPeriodic( loggedSystemStats.periodic, 0.10, 0.018 )
 
     def robotPeriodic(self):
-        wpilib.setCurrentThreadPriority(True, 99)
         commands2.CommandScheduler.getInstance().run()
-        wpilib.setCurrentThreadPriority(True, 10)
 
     def autonomousInit(self):
         self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
