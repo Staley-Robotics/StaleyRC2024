@@ -1,6 +1,6 @@
 from .Climber.Climber import *
-from .Climber.ClimberIOTalon import *
 from .Climber.ClimberIO import *
+from .Climber.ClimberIOTalon import *
 from .Elevator.Elevator import *
 from .Elevator.ElevatorIO import *
 from .Elevator.ElevatorIONeo import *

@@ -61,8 +61,9 @@ class RobotContainer:
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssElevatorIO = ElevatorIOSim()
+            ssElevatorIO = ElevatorIO()
             ssLedIO = LedIOSim( 9 )
+            ssClimberIO = ClimberIO()
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ), #211.289)
@@ -77,7 +78,7 @@ class RobotContainer:
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
             ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
             ssLedIO = LedIOActual( 0 )
-            ssClimberIO = ClimberIOTalon( 0, 1 ) #wrong
+            ssClimberIO = ClimberIOTalon( 27, 28 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -281,3 +282,11 @@ class RobotContainer:
         :returns: the autonomous command that has been selected from the ShuffleBoard
         """
         return self.m_chooser.getSelected()
+
+    def getCalibrationCommands(self) -> commands2.Command:
+        """
+        :returns: commands to schedule for calibration
+        """
+        return commands2.ParallelCommandGroup(
+            ClimberReset( self.climber )
+        )

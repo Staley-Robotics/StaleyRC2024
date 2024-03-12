@@ -8,20 +8,18 @@ class ClimberIO:
     @dataclasses.dataclass
     class ClimberIOInputs:
         #Left Motor
-        lMotorAppliedVolts: float = 0.0
-        lMotorCurrentAmps: float = 0.0
-        lMotorTempCelcius: float = 0.0
-
-        lMotorPosition: float = 0.0
-        lMotorDesiredPosition: float = 0.0
+        leftAppliedVolts: float = 0.0
+        leftCurrentAmps: float = 0.0
+        leftTempCelcius: float = 0.0
+        leftVelocity: float = 0.0
+        leftPosition: float = 0.0
 
         #Right Motor
-        rMotorAppliedVolts: float = 0.0
-        rMotorCurrentAmps: float = 0.0
-        rMotorTempCelcius: float = 0.0
-
-        rMotorPosition: float = 0.0
-        rMotorDesiredPosition: float = 0.0
+        rightAppliedVolts: float = 0.0
+        rightCurrentAmps: float = 0.0
+        rightTempCelcius: float = 0.0
+        rightPosition: float = 0.0
+        rightVelocity: float = 0.0
 
     def __init__(self):
         pass
@@ -29,13 +27,31 @@ class ClimberIO:
     def updateInputs(self, inputs:ClimberIOInputs) -> None:
         pass
 
-    def updateLeft(self) -> None: pass
-    def updateRight(self): pass
-    
-    def setBrake(self, brake:bool) -> None: pass
-    
-    def getLPosition(self): pass
-    def getLPosition(self): pass
+    def run(self) -> None:
+        pass
 
-    def setLPosition(self, position:int): pass
-    def setRPosition(self, position:int): pass
+    def setBrake(self, brake:bool) -> None:
+        pass
+
+    def setPosition(self, leftPosition:float, rightPosition:float) -> None:
+        pass
+
+    def movePosition(self, leftRate:float, rightRate:float) -> None:
+        pass
+
+    def resetPosition(self, position:float) -> None:
+        pass
+
+    def getPosition(self) -> [float, float]:
+        return [ 0.0, 0.0 ]
+
+    def atSetpoint(self, errorRange:float = 100.0) -> [bool,bool]:
+        leftPos, rightPos = self.getPosition()
+        leftSp, rightSp = self.getSetpoint()
+        leftAtPos = abs( leftSp - leftPos ) < errorRange
+        rightAtPos = abs( rightSp - rightPos ) < errorRange
+        return [ leftAtPos, rightAtPos ]
+    
+    def getSetpoint(self) -> float:
+        return [ 0.0, 0.0 ]
+    
