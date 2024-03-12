@@ -24,6 +24,10 @@ from wpimath.trajectory import TrapezoidProfileRadians
 from wpimath import units
 from ntcore import *
 
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
+from pathplannerlib.controller import PPHolonomicDriveController
+
 # Our Imports
 from util import *
 from .SwerveModuleIO import SwerveModuleIO
@@ -124,6 +128,43 @@ class SwerveDrive(Subsystem):
         self.hPid:HolonomicDriveController = None
         self.updateHolonomicDriveController()
 
+        # PathPlanner Auto Builder
+        modulePositions = [
+            self.modules[0].getReferencePosition(),
+            self.modules[1].getReferencePosition(),
+            self.modules[2].getReferencePosition(),
+            self.modules[3].getReferencePosition()
+        ]
+        radius = 0.0
+        for i in range(len(modulePositions)):
+            radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
+
+        AutoBuilder.configureHolonomic(
+            self.getPose, # Robot pose supplier
+            self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
+            self.getChassisSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.runChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                PIDConstants(
+                    self.pidX_kP.get(),
+                    self.pidX_kI.get(),
+                    self.pidX_kD.get()
+                ), # Translation PID constants
+                PIDConstants(
+                    self.pidT_kP.get(),
+                    self.pidT_kI.get(),
+                    self.pidT_kD.get()
+                ), # Rotation PID constants
+                self.maxVelocPhysical.get(), # Max module speed, in m/s
+                radius, # Drive base radius in meters. Distance from robot center to furthest module.
+                ReplanningConfig() # Default path replanning config. See the API for the options here
+            ),
+            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+            self # Reference to this subsystem to set requirements
+        )
+
+        PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
+
         # NT Publishing
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
             self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
@@ -202,6 +243,23 @@ class SwerveDrive(Subsystem):
         """
         self.gyro.simulationPeriodic( self.getRotationVelocity() )
 
+    def shouldFlipPath(self):
+        """
+        Should Path Planning Be Flipped
+        """
+        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
+
+    def ppAutoTarget(self):
+        target = -1
+        # target = -1 -> None
+        # target = 0 -> Speaker
+        # target = 1 -> Amp
+        # target = 2 -> Source
+        # target = 3 -> Stage Left
+        # target = 4 -> Stage Center
+        # target = 5 -> Stage Right
+        return None
+
     def syncGyro(self) -> None:
         print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
@@ -223,9 +281,8 @@ class SwerveDrive(Subsystem):
         )
         print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
 
-    def resetOdometry(self) -> None:
-        pose = Pose2d( Translation2d(0, 0), Rotation2d(0) )
-        self.gyro.setYaw( 0 )
+    def resetOdometry(self, pose:Pose2d = Pose2d( Translation2d(0, 0), Rotation2d(0) ) ) -> None:
+        self.gyro.setYaw( pose.rotation().degrees() )
         self.odometry.resetPosition(
             self.gyro.getRotation2d(),
             self.getModulePositions(),

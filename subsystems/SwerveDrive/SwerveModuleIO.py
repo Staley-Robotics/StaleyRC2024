@@ -27,20 +27,17 @@ class SwerveModuleIO:
         A WPIStruct Object that contains all SwerveModule Data.
         This is intended to simplify logging of this data.
         """
-        driveRadPosition: float = 0
-        driveRadPerSecVelocity: float = 0
-        driveMtrsPosition: float = 0
-        driveMtrsPerSecVelocity: float = 0
+        drivePosition: float = 0
+        driveVelocity: float = 0
         driveAppliedVolts: float = 0
         driveCurrentAmps: float = 0
         driveTempCelcius: float = 0
 
         turnCanCoderRelative: float = 0
         turnCanCoderAbsolute: float = 0
-        turnRadPosition: float = 0
-        turnRadPerSecVelocity: float = 0
-        turnDegPosition: float = 0
-        turnDegPerSecVelocity: float = 0
+        
+        turnPosition: float = 0
+        turnVelocity: float = 0
         turnAppliedVolts: float = 0
         turnCurrentAmps: float = 0
         turnTempCelcius: float = 0

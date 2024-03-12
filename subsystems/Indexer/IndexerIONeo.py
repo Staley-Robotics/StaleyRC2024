@@ -19,6 +19,7 @@ class IndexerIONeo(IndexerIO):
         self.idxMotor.restoreFactoryDefaults()
         self.idxMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
         self.idxMotor.setInverted( motorInvert.get() )
+        self.idxMotor.enableVoltageCompensation( 12.0 )
         self.idxMotor.setSmartCurrentLimit( 20 )
         self.idxMotor.setClosedLoopRampRate( 0.05 )
         self.idxMotor.burnFlash()
