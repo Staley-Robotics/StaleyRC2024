@@ -14,6 +14,7 @@ from .elevator.ElevatorManual import *
 from .elevator.ElevatorSource import *
 from .elevator.ElevatorTop import *
 from .elevator.ElevatorTrap import *
+from .indexer.IndexerDefault import *
 from .indexer.IndexerEject import *
 from .indexer.IndexerHandoff import *
 from .indexer.IndexerLaunch import *

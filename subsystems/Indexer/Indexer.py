@@ -61,6 +61,16 @@ class Indexer(Subsystem):
     def setBrake(self, brake:bool) -> None:
         self.indexer.setBrake(brake)
 
+    def hasHalfNote(self) -> int:
+        if self.hasNote():
+            return 0
+        elif self.indexer.getLowerSensorIsBroken():
+            return 1
+        elif self.indexer.getUpperSensorIsBroken():
+            return -1
+        else:
+            return 0
+    
     def hasNote(self) -> bool:
         return self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()
     

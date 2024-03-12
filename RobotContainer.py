@@ -221,6 +221,12 @@ class RobotContainer:
                 self.feeder.hasNote
             )
         )
+        
+        self.feeder.setDefaultCommand(
+            commands.IndexerDefault(
+                self.feeder
+            )
+        )
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],
