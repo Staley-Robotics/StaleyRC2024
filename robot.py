@@ -24,20 +24,20 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # Setup Console Logging
-        loggedConsole:LoggedConsole = None
-        if wpilib.RobotBase.isReal():
-            loggedConsole = LoggedConsoleRIO()
-        else:
-            loggedConsole = LoggedConsoleSIM()
-        self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
+        # loggedConsole:LoggedConsole = None
+        # if wpilib.RobotBase.isReal():
+        #     loggedConsole = LoggedConsoleRIO()
+        # else:
+        #     loggedConsole = LoggedConsoleSIM()
+        # self.addPeriodic( loggedConsole.periodic, 0.02, 0.01 )
 
         # Setup PDP Logging
-        loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kRev )
-        self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
+        # loggedPDP:LoggedPDP = LoggedPDP( PowerDistribution.ModuleType.kRev )
+        # self.addPeriodic( loggedPDP.periodic, 0.10, 0.017 )
 
         # Setup System Logging
-        loggedSystemStats:LoggedSystemStats = LoggedSystemStats()
-        self.addPeriodic( loggedSystemStats.periodic, 0.10, 0.018 )
+        # loggedSystemStats:LoggedSystemStats = LoggedSystemStats()
+        # self.addPeriodic( loggedSystemStats.periodic, 0.10, 0.018 )
 
     def robotPeriodic(self):
         wpilib.setCurrentThreadPriority(True, 99)
@@ -45,17 +45,15 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.setCurrentThreadPriority(True, 10)
 
     def autonomousInit(self):
-        pass
-        '''self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
+        self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
 
         if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.schedule()'''
+            self.m_autonomousCommand.schedule()
 
     def autonomousPeriodic(self): pass
     def autonomousExit(self):
-        pass
-        '''if self.m_autonomousCommand != None:
-            self.m_autonomousCommand.cancel()'''
+        if self.m_autonomousCommand != None:
+            self.m_autonomousCommand.cancel()
 
     def teleopInit(self): pass
     def teleopPeriodic(self): pass

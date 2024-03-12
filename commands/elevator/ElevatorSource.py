@@ -6,30 +6,30 @@
 from commands2 import Command
 
 # Our Imports
-from subsystems import Launcher
+from subsystems import Elevator
 from util import *
 
 # Intake Load Command
-class LauncherSpeaker(Command):
+class ElevatorSource(Command):
     def __init__( self,
-                  launcher:Launcher,
+                  elevator:Elevator,
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
-        self.launcher = launcher
+        self.elevator = elevator
 
-        self.setName( "LauncherSpeaker" )
-        self.addRequirements( launcher )
+        self.setName( "ElevatorSource" )
+        self.addRequirements( elevator )
 
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft.get(), Launcher.LauncherSpeeds.SpeakerRight.get())
+        self.elevator.set(Elevator.ElevatorPositions.Source.get())
 
     def end(self, interrupted:bool) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        pass # May be set to zero in future, but for now: assuming hold position
 
     def isFinished(self) -> bool:
-        return self.launcher.hasLaunched()
+        return self.elevator.atPosition()
     
     def runsWhenDisabled(self) -> bool: return False

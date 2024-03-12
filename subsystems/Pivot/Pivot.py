@@ -42,7 +42,8 @@ class Pivot(Subsystem):
         self.pivotMeasuredLogger.putNumber( "Measured", self.pivot.getPosition() )
             
     def set(self, position:float):
-        self.pivot.setPosition( min(max(position, self.PivotPositions.Downward.get()), self.PivotPositions.Upward.get()) )
+        pos = min(max(position, Pivot.PivotPositions.Downward.get()), Pivot.PivotPositions.Upward.get())
+        self.pivot.setPosition( pos )
 
     def stop(self):
         self.set( self.pivot.getPosition() )
@@ -57,4 +58,7 @@ class Pivot(Subsystem):
     #     self.set( self.PivotPositions.Trap )
 
     def atSetpoint(self) -> bool:
-        self.pivot.atSetpoint( 1.0 )
+        return self.pivot.atSetpoint( 0.5 )
+    
+    def syncEncoder(self):
+        self.pivot.syncEncoder()

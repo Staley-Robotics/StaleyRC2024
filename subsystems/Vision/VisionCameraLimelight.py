@@ -63,7 +63,7 @@ class VisionCameraLimelight(VisionCamera):
 
             # Blue Pose Data
             bluePose = self.table.getNumberArray("botpose_wpiblue", [])
-            if len(bluePose) != 7:
+            if len(bluePose) != 11:
                 inputs.blueHasData = False
             elif bluePose[0] == 0 and bluePose[1] == 0 and bluePose[5] == 0:
                 inputs.blueHasData = False
@@ -75,7 +75,7 @@ class VisionCameraLimelight(VisionCamera):
             
             # Red Pose Data
             redPose = self.table.getNumberArray("botpose_wpired", [])
-            if len(bluePose) != 7:
+            if len(bluePose) != 11:
                 inputs.redHasData = False
             elif bluePose[0] == 0 and bluePose[1] == 0 and bluePose[5] == 0:
                 inputs.redHasData = False

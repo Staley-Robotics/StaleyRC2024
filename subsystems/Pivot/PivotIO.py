@@ -42,3 +42,6 @@ class PivotIO:
     
     def getSetpoint(self) -> float:
         return 0.0
+
+    def syncEncoder(self) -> None:
+        pass

@@ -7,7 +7,8 @@ from util import *
 
 class Launcher(Subsystem):
     class LauncherSpeeds:
-        Stop = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Stop", 0.0, persistent=True )
+        DeleteStop = NTTunableFloat( "/Config/LauncherSpeeds/Stop", 0.0, persistent=False ) ## Safe to Delete after several load times
+        
         SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 0.95, persistent=True )
         SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 0.85, persistent=True )
         AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 0.30, persistent=True )
@@ -16,6 +17,9 @@ class Launcher(Subsystem):
         TrapRight = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 0.40, persistent=True )
         SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -1.0, persistent=True )
         SourceRight = NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -1.0, persistent=True )
+        
+        Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
+        ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 100.0, persistent=True )
 
     def __init__(self, launcher:LauncherIO):
         self.launcher = launcher
@@ -66,8 +70,8 @@ class Launcher(Subsystem):
         return ( left != Launcher.LauncherSpeeds.Stop.get() or right != Launcher.LauncherSpeeds.Stop.get())
 
     def hasLaunched(self) -> bool:
-        pass
+        return self.launcher.hasLaunched()
 
-    def atSpeed(self, errorRange:float = 0) -> bool:
+    def atSpeed(self, errorRange:float = 100.00) -> bool:
         status = self.launcher.atSetpoint(errorRange)
         return ( status[0] and status[1] )

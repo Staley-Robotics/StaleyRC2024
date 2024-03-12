@@ -10,27 +10,27 @@ from subsystems import Indexer
 from util import *
 
 # Intake Load Command
-class IndexerLaunch(Command):
+class IndexerSource(Command):
     def __init__( self,
-                  indexer:Indexer,
+                  indexer:Indexer
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
         self.indexer = indexer
 
-        self.setName( "IndexerLaunch" )
+        self.setName( "IndexerSource" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
-        self.indexer.setBrake(False)
+        self.indexer.setBrake(True)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Launch.get())
-
+        self.indexer.set(Indexer.IndexerSpeeds.Source.get())
+    
     def end(self, interrupted:bool) -> None:
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
-    def isFinished(self) -> bool:
-        return self.indexer.hasReleasedNote()
+    def isFinished(self) -> bool: 
+        return self.indexer.hasNote()
     
     def runsWhenDisabled(self) -> bool: return False
