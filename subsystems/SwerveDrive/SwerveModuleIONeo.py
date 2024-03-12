@@ -157,11 +157,11 @@ class SwerveModuleIONeo(SwerveModuleIO):
         inputs.turnCurrentAmps = self.turnMotor.getOutputCurrent()
         
         self.moduleState = SwerveModuleState(
-            speed=inputs.driveMtrsPerSecVelocity,
+            speed=inputs.driveVelocity,
             angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
         self.modulePosition =  SwerveModulePosition(
-            distance=inputs.driveMtrsPosition,
+            distance=inputs.drivePosition,
             angle=Rotation2d(0).fromDegrees( inputs.turnCanCoderRelative )
         )
 

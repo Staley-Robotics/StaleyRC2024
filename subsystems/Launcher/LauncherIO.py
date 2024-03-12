@@ -20,6 +20,7 @@ class LauncherIO:
         rightTempCelcius: float = 0
 
         sensor: bool = False
+        sensorCount: int = 0
 
     def __init__(self):
         pass

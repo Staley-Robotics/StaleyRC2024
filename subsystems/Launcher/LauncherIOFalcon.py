@@ -79,6 +79,7 @@ class LauncherIOFalcon(LauncherIO):
 
         self.actualVelocity = [ v0, v1 ]
         inputs.sensor = self.irSensor.get()
+        inputs.sensorCount = self.sensorCount
 
     def resetPid(self):
         self.leftMotor.config_kP( 0, self.launcher_kP.get(), 250 )
@@ -96,7 +97,12 @@ class LauncherIOFalcon(LauncherIO):
     def run(self):
         controlMode = ControlMode.Velocity
 
+        if self.lastSensor != self.irSensor.get():
+            self.lastSensor = self.irSensor.get()
+            self.sensorCount += 1
+
         if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
+            self.sensorCount = 0
             controlMode = ControlMode.PercentOutput
 
         self.leftMotor.set( controlMode, self.desiredVelocity[0] )
@@ -112,14 +118,4 @@ class LauncherIOFalcon(LauncherIO):
         return self.desiredVelocity
     
     def hasLaunched(self):
-        currentSensor = self.irSensor.get()
-        
-        if currentSensor == self.lastSensor:
-            if self.sensorCount == 2:
-                self.sensorCount = 0
-        else:
-            if currentSensor:
-                self.sensorCount += 1
-
-        self.lastSensor = currentSensor
-        return self.sensorCount == 2
+        return self.sensorCount >= 2
