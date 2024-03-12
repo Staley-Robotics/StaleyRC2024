@@ -12,7 +12,7 @@
         "y": 2.247106361909121
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C"
     },
     {
       "anchor": {
@@ -41,7 +41,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "G"
     }
   ],
   "rotationTargets": [],
@@ -59,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Locale Between",
   "previewStartingState": {
     "rotation": -27.55000000000001,
     "velocity": 0.0

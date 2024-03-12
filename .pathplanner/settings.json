@@ -2,7 +2,13 @@
   "robotWidth": 0.67,
   "robotLength": 0.83,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "HOME Between",
+    "Locale Between",
+    "MID Between",
+    "AMP",
+    "ToFrom Shoot"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 4.25,
   "defaultMaxAccel": 2.125,

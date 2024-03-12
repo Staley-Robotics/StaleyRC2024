@@ -14,31 +14,73 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C-D"
+            "pathName": "M-B"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-E"
+            "pathName": "B-A"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-F"
+            "pathName": "A-D"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-G"
+            "pathName": "D-Q"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-H"
+            "pathName": "D-E"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-Q"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Q-F"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-G"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "G-S"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S-H"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "H-S"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R-C"
           }
         }
       ]
