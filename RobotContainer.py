@@ -1,4 +1,6 @@
+import os
 import typing
+from pathlib import Path
 
 import commands2
 import commands2.button
@@ -119,7 +121,11 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        self.m_chooser.addOption("PathPlanner", AutoBuilder.followPath( PathPlannerPath.fromPathFile('Example Path') ) )
+        p = Path( "deploy/pathplanner/autos" )
+        for e1 in os.scandir( p ):
+            if not e1.is_dir() and e1.name.endswith(".auto"):
+                f = e1.name.removesuffix(".auto")
+                self.m_chooser.addOption( f, AutoBuilder.buildAuto( f ) )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
