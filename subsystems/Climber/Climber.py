@@ -6,9 +6,10 @@ from util import *
 from .ClimberIO import ClimberIO
 
 class Climber(Subsystem):
-    # class ClimberPositions:
-    #     bottom = 0.0
-    #     top = 100
+    class ClimberPositions:
+        Bottom = NTTunableFloat( "/Config/ClimberPositions/Bottom", 0.0, persistent=True )
+        Top = NTTunableFloat( "/Config/ClimberPositions/Top", 50.0, persistent=True )
+        Reset = NTTunableFloat( "/Config/ClimberPositions/Reset", -5000.0, persistent=True )
 
     def __init__(self, climber:ClimberIO):
         self.climber = climber
@@ -31,34 +32,34 @@ class Climber(Subsystem):
         if False: #self.isCharacterizing.get():
             self.climber.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:
-             self.climber.upateLeft()
-             self.climber.upateRight()
+             self.climber.run()
 
         # Post Run Logging
-        # self.climberMeasuredLogger.putNumber( "Measured", self.climber.getVelocity() )
-        # self.climberMeasuredLogger.putNumber( "Setpoint", self.climber.getSetpoint() )
+        self.climberMeasuredLogger.putNumberArray( "Measured", self.climber.getPosition() )
+        self.climberMeasuredLogger.putNumberArray( "Setpoint", self.climber.getSetpoint() )
 
-    ## Start nifrengrioe functions
-    def updateLeft(self):
-        self.climber.updateLeft()
-    def updateRight(self):
-        self.climber.updateRight()
+    def set(self, leftPosition:float, rightPosition:float, override:bool = False):
+        if not override:
+            leftPosition = min( max( leftPosition, Climber.ClimberPositions.Bottom.get() ), Climber.ClimberPositions.Top.get() )
+            rightPosition = min( max( leftPosition, Climber.ClimberPositions.Bottom.get() ), Climber.ClimberPositions.Top.get() )
+        self.climber.setPosition( leftPosition, rightPosition )
 
-    def setBrakeMode(self, brake:bool) -> None:
-        self.climber.setBrakeMode(brake)
+    def move(self, leftRate:float, rightRate:float):
+        self.climber.movePosition( leftRate, rightRate )
+
+    def stop(self):
+        currentPos = self.climber.getPosition()
+        self.set( currentPos[0], currentPos[1] )
+
+    def setBrake(self, brake:bool) -> None:
+        self.climber.setBrake(brake)
     
-    def getLPosition(self):
-        return self.climber.getLPosition()
-    def getRPosition(self):
-        return self.climber.getRPosition()
-    
-    def setLPosition(self, position: int):
-        self.climber.setLPosition(position)
-    def setRPosition(self, position: int):
-        self.climber.setRPosition(position)
-    
-    def moveLeftClimber(self, speed:float):
-        self.climber.moveLeftClimber(speed)
-    def moveRightClimber(self, speed:float):
-        self.climber.moveRightClimber(speed)
-    ## End ntrbno functions
+    def getPosition(self) -> [float, float]:
+        return self.climber.getPosition()
+
+    def atSetpoint(self, errorRange:float = 100.0) -> bool:
+        status = self.climber.atSetpoint(errorRange)
+        return ( status[0] and status[1] )
+
+    def reset(self) -> None:
+        self.climber.resetPosition( Climber.ClimberPositions.Bottom.get() )
