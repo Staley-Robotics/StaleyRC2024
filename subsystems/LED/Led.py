@@ -28,8 +28,8 @@ class LED(Subsystem):
         self.ledLogger.set(self.ledInputs)
 
         # Run Subsystem
-        if self.offline.get():#wpilib.RobotBase.isDisabled() or self.offline.get():
-            #logic copied from launcher -- doesn't actually disable?
+        if self.offline.get() or DriverStation.isDisabled():
+            #logic copied from Launcher -- doesn't actually disable?
             self.defaultColor()
 
         self.led.refresh()
