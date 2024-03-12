@@ -9,16 +9,16 @@ class Launcher(Subsystem):
     class LauncherSpeeds:
         DeleteStop = NTTunableFloat( "/Config/LauncherSpeeds/Stop", 0.0, persistent=False ) ## Safe to Delete after several load times
         
-        SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 0.95, persistent=True )
-        SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 0.85, persistent=True )
-        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 0.30, persistent=True )
-        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 0.20, persistent=True )
-        TrapLeft = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 0.50, persistent=True )
-        TrapRight = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 0.40, persistent=True )
-        SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -1.0, persistent=True )
-        SourceRight = NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -1.0, persistent=True )
+        SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 12000.0, persistent=True )
+        SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 10000.0, persistent=True )
+        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 2000.0, persistent=True )
+        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 2000.0, persistent=True )
+        TrapLeft = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 8000.0, persistent=True )
+        TrapRight = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 8000.0, persistent=True )
+        SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -8000.0, persistent=True )
+        SourceRight = NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -8000.0, persistent=True )
         
-        Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 0.25, persistent=True )
+        Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 1000.0, persistent=True )
         Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
         ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 100.0, persistent=True )
 
