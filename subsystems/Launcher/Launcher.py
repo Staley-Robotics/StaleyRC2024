@@ -7,8 +7,6 @@ from util import *
 
 class Launcher(Subsystem):
     class LauncherSpeeds:
-        DeleteStop = NTTunableFloat( "/Config/LauncherSpeeds/Stop", 0.0, persistent=False ) ## Safe to Delete after several load times
-        
         SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 12000.0, persistent=True )
         SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 10000.0, persistent=True )
         AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 2000.0, persistent=True )
