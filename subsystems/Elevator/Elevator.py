@@ -17,7 +17,7 @@ class Elevator(Subsystem):
         self.elevator = elevator
         self.elevatorInputs = elevator.ElevatorIOInputs
         self.elevatorLogger = NetworkTableInstance.getDefault().getStructTopic( "/Elevator", ElevatorIO.ElevatorIOInputs ).publish()
-        self.pivotMeasuredLogger = NetworkTableInstance.getDefault().getTable("/Logging/Elevator")
+        self.elevatorMeasuredLogger = NetworkTableInstance.getDefault().getTable("/Logging/Elevator")
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/Elevator", False, persistent=True )
 
@@ -37,8 +37,8 @@ class Elevator(Subsystem):
             # self.pivot.pivotMotor.set(0)
 
         # Post Run Logging
-        self.pivotMeasuredLogger.putNumber( "Setpoint", self.elevator.getSetpoint() )
-        self.pivotMeasuredLogger.putNumber( "Measured", self.elevator.getPosition() )
+        self.elevatorMeasuredLogger.putNumber( "Setpoint", self.elevator.getSetpoint() )
+        self.elevatorMeasuredLogger.putNumber( "Measured", self.elevator.getPosition() )
 
     def set(self, position) -> None:
         self.elevator.setPosition( min( max( position, Elevator.ElevatorPositions.Bottom.get() ), Elevator.ElevatorPositions.Top.get() ) )
@@ -46,6 +46,8 @@ class Elevator(Subsystem):
     def stop(self) -> None:
         self.set( self.elevator.getPosition() )
 
-    def movePosition(self, position) -> None: pass
+    def movePosition(self, position) -> None:
+        pass
 
-    def atPosition(self) -> bool: return True
+    def atPosition(self) -> bool:
+        return True

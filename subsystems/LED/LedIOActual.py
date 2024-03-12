@@ -11,13 +11,7 @@ class LedIOActual(LedIO):
 
         ## init LED
         self.m_led = wpilib.AddressableLED(PWMPort)
-
-        # Some other init stufs
-
         self.m_ledLength = 22 # Num of LEDs on strip
-
-        # Reuse buffer -- wdym?
-        # Length is expensive to set, so only set it once, then just update data
         self.m_led.setLength(self.m_ledLength)
 
         self.m_ledData = [wpilib.AddressableLED.LEDData(255, 0, 0) for i in range(self.m_ledLength)]
@@ -32,22 +26,19 @@ class LedIOActual(LedIO):
             'endgame': [wpilib.AddressableLED.LEDData(255, 255, 255) for i in range(self.m_ledLength)],
         }
 
-        #currently uses color updated spicifically from commands, maybe shift to modes to call funcs for blinky or cycling colors
-        #better explained: change fromthe various methods, to just defining multiple funcs as frag shaders and swapping between them
-        self.currentColor = self.color_sqncs['default']
-
         self.m_led.setData(self.currentColor)
         self.m_led.start()
 
 
     def updateInputs(self, inputs:LedIO.LedIOInputs):
+        #logs the active color on the first pixel of the led for testing purposes
         inputs.light1_r = self.currentColor[0].r
         inputs.light1_g = self.currentColor[0].g
         inputs.light1_b = self.currentColor[0].b
 
     def setColor(self, color_sqnc_name:str):
         '''
-        changes current color
+        changes current color to :param color_sqnc_name: from color_sqncs dict
         '''
         self.currentColor = self.color_sqncs[color_sqnc_name]
 

@@ -1,3 +1,6 @@
+from .climber.ClimbByStickMono import *
+from .climber.ClimberResetDualControl import *
+from .climber.ClimberResetMonoControl import *
 from .drive.DriveAimSpeaker import *
 from .drive.DriveByStick import *
 from .drive.DriveDistance import *
