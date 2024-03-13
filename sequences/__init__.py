@@ -10,5 +10,6 @@ from .NoteLaunchSpeaker import *
 from .NoteLaunchTrap import *
 from .NoteLoadGround import *
 from .NoteLoadSource import *
+from .NoteToss import *
 from .PivotDefault import *
 from .SampleSequence import *

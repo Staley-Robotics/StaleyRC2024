@@ -10,7 +10,7 @@ from subsystems import Launcher
 from util import *
 
 # Intake Load Command
-class LauncherSpeaker(Command):
+class LauncherToss(Command):
     def __init__( self,
                   launcher:Launcher,
                 ):
@@ -18,7 +18,7 @@ class LauncherSpeaker(Command):
         super().__init__()
         self.launcher = launcher
 
-        self.setName( "LauncherSpeaker" )
+        self.setName( "LauncherToss" )
         self.addRequirements( launcher )
         self.timer = Timer()
 
@@ -27,7 +27,7 @@ class LauncherSpeaker(Command):
         self.timer.start()
 
     def execute(self) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft.get(), Launcher.LauncherSpeeds.SpeakerRight.get())
+        self.launcher.set(Launcher.LauncherSpeeds.TossLeft.get(), Launcher.LauncherSpeeds.TossRight.get())
 
     def end(self, interrupted:bool) -> None:
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())

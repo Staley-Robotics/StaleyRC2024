@@ -142,12 +142,6 @@ class DriveByStick(Command):
             y *= self.halfSpeedLinear.get()
             r *= self.halfSpeedAngular.get()
             magH = self.halfSpeedAngular.get()
-
-        
-        # Determine Velocities
-        veloc_x = x * self.velocLinear.get()
-        veloc_y = y * self.velocLinear.get()
-        veloc_r = r * self.velocAngular.get()
         
         # Calculate / Redetermine veloc_r (Rotation via Holonomic or Buttons)
         if abs(hX) > 0.1 or abs(hY) > 0.1:
@@ -157,9 +151,14 @@ class DriveByStick(Command):
             goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
-            veloc_r = r # min( max( r, -1.0), 1.0 )
+            r = min( max( r, -1.0), 1.0 )
         else:
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
+        
+        # Determine Velocities
+        veloc_x = x * self.velocLinear.get()
+        veloc_y = y * self.velocLinear.get()
+        veloc_r = r * self.velocAngular.get()
 
         # Determine when ChassisSpeeds capability to use
         if self.isFieldRelative.get():

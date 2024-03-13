@@ -29,7 +29,7 @@ class LauncherIOFalcon(LauncherIO):
         self.leftMotor.setNeutralMode( NeutralMode.Coast )
         self.leftMotor.setInverted( False )
 
-        self.leftMotor.configVoltageCompSaturation( 11.0, 250 )
+        self.leftMotor.configVoltageCompSaturation( 9.0, 250 )
         self.leftMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
@@ -45,7 +45,7 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.setNeutralMode( NeutralMode.Coast )
         self.rightMotor.setInverted( True )
         
-        self.rightMotor.configVoltageCompSaturation( 11.0, 250 )
+        self.rightMotor.configVoltageCompSaturation( 9.0, 250 )
         self.rightMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???

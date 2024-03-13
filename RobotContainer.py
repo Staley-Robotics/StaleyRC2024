@@ -77,7 +77,7 @@ class RobotContainer:
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
             ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
-            ssLedIO = LedIOActual( 0 )
+            ssLedIO = LedIO() #LedIOActual( 0 )
             ssClimberIO = ClimberIOTalon( 27, 28 )
 
         # Vision
@@ -98,7 +98,12 @@ class RobotContainer:
         self.climber = Climber( ssClimberIO )
 
         # Register Pathplanner Commands
-        NamedCommands.registerCommand('AutoPivot', PivotAim(self.pivot, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoPivot",
+                                      PivotAim(self.pivot, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoLaunch",
+                                      NoteLaunchSpeaker(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoPickup",
+                                      NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator)) 
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -124,7 +129,9 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        p = Path( "deploy/pathplanner/autos" )
+        p = Path( "/home/lvuser/py/deploy/pathplanner/autos" )
+        if RobotBase.isSimulation():
+            p = Path( "../deploy/pathplanner/autos" )
         for e1 in os.scandir( p ):
             if not e1.is_dir() and e1.name.endswith(".auto"):
                 f = e1.name.removesuffix(".auto")
@@ -152,7 +159,7 @@ class RobotContainer:
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
         self.m_driver1.y().onTrue(
-            commands.LauncherSpeaker( self.launcher )
+            sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
         )
 
         self.m_driver1.leftBumper().onTrue(

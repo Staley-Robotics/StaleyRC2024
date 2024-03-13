@@ -89,7 +89,7 @@ class ClimberIOTalon(ClimberIO):
         return self.actualPosition
 
     def getSetpoint(self) -> [float, float]:
-        return self.desiredPosition, self.desiredPosition
+        return self.desiredPosition
    
     def movePosition( self, leftSpeed:float, rightSpeed:float ):
         leftSpeed = applyDeadband( leftSpeed, 0.04 )

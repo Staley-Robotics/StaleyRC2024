@@ -34,6 +34,7 @@ from .launcher.LauncherAmp import *
 from .launcher.LauncherEject import *
 from .launcher.LauncherSource import *
 from .launcher.LauncherSpeaker import *
+from .launcher.LauncherToss import *
 from .launcher.LauncherTrap import *
 from .LauncherUtils import *
 from .led.defaultLED import *
@@ -47,6 +48,7 @@ from .pivot.PivotHandoff import *
 from .pivot.PivotSource import *
 from .pivot.PivotTop import *
 from .pivot.PivotToPosition import *
+from .pivot.PivotToss import *
 from .pivot.PivotTrap import *
 from .pointToStick import *
 from .RunLauncher import *

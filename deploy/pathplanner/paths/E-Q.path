@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.852205533280115,
+        "x": 8.15,
         "y": 5.78
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.331901249553988,
+        "x": 7.629695716273874,
         "y": 5.938957573599671
       },
       "isLocked": false,
@@ -39,8 +39,8 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 0,
-    "rotateFast": false
+    "rotation": 10.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "ToFrom Shoot",

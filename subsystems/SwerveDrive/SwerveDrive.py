@@ -163,7 +163,7 @@ class SwerveDrive(Subsystem):
             self # Reference to this subsystem to set requirements
         )
 
-        PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
+        #PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
 
         # NT Publishing
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        

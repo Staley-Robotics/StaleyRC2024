@@ -52,6 +52,6 @@ class ClimberIO:
         rightAtPos = abs( rightSp - rightPos ) < errorRange
         return [ leftAtPos, rightAtPos ]
     
-    def getSetpoint(self) -> float:
+    def getSetpoint(self) -> [float,float]:
         return [ 0.0, 0.0 ]
     
