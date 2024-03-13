@@ -133,10 +133,11 @@ class RobotContainer:
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
         p = Path( "/home/lvuser/py/deploy/pathplanner/autos" )
         if RobotBase.isSimulation():
-            p = Path( "../deploy/pathplanner/autos" )
+            p = Path( "deploy/pathplanner/autos" )
         for e1 in os.scandir( p ):
             if not e1.is_dir() and e1.name.endswith(".auto"):
                 f = e1.name.removesuffix(".auto")
+                print( f"Loading Auto: {f}" )
                 self.m_chooser.addOption( f, AutoBuilder.buildAuto( f ) )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
