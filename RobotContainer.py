@@ -83,7 +83,9 @@ class RobotContainer:
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
-            VisionCameraLimelight( "limelight-two" )
+            VisionCameraLimelight( "limelight-two" ),
+            VisionCameraLimelight( "limelight-three" ),
+            VisionCameraLimelight( "limelight-four" )
         ]
 
         # Link IO Systems to Subsystems

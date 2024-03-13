@@ -96,6 +96,8 @@ class Vision(Subsystem):
                     Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
                 )
 
+            self.cameras[x].run()
+
 
             
 
