@@ -184,14 +184,17 @@ class RobotContainer:
         )
         
         #  Driver 2
-        #self.m_driver2.a().whileTrue(
-        #    sequences.SystemRealign()
-        #)
+        self.m_driver2.a().whileTrue(
+           sequences.AllRealign( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
         self.m_driver2.x().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
         self.m_driver2.b().onTrue(
             sequences.NoteToss( self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.y().whileTrue(
+            commands.PivotBottom( self.pivot )
         )
         self.m_driver2.back().onTrue(
             sequences.EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
