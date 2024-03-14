@@ -24,12 +24,13 @@ class ClimberCollapse(Command):
         self.climber.setBrake(True)
 
     def execute(self) -> None:
-        self.climber.set(Climber.ClimberPositions.Bottom.get())
+        self.climber.set(Climber.ClimberPositions.Bottom.get(), Climber.ClimberPositions.Bottom.get())
     
     def end(self, interrupted:bool) -> None:
         self.climber.stop()
 
     def isFinished(self) -> bool:
-        return not self.climber.atSetpoint()
+        return False
+        return self.climber.atSetpoint()
     
     def runsWhenDisabled(self) -> bool: return False

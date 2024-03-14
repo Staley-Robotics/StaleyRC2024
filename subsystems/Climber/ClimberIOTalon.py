@@ -29,17 +29,19 @@ class ClimberIOTalon(ClimberIO):
         self.lClimbMotor = WPI_TalonSRX( lMotorId )
         self.lClimbMotor.clearStickyFaults()
         self.lClimbMotor.configFactoryDefault()
-        self.lClimbMotor.setNeutralMode( NeutralMode.Brake )
-        self.lClimbMotor.setInverted( lMotorInvert.get() )
         self.lClimbMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative)
+        self.lClimbMotor.setSensorPhase( False )
+        self.lClimbMotor.setInverted( False )
+        self.lClimbMotor.setNeutralMode( NeutralMode.Brake )
         
         #Right Motor
         self.rClimbMotor = WPI_TalonSRX( rMotorId )
         self.rClimbMotor.clearStickyFaults()
         self.rClimbMotor.configFactoryDefault()
-        self.rClimbMotor.setNeutralMode( NeutralMode.Brake )
-        self.rClimbMotor.setInverted( rMotorInvert.get() )
         self.rClimbMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative)
+        self.rClimbMotor.setSensorPhase( False )
+        self.rClimbMotor.setInverted( True )
+        self.rClimbMotor.setNeutralMode( NeutralMode.Brake )
 
         self.resetPid()
         
@@ -66,12 +68,14 @@ class ClimberIOTalon(ClimberIO):
         self.lClimbMotor.config_kD( 0, self.climber_kD.get(), 250 )
         self.lClimbMotor.config_kF( 0, self.climber_kF.get(), 250 )
         self.lClimbMotor.config_IntegralZone( 0, self.climber_Iz.get(), 250 )
+        self.lClimbMotor.selectProfileSlot( 0, 0 )
 
         self.rClimbMotor.config_kP( 0, self.climber_kP.get(), 250 )
         self.rClimbMotor.config_kI( 0, self.climber_kI.get(), 250 )
         self.rClimbMotor.config_kD( 0, self.climber_kD.get(), 250 )
         self.rClimbMotor.config_kF( 0, self.climber_kF.get(), 250 )
         self.rClimbMotor.config_IntegralZone( 0, self.climber_Iz.get(), 250 )
+        self.rClimbMotor.selectProfileSlot( 0, 0 )
 
     def run(self):
         self.lClimbMotor.set( ControlMode.Position, self.desiredPosition[0] )
@@ -82,8 +86,7 @@ class ClimberIOTalon(ClimberIO):
         self.rClimbMotor.setNeutralMode( NeutralMode.Brake if brake else NeutralMode.Coast )
     
     def setPosition( self, leftPosition:float, rightPosition:float ):
-        self.desiredLPosition = leftPosition
-        self.desiredRPosition = rightPosition
+        self.desiredPosition = [ leftPosition, rightPosition ]
 
     def getPosition(self) -> [float, float]:
         return self.actualPosition

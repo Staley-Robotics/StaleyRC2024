@@ -66,10 +66,10 @@ class RobotContainer:
             ssClimberIO = ClimberIO()
         else:
             ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,  5.361 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25,  298.828 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.2667, -0.2667,  5.361 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.2667,  0.2667,  298.828 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
@@ -118,9 +118,10 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Climber", self.climber )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands2.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Climber Reset", commands.ClimberReset( self.climber ) )
         #wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
         #wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
@@ -165,8 +166,13 @@ class RobotContainer:
             sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
         )
 
-        self.m_driver1.leftBumper().onTrue(
+        self.m_driver1.back().onTrue(
             commands.ToggleFieldRelative()
+        )
+        self.m_driver1.leftBumper().whileTrue(
+            commands.ClimberExtend(
+                self.climber
+            )
         )
         self.m_driver1.rightBumper().onTrue(
             commands.ToggleHalfSpeed()
@@ -238,6 +244,12 @@ class RobotContainer:
         self.feeder.setDefaultCommand(
             commands.IndexerDefault(
                 self.feeder
+            )
+        )
+
+        self.climber.setDefaultCommand(
+            commands.ClimberCollapse(
+                self.climber
             )
         )
     

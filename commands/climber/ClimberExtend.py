@@ -24,12 +24,13 @@ class ClimberExtend(Command):
         self.climber.setBrake(True)
 
     def execute(self) -> None:
-        self.climber.set(Climber.ClimberPositions.Top.get())
+        self.climber.set(Climber.ClimberPositions.Top.get(),Climber.ClimberPositions.Top.get())
     
     def end(self, interrupted:bool) -> None:
         self.climber.stop()
 
     def isFinished(self) -> bool:
+        return False
         return not self.climber.atSetpoint()
     
     def runsWhenDisabled(self) -> bool: return False
