@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.05,
-        "y": 6.75
+        "x": 2.013815572471545,
+        "y": 6.955212085995401
       },
       "isLocked": false,
       "linkedName": "L"
@@ -45,7 +45,7 @@
   "reversed": false,
   "folder": "HOME Between",
   "previewStartingState": {
-    "rotation": 0.0,
+    "rotation": 20.0,
     "velocity": 0
   },
   "useDefaultConstraints": false
