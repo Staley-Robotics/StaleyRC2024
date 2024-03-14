@@ -50,6 +50,7 @@ class MyRobot(wpilib.TimedRobot):
         commands2.CommandScheduler.getInstance().run()
 
     def autonomousInit(self):
+        self.m_robotContainer.runCalibration()
         self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
 
         if self.m_autonomousCommand != None:
@@ -60,7 +61,9 @@ class MyRobot(wpilib.TimedRobot):
         if self.m_autonomousCommand != None:
             self.m_autonomousCommand.cancel()
 
-    def teleopInit(self): pass
+    def teleopInit(self):
+        self.m_robotContainer.runCalibration()
+        
     def teleopPeriodic(self): pass
     def teleopExit(self): pass
 

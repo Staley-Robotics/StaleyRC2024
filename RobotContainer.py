@@ -144,9 +144,18 @@ class RobotContainer:
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+        self.m_driver2 = commands2.button.CommandXboxController(1)
+
         ## Driving
         self.m_driver1.a().whileTrue(
             commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+        self.m_driver1.b().whileTrue(
+            commands.DriveAimAmp(
                 self.drivetrain,
                 self.m_driver1.getLeftY,
                 self.m_driver1.getLeftX
@@ -158,26 +167,38 @@ class RobotContainer:
         self.m_driver1.x().onTrue(
             sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose )
         )
-        # All Stop / Commands Reset
-        self.m_driver1.b().onTrue(
-            sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
-        )
         self.m_driver1.y().onTrue(
             sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
         )
-
         self.m_driver1.back().onTrue(
             commands.ToggleFieldRelative()
         )
         self.m_driver1.leftBumper().whileTrue(
-            commands.ClimberExtend(
-                self.climber
-            )
+            commands.ClimberExtend( self.climber )
         )
         self.m_driver1.rightBumper().onTrue(
             commands.ToggleHalfSpeed()
         )
+        self.m_driver1.start().onTrue(
+            commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True)
+        )
         
+        #  Driver 2
+        #self.m_driver2.a().whileTrue(
+        #    sequences.SystemRealign()
+        #)
+        self.m_driver2.x().onTrue(
+            sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.b().onTrue(
+            sequences.NoteToss( self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.back().onTrue(
+            sequences.EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
+        )
+        self.m_driver2.leftBumper().whileTrue(
+            commands.ClimberExtend( self.climber ) 
+        )
         # # Safety and Other Commands
         # cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
         # cTab.add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
@@ -305,10 +326,8 @@ class RobotContainer:
         """
         return self.m_chooser.getSelected()
 
-    def getCalibrationCommands(self) -> commands2.Command:
+    def runCalibration(self) -> None:
         """
-        :returns: commands to schedule for calibration
+        Adds the calibration commands to the Command Scheduler
         """
-        return commands2.ParallelCommandGroup(
-            ClimberReset( self.climber )
-        )
+        ClimberReset( self.climber ).schedule()

@@ -3,6 +3,7 @@ from .climber.ClimbBySticks import *
 from .climber.ClimberCollapse import *
 from .climber.ClimberExtend import *
 from .climber.ClimberReset import *
+from .drive.DriveAimAmp import *
 from .drive.DriveAimSpeaker import *
 from .drive.DriveByStick import *
 from .drive.DriveDistance import *
@@ -34,6 +35,7 @@ from .launcher.LauncherAmp import *
 from .launcher.LauncherEject import *
 from .launcher.LauncherSource import *
 from .launcher.LauncherSpeaker import *
+from .launcher.LauncherStop import *
 from .launcher.LauncherToss import *
 from .launcher.LauncherTrap import *
 from .LauncherUtils import *
