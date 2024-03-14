@@ -1,5 +1,4 @@
-from rev import *
-from phoenix5 import *
+from phoenix5 import WPI_TalonSRX, FeedbackDevice, NeutralMode, ControlMode
 from wpimath import applyDeadband
 
 from .ClimberIO import ClimberIO
