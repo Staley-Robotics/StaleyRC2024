@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.25,
+      "y": 6.6
+    },
+    "rotation": 45.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 7.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L-AmpOut"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
