@@ -487,7 +487,7 @@ class SwerveDrive(Subsystem):
         """
         self.runChassisSpeeds( ChassisSpeeds(0,0,0) )
 
-    def runPercentageInputs(self, x:float = 0.0, y:float = 0.0, r:float = 0.0) -> None:
+    def runPercentageInputs(self, x:float = 0.0, y:float = 0.0, r:float = 0.0, fieldRelative:bool = True) -> None:
         """
         Runs this SwerveDrive in x,y velocities and r rotations based on the maximum velocity characterized
         """
@@ -499,7 +499,7 @@ class SwerveDrive(Subsystem):
         veloc_y = y * self.maxVelocDriver.get()
         veloc_r = r * self.maxAngVelocDriver.get()
 
-        if self.isFieldRelative():
+        if fieldRelative:
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 vx = veloc_x,
                 vy = veloc_y,
