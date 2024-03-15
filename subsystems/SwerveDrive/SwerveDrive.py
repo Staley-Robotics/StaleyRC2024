@@ -124,6 +124,11 @@ class SwerveDrive(Subsystem):
             Pose2d(Translation2d(0,0), Rotation2d(0))
         )
 
+        self.odometry.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
+        self.odometry2.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
+        self.odometryWheelsOnly.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
+
+
         # PID Controllers for Drive Motion
         self.hPid:HolonomicDriveController = None
         self.updateHolonomicDriveController()
