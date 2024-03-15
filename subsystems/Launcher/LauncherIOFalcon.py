@@ -12,11 +12,11 @@ class LauncherIOFalcon(LauncherIO):
         leftCanBus = NTTunableString( "/Config/Launcher/Falcon/LeftCanBus", "canivore1", persistent=False )
         rightCanBus = NTTunableString( "/Config/Launcher/Falcon/RightCanBus", "canivore1", persistent=False )
 
-        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 1.0, updater=self.resetPid, persistent=True)
+        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0200, updater=self.resetPid, persistent=True)
         self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kD = NTTunableFloat('/Config/Launcher/Falcon/PID/kD', 0.0, updater=self.resetPid, persistent=True)
-        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.0, updater=self.resetPid, persistent=True)
+        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.0605, updater=self.resetPid, persistent=True)
 
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]

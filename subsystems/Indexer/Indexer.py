@@ -12,8 +12,8 @@ class Indexer(Subsystem):
         Launch = NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True )
         Source = NTTunableFloat( "/Config/IndexerSpeeds/Source", -0.35, persistent=True )
         Eject = NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0, persistent=True )
-        SelfIn = NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", 0.05, persistent=True )
-        SelfOut = NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", -0.05, persistent=True )
+        SelfIn = NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", -0.05, persistent=True )
+        SelfOut = NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", 0.05, persistent=True )
 
     def __init__(self, indexer:IndexerIO):
         self.indexer = indexer

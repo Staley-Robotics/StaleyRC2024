@@ -127,7 +127,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Climber Reset", commands.ClimberReset( self.climber ) )
         #wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        #wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
+        wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
         #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
         #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
         #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )

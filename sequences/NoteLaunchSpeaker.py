@@ -23,7 +23,7 @@ class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
                     LauncherSpeaker(launcher),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
-                        commands2.WaitUntilCommand( condition = launcher.atSpeed ),
+                        commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(1000) ),
                         IndexerLaunch(indexer)
                     )
                 )
