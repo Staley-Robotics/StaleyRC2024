@@ -46,7 +46,8 @@ class RobotContainer:
         ssPivotIO = None
         ssElevatorIO = None
         ssLedIO = None
-        ssClimberIO = None
+        ssClimberIOLeft = None
+        ssClimberIORight = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -63,7 +64,8 @@ class RobotContainer:
             ssPivotIO = PivotIOSim()
             ssElevatorIO = ElevatorIO()
             ssLedIO = LedIOSim( 9 )
-            ssClimberIO = ClimberIO()
+            ssClimberIOLeft = ClimberIO()
+            ssClimberIORight = ClimberIO()
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
@@ -78,7 +80,8 @@ class RobotContainer:
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
             ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
             ssLedIO = LedIO() #LedIOActual( 0 )
-            ssClimberIO = ClimberIOTalon( 27, 28 )
+            ssClimberIOLeft = ClimberIOTalon( 27, 5 )
+            ssClimberIORight = ClimberIOTalon( 28, 6, True )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -97,7 +100,7 @@ class RobotContainer:
         self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
-        self.climber = Climber( ssClimberIO )
+        self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
 
         # Register Pathplanner Commands
         NamedCommands.registerCommand("AutoPivot",
@@ -333,4 +336,4 @@ class RobotContainer:
         """
         Adds the calibration commands to the Command Scheduler
         """
-        ClimberReset( self.climber ).schedule()
+        ClimberResetSwitch( self.climber ).schedule()
