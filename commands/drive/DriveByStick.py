@@ -46,7 +46,7 @@ class DriveByStick(Command):
         self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
         self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
         self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
-        self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", False, persistent=False )        
+        self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", False, persistent=True )        
         
         self.isAimingSpeaker = NTTunableBoolean( "/Driver1/isAimingSpeaker", False, persistent=False )
         self.isAimingAmp = NTTunableBoolean( "/Driver1/isAimingAmp", False, persistent=False )
