@@ -158,5 +158,6 @@ simgui-ds.json
 simgui-window.json
 simgui.json
 *.wpilog
+*.hoot
 logs/
 ctre_sim/
