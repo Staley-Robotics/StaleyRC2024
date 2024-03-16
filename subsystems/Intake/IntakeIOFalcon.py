@@ -6,29 +6,23 @@ from util import *
 
 class IntakeIOFalcon(IntakeIO):
     def __init__(self, upperCanId:int, lowerCanId:int, sensorId:int ):
-        # Tunable Settings
-        upperCanBus = NTTunableString( "/Config/Intake/Falcon/UpperMotor/CanBus", "canivore1", persistent=False )
-        upperInvert = NTTunableBoolean( "/Config/Intake/Falcon/UpperMotor/Invert", False, updater=lambda: self.upperMotor.setInverted( upperInvert.get() ), persistent=True )
-        lowerCanBus = NTTunableString( "/Config/Intake/Falcon/LowerMotor/CanBus", "canivore1", persistent=False )
-        lowerInvert = NTTunableBoolean( "/Config/Intake/Falcon/LowerMotor/Invert", False, updater=lambda: self.lowerMotor.setInverted( lowerInvert.get() ), persistent=True )
-
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
         self.desiredVelocity = [ 0.0, 0.0 ]
         
         # Upper Motor
-        self.upperMotor = WPI_TalonFX( upperCanId, upperCanBus.get() )
+        self.upperMotor = WPI_TalonFX( upperCanId, "canivore1" )
         self.upperMotor.clearStickyFaults()
         self.upperMotor.configFactoryDefault()
         self.upperMotor.setNeutralMode( NeutralMode.Coast )
-        self.upperMotor.setInverted( upperInvert.get() )
+        self.upperMotor.setInverted( False )
 
         # Lower Motor
-        self.lowerMotor = WPI_TalonFX( lowerCanId, lowerCanBus.get() )
+        self.lowerMotor = WPI_TalonFX( lowerCanId, "canivore1" )
         self.lowerMotor.clearStickyFaults()
         self.lowerMotor.configFactoryDefault()
         self.lowerMotor.setNeutralMode( NeutralMode.Coast )
-        self.lowerMotor.setInverted( lowerInvert.get() )
+        self.lowerMotor.setInverted( False )
 
         # IR sensor
         self.irSensor = wpilib.DigitalInput(sensorId)

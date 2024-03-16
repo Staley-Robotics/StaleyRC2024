@@ -10,7 +10,7 @@ class ClimberIOTalon(ClimberIO):
     def __init__( self, motorId:int, sensorId:int, invert:bool = False ):
         # Tunable Settings
         self.extendRate = NTTunableFloat('/Config/Climber/ExtendRate', 10.0, updater=self.resetPid, persistent=True)
-        self.climber_kP = NTTunableFloat('/Config/Climber/PID/kP', 0.0, updater=self.resetPid, persistent=True)
+        self.climber_kP = NTTunableFloat('/Config/Climber/PID/kP', 1.0, updater=self.resetPid, persistent=True)
         self.climber_kI = NTTunableFloat('/Config/Climber/PID/kI', 0.0, updater=self.resetPid, persistent=True)
         self.climber_Iz = NTTunableFloat('/Config/Climber/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.climber_kD = NTTunableFloat('/Config/Climber/PID/kD', 0.0, updater=self.resetPid, persistent=True)
@@ -54,7 +54,7 @@ class ClimberIOTalon(ClimberIO):
         self.climbMotor.selectProfileSlot( 0, 0 )
 
     def run(self):
-        if not self.sensor.get() and self.desiredPosition < 0.0:
+        if not self.sensor.get() and ( self.desiredPosition < 0.0 or self.actualPosition < 0.0 ):
             self.resetPosition( 0.0 )
             self.desiredPosition = 0.0
         

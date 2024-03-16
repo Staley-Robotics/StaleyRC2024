@@ -111,23 +111,7 @@ class SwerveDrive(Subsystem):
             self.getModulePositions(),
             Pose2d(Translation2d(0,0), Rotation2d(0))
         )
-        self.odometry2 = SwerveDrive4PoseEstimator(
-            self.getKinematics(),
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            Pose2d(Translation2d(0,0), Rotation2d(0))
-        )
-        self.odometryWheelsOnly = SwerveDrive4PoseEstimator(
-            self.getKinematics(),
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            Pose2d(Translation2d(0,0), Rotation2d(0))
-        )
-
-        self.odometry.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
-        self.odometry2.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
-        self.odometryWheelsOnly.setVisionMeasurementStdDevs([0.5, 0.5, 0.25])
-
+        self.odometry.setVisionMeasurementStdDevs([1.5, 1.5, 1.5])
 
         # PID Controllers for Drive Motion
         self.hPid:HolonomicDriveController = None
@@ -184,8 +168,6 @@ class SwerveDrive(Subsystem):
         self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModuleIO.SwerveModuleIOInputs ).publish()
 
         self.ntRobotPose2d = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/Robot", Pose2d ).publish()
-        self.ntRobotPose2dNoTime = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/RobotUpdateNoTime", Pose2d ).publish()
-        self.ntRobotPose2dWheels = NetworkTableInstance.getDefault().getStructTopic( "/Logging/Odometry/RobotWheelsOnly", Pose2d ).publish()
         self.ntChassisSpeedsCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Robot/Current", ChassisSpeeds ).publish()
         self.ntChassisSpeedsNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Robot/Next", ChassisSpeeds ).publish()
         self.ntChassisSpeedsFieldCurrent = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Field/Current", ChassisSpeeds ).publish()
@@ -222,19 +204,9 @@ class SwerveDrive(Subsystem):
             self.gyro.getRotation2d(),
             self.getModulePositions()
         )
-        pose2 = self.odometry2.update(
-            self.gyro.getRotation2d(),
-            self.getModulePositions()
-        )
-        pose3 = self.odometryWheelsOnly.update(
-            self.gyro.getRotation2d(),
-            self.getModulePositions()
-        )
 
         # Logging: RobotPose, ChassisSpeeds, SwerveModuleStates Speeds
         self.ntRobotPose2d.set( pose )
-        self.ntRobotPose2dNoTime.set( pose2 )
-        self.ntRobotPose2dWheels.set( pose3 )
         self.ntChassisSpeedsCurrent.set( self.getChassisSpeeds() )
         self.ntChassisSpeedsFieldCurrent.set( self.getChassisSpeeds(True) )
         self.ntSwerveModuleStatesCurrent.set( self.getModuleStates() )
@@ -269,20 +241,10 @@ class SwerveDrive(Subsystem):
         print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
         self.gyro.setYaw( pose.rotation().degrees() )
-        self.getOdometry(0).resetPosition(
+        self.odometry.resetPosition(
             self.gyro.getRotation2d(),
             self.getModulePositions(),
             pose
-        )
-        self.getOdometry(1).resetPosition(
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            pose
-        )
-        self.getOdometry(2).resetPosition(
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            self.getOdometry(2).getEstimatedPosition()
         )
         print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
 
@@ -303,19 +265,12 @@ class SwerveDrive(Subsystem):
         """
         return self.kinematics
        
-    def getOdometry(self, version = 0) -> SwerveDrive4PoseEstimator:
+    def getOdometry(self) -> SwerveDrive4PoseEstimator:
         """
         Get The Current Odometry (fused with Vision Data) of this SwerveDrive
 
         :returns: SwerveDrive4PoseEstimator
         """
-        match version:
-            case 0:
-                return self.odometry
-            case 1:
-                return self.odometry2
-            case 2:
-                return self.odometryWheelsOnly
         return self.odometry
 
     def updateHolonomicDriveController(self) -> None:

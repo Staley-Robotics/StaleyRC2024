@@ -9,14 +9,6 @@ class PivotIOFalcon(PivotIO):
     
     def __init__(self, motorId:int, encoderId:int, encoderOffset:float=0.0):
         # Tunable Settings
-        pivotCanBus = NTTunableString( "/Config/Pivot/Falcon/Motor/CanBus", "canivore1", persistent=False )
-        pivotInvert = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Invert", False, updater=lambda: self.pivotMotor.setInverted( pivotInvert.get() ), persistent=True )
-        pivotPhase = NTTunableBoolean( "/Config/Pivot/Falcon/Motor/Phase", False, updater=lambda: self.pivotMotor.setSensorPhase( pivotPhase.get() ), persistent=True )
-        encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "canivore1", persistent=False )
-        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
-        encoderCanBus = NTTunableString( "/Config/Pivot/Falcon/Encoder/CanBus", "rio", persistent=True )
-        encoderDirection = NTTunableBoolean( "/Config/Pivot/Falcon/Encoder/PositiveClockwise", True, updater=lambda: self.pivotEncoder.configSensorDirection( encoderDirection.get() ), persistent=True )
-
         # Tunables
         self.pivot_kP = NTTunableFloat('Pivot/PID_kP', 5, updater=self.resetPid, persistent=True)
         self.pivot_kI = NTTunableFloat('Pivot/PID_kI', 0.0, updater=self.resetPid, persistent=True)
@@ -26,19 +18,18 @@ class PivotIOFalcon(PivotIO):
 
         # Encoder
         self.pivotEncoderOffset = encoderOffset
-        self.pivotEncoder = WPI_CANCoder( encoderId, encoderCanBus.get() )
+        self.pivotEncoder = WPI_CANCoder( encoderId, "canivore1" )
         self.pivotEncoder.configFactoryDefault( 250 )
         self.pivotEncoder.configSensorInitializationStrategy( SensorInitializationStrategy.BootToAbsolutePosition, 250 )
         self.pivotEncoder.configAbsoluteSensorRange( AbsoluteSensorRange.Signed_PlusMinus180, 250 )
-        self.pivotEncoder.configSensorDirection( encoderDirection.get(), 250 )
+        self.pivotEncoder.configSensorDirection( True, 250 )
         self.pivotEncoder.configMagnetOffset( encoderOffset, 250 )        
-        #self.syncEncoder()
 
         # Motor
-        self.pivotMotor = WPI_TalonFX( motorId, pivotCanBus.get() )
+        self.pivotMotor = WPI_TalonFX( motorId, "canivore1" )
         self.pivotMotor.configFactoryDefault( 250 )
-        self.pivotMotor.setSensorPhase( pivotPhase.get() )
-        self.pivotMotor.setInverted( pivotInvert.get() )
+        self.pivotMotor.setSensorPhase( False )
+        self.pivotMotor.setInverted( False )
         self.pivotMotor.setNeutralMode( NeutralMode.Coast )
         self.pivotMotor.configFeedbackNotContinuous( True, 250 )
         self.pivotMotor.configNeutralDeadband( 0.005, 250 )
@@ -74,7 +65,6 @@ class PivotIOFalcon(PivotIO):
         inputs.encoderVelocity = self.pivotEncoder.getVelocity()
 
         self.actualPosition = inputs.encoderPositionRel
-
 
     def resetPid(self):
         self.pivotMotor.config_kP( 0, self.pivot_kP.get(), 250 )

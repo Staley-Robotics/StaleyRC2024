@@ -7,16 +7,12 @@ from util import *
 class LauncherIOFalcon(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
-        leftInvert = NTTunableBoolean( "/Config/Launcher/Falcon/LeftInvert", False, updater=lambda: self.leftMotor.setInverted( leftInvert.get() ), persistent=False )
-        rightInvert = NTTunableBoolean( "/Config/Launcher/Falcon/RightInvert", True, updater=lambda: self.rightMotor.setInverted( rightInvert.get() ), persistent=False )
-        leftCanBus = NTTunableString( "/Config/Launcher/Falcon/LeftCanBus", "canivore1", persistent=False )
-        rightCanBus = NTTunableString( "/Config/Launcher/Falcon/RightCanBus", "canivore1", persistent=False )
-
-        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0200, updater=self.resetPid, persistent=True)
-        self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.0, updater=self.resetPid, persistent=True)
+        self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 9.0, updater=self.updateVoltageComp, persistent=True)
+        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0450, updater=self.resetPid, persistent=True)
+        self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.000003, updater=self.resetPid, persistent=True)
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kD = NTTunableFloat('/Config/Launcher/Falcon/PID/kD', 0.0, updater=self.resetPid, persistent=True)
-        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.0605, updater=self.resetPid, persistent=True)
+        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.065, updater=self.resetPid, persistent=True)
 
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
@@ -28,9 +24,6 @@ class LauncherIOFalcon(LauncherIO):
         self.leftMotor.configFactoryDefault( 250 )
         self.leftMotor.setNeutralMode( NeutralMode.Coast )
         self.leftMotor.setInverted( False )
-
-        self.leftMotor.configVoltageCompSaturation( 9.0, 250 )
-        self.leftMotor.enableVoltageCompensation( True )
 
         # Falcon Current Limit???
         #supplyCurrentCfg = SupplyCurrentLimitConfiguration( True, 40, 40, 1.0 )
@@ -44,9 +37,8 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.configFactoryDefault( 250 )
         self.rightMotor.setNeutralMode( NeutralMode.Coast )
         self.rightMotor.setInverted( True )
-        
-        self.rightMotor.configVoltageCompSaturation( 9.0, 250 )
-        self.rightMotor.enableVoltageCompensation( True )
+
+        self.updateVoltageComp()
 
         # Falcon Current Limit???
         #supplyCurrentCfg = SupplyCurrentLimitConfiguration( True, 40, 40, 1.0 )
@@ -91,6 +83,20 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.config_kD( 0, self.launcher_kD.get(), 250 )
         self.rightMotor.config_kF( 0, self.launcher_kF.get(), 250 )
         self.rightMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
+
+    def updateVoltageComp(self):
+        value = self.voltageComp.get()
+        if value != abs( value ):
+            self.voltageComp.set( abs(value) )
+        elif value == 0.0:
+            self.leftMotor.enableVoltageCompensation( False )
+            self.rightMotor.enableVoltageCompensation( False )
+        else:
+            self.leftMotor.configVoltageCompSaturation( value, 250 )
+            self.leftMotor.enableVoltageCompensation( True )
+            self.rightMotor.configVoltageCompSaturation( value, 250 )
+            self.rightMotor.enableVoltageCompensation( True )
+
 
     def run(self):
         controlMode = ControlMode.Velocity

@@ -157,7 +157,22 @@ class RobotContainer:
                 self.m_driver1.getLeftX
             )
         )
+        self.m_driver2.a().whileTrue(
+            commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+
         self.m_driver1.b().whileTrue(
+            commands.DriveAimAmp(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+        self.m_driver2.back().whileTrue(
             commands.DriveAimAmp(
                 self.drivetrain,
                 self.m_driver1.getLeftY,
@@ -187,24 +202,25 @@ class RobotContainer:
         )
         
         #  Driver 2
-        self.m_driver2.a().whileTrue(
+        self.m_driver2.x().onTrue(
+            sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose )
+        )
+        self.m_driver2.leftBumper().onTrue(
+            sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.b().whileTrue(
            sequences.AllRealign( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
         )
-        self.m_driver2.x().onTrue(
+        self.m_driver2.rightBumper().onTrue(
             sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
-        )
-        self.m_driver2.b().onTrue(
-            sequences.NoteToss( self.feeder, self.launcher, self.pivot, self.elevator )
         )
         self.m_driver2.y().whileTrue(
             commands.PivotBottom( self.pivot )
         )
-        self.m_driver2.back().onTrue(
+        self.m_driver2.start().onTrue(
             sequences.EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
         )
-        self.m_driver2.leftBumper().whileTrue(
-            commands.ClimberExtend( self.climber ) 
-        )
+        
         # # Safety and Other Commands
         # cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
         # cTab.add( "AllStop", sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator ) ).withPosition(0, 0)
@@ -257,6 +273,14 @@ class RobotContainer:
                 self.m_driver1.getRightY,
                 self.m_driver1.getRightX,
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
+            )
+        )
+
+        self.launcher.setDefaultCommand(
+            commands2.ConditionalCommand(
+                commands.LauncherSpeaker( self.launcher ),
+                commands2.cmd.none(),
+                lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
             )
         )
 
@@ -337,3 +361,4 @@ class RobotContainer:
         Adds the calibration commands to the Command Scheduler
         """
         ClimberResetSwitch( self.climber ).schedule()
+        self.drivetrain.syncGyro()

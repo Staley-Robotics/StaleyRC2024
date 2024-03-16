@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import wpilib
 import wpiutil.log
 from urcl import URCL
@@ -12,10 +15,8 @@ from util.LoggedSystemStats import *
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
         # Start Logging using the built in DataLogManager
-        if wpilib.RobotBase.isReal():
-            wpilib.DataLogManager.start( dir='/U/logs', period=1.0 )
-        else:
-            wpilib.DataLogManager.start( dir='.logs', period=1.0 )
+        logDir = '/U/logs' if wpilib.RobotBase.isReal() else '.logs'
+        wpilib.DataLogManager.start( dir=(logDir if Path(logDir).is_dir() else ''), period=1.0 )
         wpilib.DriverStation.startDataLog( wpilib.DataLogManager.getLog() )
 
         self.m_robotContainer = RobotContainer.RobotContainer()
@@ -25,7 +26,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # Disable Watchdog Warning
-        wpilib.Watchdog( 0.05, lambda: None).suppressTimeoutMessage(True)
+        wpilib.Watchdog( 0.05, lambda: None ).suppressTimeoutMessage(True)
 
         # Rev Raw Logging
         URCL.start()
