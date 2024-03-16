@@ -18,10 +18,10 @@ class Launcher(Subsystem):
         TossLeft = NTTunableFloat( "/Config/LauncherSpeeds/Toss/Left", 12000.0, persistent=True )
         TossRight = NTTunableFloat( "/Config/LauncherSpeeds/Toss/Right", 12000.0, persistent=True )
 
-        TimeDelay = NTTunableFloat( "/Config/LauncherSpeeds/Other/TimeDelay", 2.5, persistent=True )
+        TimeDelay = NTTunableFloat( "/Config/LauncherSpeeds/Other/TimeDelay", 20.00, persistent=True )
         Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 1000.0, persistent=True )
         Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
-        ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 100.0, persistent=True )
+        ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 350.0, persistent=True )
 
     def __init__(self, launcher:LauncherIO):
         self.launcher = launcher
