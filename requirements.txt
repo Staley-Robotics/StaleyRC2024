@@ -2,39 +2,39 @@
 robotpy-installer==2024.2.2
 
 ### RobotPy
-robotpy==2024.3.1.0
+robotpy==2024.3.2.1
 #pyfrc=2024.0.1
-#pyntcore-2024.3.1.0
+#pyntcore-2024.3.2.0
 #robotpy-cli=2024.0.0
-#robotpy-hal-2024.3.1.0
-#robotpy-halsim-gui==2024.3.1.0
-#robotpy-wpimath==2024.3.1.0
-#robotpy-wpinet==2024.3.1.0
-#robotpy-wpiutil==2024.3.1.0
-#wpilib==2024.3.1.0
+#robotpy-hal-2024.3.2.0
+#robotpy-halsim-gui==2024.3.2.0
+#robotpy-wpimath==2024.3.2.0
+#robotpy-wpinet==2024.3.2.0
+#robotpy-wpiutil==2024.3.2.0
+#wpilib==2024.3.2.0
 
 #robotpy-build==2024.0.0
-#robotpy-romi==2024.3.1.0
+#robotpy-romi==2024.3.2.0
 #robotpy-sphinx-plugin==0.2.5
 #robotpy-wpilib-utilities==2024.0.0
-#robotpy-xrp==2024.3.1.0
+#robotpy-xrp==2024.3.2.0
 
 ### RobotPy Extras
-robotpy-apriltag==2024.3.1.0
+robotpy-apriltag==2024.3.2.0
 robotpy-commands-v2==2024.3.1
-robotpy-cscore==2024.3.1.0
-robotpy-halsim-ds-socket==2024.3.1.0
-robotpy-halsim-ws==2024.3.1.0
-robotpy-navx==2024.1.0
+robotpy-cscore==2024.3.2.0
+robotpy-halsim-ds-socket==2024.3.2.0
+robotpy-halsim-ws==2024.3.2.0
+robotpy-navx==2024.1.1
 robotpy-pathplannerlib==2024.2.6
-robotpy-playingwithfusion==2024.1.0
+robotpy-playingwithfusion==2024.2.0
 
 
 ### Rev Robotics
-robotpy-rev==2024.2.1
+robotpy-rev==2024.2.3
 robotpy-urcl==2024.0.1
 
 ### CTRE
-robotpy-ctre==2024.1.2 #phoenix5
+robotpy-ctre==2024.1.3 #phoenix5
 phoenix6==24.2.0
 
