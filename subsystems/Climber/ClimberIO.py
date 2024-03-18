@@ -7,19 +7,13 @@ class ClimberIO:
     @wpiutil.wpistruct.make_wpistruct(name="ClimberIOInputs")
     @dataclasses.dataclass
     class ClimberIOInputs:
-        #Left Motor
-        leftAppliedVolts: float = 0.0
-        leftCurrentAmps: float = 0.0
-        leftTempCelcius: float = 0.0
-        leftVelocity: float = 0.0
-        leftPosition: float = 0.0
-
-        #Right Motor
-        rightAppliedVolts: float = 0.0
-        rightCurrentAmps: float = 0.0
-        rightTempCelcius: float = 0.0
-        rightPosition: float = 0.0
-        rightVelocity: float = 0.0
+        #Motor
+        motorAppliedVolts: float = 0.0
+        motorCurrentAmps: float = 0.0
+        motorTempCelcius: float = 0.0
+        motorVelocity: float = 0.0
+        motorPosition: float = 0.0
+        sensor: bool = True
 
     def __init__(self):
         pass
@@ -33,25 +27,24 @@ class ClimberIO:
     def setBrake(self, brake:bool) -> None:
         pass
 
-    def setPosition(self, leftPosition:float, rightPosition:float) -> None:
+    def setPosition(self, position:float) -> None:
         pass
 
-    def movePosition(self, leftRate:float, rightRate:float) -> None:
+    def movePosition(self, rate:float) -> None:
         pass
 
     def resetPosition(self, position:float) -> None:
         pass
 
-    def getPosition(self) -> [float, float]:
-        return [ 0.0, 0.0 ]
+    def getPosition(self) -> float:
+        return 0.0
 
-    def atSetpoint(self, errorRange:float = 100.0) -> [bool,bool]:
-        leftPos, rightPos = self.getPosition()
-        leftSp, rightSp = self.getSetpoint()
+    def atSetpoint(self, errorRange:float = 100.0) -> bool:
+        leftPos = self.getPosition()
+        leftSp = self.getSetpoint()
         leftAtPos = abs( leftSp - leftPos ) < errorRange
-        rightAtPos = abs( rightSp - rightPos ) < errorRange
-        return [ leftAtPos, rightAtPos ]
+        return leftAtPos
     
     def getSetpoint(self) -> float:
-        return [ 0.0, 0.0 ]
+        return 0.0
     

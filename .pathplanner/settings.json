@@ -3,10 +3,11 @@
   "robotLength": 0.83,
   "holonomicMode": true,
   "pathFolders": [
+    "AMP",
     "HOME Between",
     "Locale Between",
     "MID Between",
-    "AMP",
+    "Red",
     "ToFrom Shoot"
   ],
   "autoFolders": [],

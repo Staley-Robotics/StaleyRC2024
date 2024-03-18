@@ -20,16 +20,20 @@ class LauncherSpeaker(Command):
 
         self.setName( "LauncherSpeaker" )
         self.addRequirements( launcher )
+        self.timer = Timer()
 
-    def initialize(self) -> None: pass
+    def initialize(self) -> None:
+        self.timer.reset()
+        self.timer.start()
 
     def execute(self) -> None:
         self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft.get(), Launcher.LauncherSpeeds.SpeakerRight.get())
 
     def end(self, interrupted:bool) -> None:
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        self.timer.stop()
 
     def isFinished(self) -> bool:
-        return self.launcher.hasLaunched()
+        return self.timer.hasElapsed( Launcher.LauncherSpeeds.TimeDelay.get() ) or self.launcher.hasLaunched()
     
     def runsWhenDisabled(self) -> bool: return False

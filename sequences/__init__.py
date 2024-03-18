@@ -1,3 +1,4 @@
+from .AllRealign import *
 from .AllStop import *
 from .DemoSwerveDrivePoses import *
 from .DemoSwerveDriveTimedPath import *
@@ -7,8 +8,10 @@ from .Launch import *
 from .NoteAction import *
 from .NoteLaunchAmp import *
 from .NoteLaunchSpeaker import *
+from .NoteLaunchSpeakerAuto import *
 from .NoteLaunchTrap import *
 from .NoteLoadGround import *
 from .NoteLoadSource import *
+from .NoteToss import *
 from .PivotDefault import *
 from .SampleSequence import *

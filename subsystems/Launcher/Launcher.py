@@ -7,18 +7,21 @@ from util import *
 
 class Launcher(Subsystem):
     class LauncherSpeeds:
-        SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 12000.0, persistent=True )
-        SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 10000.0, persistent=True )
-        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 2000.0, persistent=True )
-        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 2000.0, persistent=True )
+        SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 14500.0, persistent=True )
+        SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 12000.0, persistent=True )
+        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 3000.0, persistent=True )
+        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 3000.0, persistent=True )
         TrapLeft = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 8000.0, persistent=True )
         TrapRight = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 8000.0, persistent=True )
         SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -8000.0, persistent=True )
         SourceRight = NTTunableFloat( "/Config/LauncherSpeeds/Source/Right", -8000.0, persistent=True )
-        
+        TossLeft = NTTunableFloat( "/Config/LauncherSpeeds/Toss/Left", 12000.0, persistent=True )
+        TossRight = NTTunableFloat( "/Config/LauncherSpeeds/Toss/Right", 12000.0, persistent=True )
+
+        TimeDelay = NTTunableFloat( "/Config/LauncherSpeeds/Other/TimeDelay", 20.00, persistent=True )
         Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 1000.0, persistent=True )
         Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
-        ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 100.0, persistent=True )
+        ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 350.0, persistent=True )
 
     def __init__(self, launcher:LauncherIO):
         self.launcher = launcher

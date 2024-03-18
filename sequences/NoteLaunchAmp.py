@@ -16,13 +16,13 @@ class NoteLaunchAmp(commands2.SequentialCommandGroup):
             )
         )
         self.addCommands(
-            commands2.ParallelRaceGroup(
+            commands2.ParallelCommandGroup(
                 PivotAmp(pivot),
                 commands2.ParallelCommandGroup(
                     LauncherAmp(launcher),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
-                        commands2.WaitUntilCommand( condition = launcher.atSpeed ),
+                        commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(300) ),
                         IndexerLaunch(indexer)
                     )
                 )

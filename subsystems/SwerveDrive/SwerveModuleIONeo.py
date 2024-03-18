@@ -80,9 +80,9 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turnMotor.restoreFactoryDefaults() 
         self.turnMotor.setInverted( True )  
         self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast ) 
-        self.turnMotor.enableVoltageCompensation( 12.0 )
-        self.turnMotor.setSmartCurrentLimit( 30 )
-        self.turnMotor.setClosedLoopRampRate( 0.05 )
+        self.turnMotor.enableVoltageCompensation( 12.00 )
+        self.turnMotor.setSmartCurrentLimit( 15 )
+        self.turnMotor.setClosedLoopRampRate( 0.20 )
         self.turnMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.turnMotorEncoder = self.turnMotor.getEncoder()
@@ -108,9 +108,9 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.driveMotor.restoreFactoryDefaults()
         self.driveMotor.setInverted( True )
         self.driveMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.driveMotor.enableVoltageCompensation( 12.0 )
+        self.driveMotor.enableVoltageCompensation( 12.00 )
         self.driveMotor.setSmartCurrentLimit( 30 )
-        self.driveMotor.setClosedLoopRampRate( 0.05 )
+        self.driveMotor.setClosedLoopRampRate( 0.20 )
         self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus0, 20 )
         self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus1, 20 )
         self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
@@ -122,7 +122,7 @@ class SwerveModuleIONeo(SwerveModuleIO):
 
         self.driveMotorPid = self.driveMotor.getPIDController()
         self.driveMotorPid.setFeedbackDevice( self.driveMotorEncoder )
-        self.driveMotorPid.setOutputRange( -0.95, 0.95 )
+        self.driveMotorPid.setOutputRange( -1.00, 1.00 )
         self.updateDrivePIDController()
 
         # Save Drive Motor Config

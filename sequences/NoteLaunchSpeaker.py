@@ -16,14 +16,14 @@ class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
         )
         self.addCommands(
             commands2.ParallelRaceGroup(
-                commands2.RepeatCommand(
-                    PivotAim(pivot,getPose)
-                ),
+                #commands2.RepeatCommand(
+                #    PivotAim(pivot,getPose)
+                #),
                 commands2.ParallelCommandGroup(
                     LauncherSpeaker(launcher),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
-                        commands2.WaitUntilCommand( condition = launcher.atSpeed ),
+                        commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(1000) ),
                         IndexerLaunch(indexer)
                     )
                 )

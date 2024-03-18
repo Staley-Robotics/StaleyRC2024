@@ -36,13 +36,13 @@ class ClimberReset(Command):
         self.stalledCycleCount = [ 0, 0 ]
         self.lastPosition = self.climber.getPosition()
 
+    def execute(self) -> None:
         self.climber.set(
             Climber.ClimberPositions.Reset.get(),
             Climber.ClimberPositions.Reset.get(),
             override = True
         )
 
-    def execute(self) -> None:
         currentPos = self.climber.getPosition()
         
         # Loop Through Motors

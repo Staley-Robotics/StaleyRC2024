@@ -47,3 +47,6 @@ class VisionCamera:
         Update Input Logs
         """
         pass
+
+    def run(self):
+        pass

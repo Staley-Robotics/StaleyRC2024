@@ -37,7 +37,7 @@ class DriveByStick(Command):
         self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 3.7, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 2 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
-        self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 1.0, persistent=True )
+        self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
 
         self.srlV = NTTunableFloat( "/Config/Driver1/SrlVelocity", 3.0, self.updateSlewRateLimiterVelocity )
         self.srlH = NTTunableFloat( "/Config/Driver1/SrlHolonomic", 3.0, self.updateSlewRateLimiterHolonomic )
@@ -46,7 +46,7 @@ class DriveByStick(Command):
         self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
         self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
         self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
-        self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", False, persistent=False )        
+        self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", True, persistent=True )        
         
         self.isAimingSpeaker = NTTunableBoolean( "/Driver1/isAimingSpeaker", False, persistent=False )
         self.isAimingAmp = NTTunableBoolean( "/Driver1/isAimingAmp", False, persistent=False )
@@ -142,12 +142,6 @@ class DriveByStick(Command):
             y *= self.halfSpeedLinear.get()
             r *= self.halfSpeedAngular.get()
             magH = self.halfSpeedAngular.get()
-
-        
-        # Determine Velocities
-        veloc_x = x * self.velocLinear.get()
-        veloc_y = y * self.velocLinear.get()
-        veloc_r = r * self.velocAngular.get()
         
         # Calculate / Redetermine veloc_r (Rotation via Holonomic or Buttons)
         if abs(hX) > 0.1 or abs(hY) > 0.1:
@@ -157,9 +151,14 @@ class DriveByStick(Command):
             goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
-            veloc_r = r # min( max( r, -1.0), 1.0 )
+            r = min( max( r, -1.0), 1.0 )
         else:
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
+        
+        # Determine Velocities
+        veloc_x = x * self.velocLinear.get()
+        veloc_y = y * self.velocLinear.get()
+        veloc_r = r * self.velocAngular.get()
 
         # Determine when ChassisSpeeds capability to use
         if self.isFieldRelative.get():

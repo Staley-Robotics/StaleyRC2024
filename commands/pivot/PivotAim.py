@@ -21,7 +21,7 @@ class PivotAim(Command):
         self.getPose = getPose
 
         self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
-        self.calcAim = NTTunableFloat( "/PivotCalc", 0.0 )
+        self.calcAim = NTTunableFloat( "/Logging/PivotCalc", 0.0 )
         
         self.setName( "PivotAim" )
         self.addRequirements( pivot )

@@ -34,6 +34,7 @@ class RobotContainer:
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
+        self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
 
         # Create Subsystems
         # IO Systems
@@ -46,7 +47,8 @@ class RobotContainer:
         ssPivotIO = None
         ssElevatorIO = None
         ssLedIO = None
-        ssClimberIO = None
+        ssClimberIOLeft = None
+        ssClimberIORight = None
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -63,27 +65,31 @@ class RobotContainer:
             ssPivotIO = PivotIOSim()
             ssElevatorIO = ElevatorIO()
             ssLedIO = LedIOSim( 9 )
-            ssClimberIO = ClimberIO()
+            ssClimberIOLeft = ClimberIO()
+            ssClimberIORight = ClimberIO()
         else:
             ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.25,  0.25,  97.471 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.25, -0.25,  5.361 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.25,  0.25,  298.828 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.25, -0.25,  60.557 )  #65.654)
+                SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
+                SwerveModuleIONeo("FR", 1, 2, 12,  0.2667, -0.2667,  5.361 ), #125.068) #  35.684)
+                SwerveModuleIONeo("BL", 5, 6, 16, -0.2667,  0.2667,  298.828 ), #223.945)
+                SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
-            ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
+            ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
             ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
-            ssLedIO = LedIOActual( 0 )
-            ssClimberIO = ClimberIOTalon( 27, 28 )
+            ssLedIO = LedIO() #LedIOActual( 0 )
+            ssClimberIOLeft = ClimberIOTalon( 27, 5 )
+            ssClimberIORight = ClimberIOTalon( 28, 6, True )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
             VisionCameraLimelight( "limelight-one" ),
-            VisionCameraLimelight( "limelight-two" )
+            VisionCameraLimelight( "limelight-two" ),
+            VisionCameraLimelight( "limelight-three" ),
+            VisionCameraLimelight( "limelight-four" )
         ]
 
         # Link IO Systems to Subsystems
@@ -95,10 +101,15 @@ class RobotContainer:
         self.elevator:Elevator = Elevator( ssElevatorIO )
         self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.led = LED( ssLedIO )
-        self.climber = Climber( ssClimberIO )
+        self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
 
         # Register Pathplanner Commands
-        NamedCommands.registerCommand('AutoPivot', PivotAim(self.pivot, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoPivot",
+                                      PivotAim(self.pivot, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoLaunch",
+                                      NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
+        NamedCommands.registerCommand("AutoPickup",
+                                      NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator)) 
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -111,12 +122,13 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Climber", self.climber )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Zero Odometry", commands.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Re-Sync Pivot", commands2.cmd.runOnce( self.pivot.syncEncoder ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Climber Reset", commands.ClimberReset( self.climber ) )
         #wpilib.SmartDashboard.putData( "run led rainbow", runLedRainbow(self.led))
 
-        #wpilib.SmartDashboard.putData( "Pivot Up", PivotTop(self.pivot) )
+        wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
         #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
         #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
         #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
@@ -124,18 +136,45 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        p = Path( "deploy/pathplanner/autos" )
+        p = Path( "/home/lvuser/py/deploy/pathplanner/autos" )
+        if RobotBase.isSimulation():
+            p = Path( "deploy/pathplanner/autos" )
         for e1 in os.scandir( p ):
             if not e1.is_dir() and e1.name.endswith(".auto"):
                 f = e1.name.removesuffix(".auto")
+                print( f"Loading Auto: {f}" )
                 self.m_chooser.addOption( f, AutoBuilder.buildAuto( f ) )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
+        self.m_driver2 = commands2.button.CommandXboxController(1)
+
         ## Driving
         self.m_driver1.a().whileTrue(
             commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+        self.m_driver2.a().whileTrue(
+            commands.DriveAimSpeaker(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+
+        self.m_driver1.b().whileTrue(
+            commands.DriveAimAmp(
+                self.drivetrain,
+                self.m_driver1.getLeftY,
+                self.m_driver1.getLeftX
+            )
+        )
+        self.m_driver2.back().whileTrue(
+            commands.DriveAimAmp(
                 self.drivetrain,
                 self.m_driver1.getLeftY,
                 self.m_driver1.getLeftX
@@ -147,19 +186,51 @@ class RobotContainer:
         self.m_driver1.x().onTrue(
             sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose )
         )
-        # All Stop / Commands Reset
-        self.m_driver1.b().onTrue(
-            sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
-        )
         self.m_driver1.y().onTrue(
-            commands.LauncherSpeaker( self.launcher )
+            sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
         )
-
-        self.m_driver1.leftBumper().onTrue(
+        self.m_driver1.back().onTrue(
             commands.ToggleFieldRelative()
+        )
+        self.m_driver1.leftBumper().whileTrue(
+            commands.ClimberExtend( self.climber )
         )
         self.m_driver1.rightBumper().onTrue(
             commands.ToggleHalfSpeed()
+        )
+        self.m_driver1.start().onTrue(
+            commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True)
+        )
+        
+        #  Driver 2
+        self.m_driver2.x().onTrue(
+            sequences.NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose )
+        )
+        self.m_driver2.leftBumper().onTrue(
+            sequences.NoteLaunchAmp( self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.b().whileTrue(
+           sequences.AllRealign( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.rightBumper().onTrue(
+            sequences.AllStop( self.intake, self.feeder, self.launcher, self.pivot, self.elevator )
+        )
+        self.m_driver2.y().whileTrue(
+            commands.PivotBottom( self.pivot )
+        )
+        self.m_driver2.start().onTrue(
+            sequences.EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
+        )
+
+        self.m_driver2.povUp().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.aimAdjust.set( self.aimAdjust.get() + 0.5 )
+            ).ignoringDisable(True)
+        )
+        self.m_driver2.povDown().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.aimAdjust.set( self.aimAdjust.get() - 0.5 )
+            ).ignoringDisable(True)
         )
         
         # # Safety and Other Commands
@@ -217,6 +288,14 @@ class RobotContainer:
             )
         )
 
+        self.launcher.setDefaultCommand(
+            commands2.ConditionalCommand(
+                commands.LauncherSpeaker( self.launcher ),
+                commands2.cmd.none(),
+                lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
+            )
+        )
+
         self.pivot.setDefaultCommand(
             sequences.PivotDefault(
                 self.pivot,
@@ -228,6 +307,12 @@ class RobotContainer:
         self.feeder.setDefaultCommand(
             commands.IndexerDefault(
                 self.feeder
+            )
+        )
+
+        self.climber.setDefaultCommand(
+            commands.ClimberCollapse(
+                self.climber
             )
         )
     
@@ -283,10 +368,9 @@ class RobotContainer:
         """
         return self.m_chooser.getSelected()
 
-    def getCalibrationCommands(self) -> commands2.Command:
+    def runCalibration(self) -> None:
         """
-        :returns: commands to schedule for calibration
+        Adds the calibration commands to the Command Scheduler
         """
-        return commands2.ParallelCommandGroup(
-            ClimberReset( self.climber )
-        )
+        ClimberResetSwitch( self.climber ).schedule()
+        self.drivetrain.syncGyro()

@@ -34,7 +34,7 @@ class Vision(Subsystem):
 
     def __init__( self,
                   cameras:typing.Tuple[VisionCamera], 
-                  odometryFunction:typing.Callable[[int], SwerveDrive4PoseEstimator]):
+                  odometryFunction:typing.Callable[[], SwerveDrive4PoseEstimator]):
         """
         Initialization
         """
@@ -74,27 +74,17 @@ class Vision(Subsystem):
            
             # Fuse Data with Odometry
             if DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self.cameraInputs[x].blueHasData:
-                self.getOdometry(0).addVisionMeasurement(
+                self.getOdometry().addVisionMeasurement(
                     self.cameraInputs[x].blueRobotPose2d,
                     Timer.getFPGATimestamp() - self.cameraInputs[x].blueLatencySecs
                 )
             elif DriverStation.getAlliance() == DriverStation.Alliance.kRed and self.cameraInputs[x].redHasData:
-                self.getOdometry(0).addVisionMeasurement(
+                self.getOdometry().addVisionMeasurement(
                     self.cameraInputs[x].redRobotPose2d,
                     Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
                 )
 
-            # Fuse Data with Odometry Test
-            if DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self.cameraInputs[x].blueHasData:
-                self.getOdometry(1).addVisionMeasurement(
-                    self.cameraInputs[x].blueRobotPose2d,
-                    Timer.getFPGATimestamp() - self.cameraInputs[x].blueLatencySecs
-                )
-            elif DriverStation.getAlliance() == DriverStation.Alliance.kRed and self.cameraInputs[x].redHasData:
-                self.getOdometry(1).addVisionMeasurement(
-                    self.cameraInputs[x].redRobotPose2d,
-                    Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
-                )
+            self.cameras[x].run()
 
 
             
