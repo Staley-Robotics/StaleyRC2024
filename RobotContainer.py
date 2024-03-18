@@ -34,6 +34,7 @@ class RobotContainer:
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
+        self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
 
         # Create Subsystems
         # IO Systems
@@ -77,7 +78,7 @@ class RobotContainer:
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
-            ssPivotIO = PivotIOFalcon( 25, 26, -77.520 )
+            ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
             ssElevatorIO = ElevatorIO() #ElevatorIONeo( 27, 28 )
             ssLedIO = LedIO() #LedIOActual( 0 )
             ssClimberIOLeft = ClimberIOTalon( 27, 5 )
@@ -106,7 +107,7 @@ class RobotContainer:
         NamedCommands.registerCommand("AutoPivot",
                                       PivotAim(self.pivot, self.drivetrain.getPose)) 
         NamedCommands.registerCommand("AutoLaunch",
-                                      NoteLaunchSpeaker(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
+                                      NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
         NamedCommands.registerCommand("AutoPickup",
                                       NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator)) 
 
@@ -219,6 +220,17 @@ class RobotContainer:
         )
         self.m_driver2.start().onTrue(
             sequences.EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
+        )
+
+        self.m_driver2.povUp().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.aimAdjust.set( self.aimAdjust.get() + 0.5 )
+            ).ignoringDisable(True)
+        )
+        self.m_driver2.povDown().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.aimAdjust.set( self.aimAdjust.get() - 0.5 )
+            ).ignoringDisable(True)
         )
         
         # # Safety and Other Commands

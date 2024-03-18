@@ -25,6 +25,7 @@ from .indexer.IndexerDefault import *
 from .indexer.IndexerEject import *
 from .indexer.IndexerHandoff import *
 from .indexer.IndexerLaunch import *
+from .indexer.IndexerRealign import *
 from .indexer.IndexerSource import *
 from .IndexerUtils import *
 from .intake.IntakeEject import *
@@ -49,6 +50,7 @@ from .pivot.PivotByStick import *
 from .pivot.PivotEject import *
 from .pivot.PivotHandoff import *
 from .pivot.PivotSource import *
+from .pivot.PivotSpeaker import *
 from .pivot.PivotTop import *
 from .pivot.PivotToPosition import *
 from .pivot.PivotToss import *

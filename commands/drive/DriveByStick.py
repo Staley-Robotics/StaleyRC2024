@@ -37,7 +37,7 @@ class DriveByStick(Command):
         self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 3.7, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 2 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
-        self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 1.0, persistent=True )
+        self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
 
         self.srlV = NTTunableFloat( "/Config/Driver1/SrlVelocity", 3.0, self.updateSlewRateLimiterVelocity )
         self.srlH = NTTunableFloat( "/Config/Driver1/SrlHolonomic", 3.0, self.updateSlewRateLimiterHolonomic )

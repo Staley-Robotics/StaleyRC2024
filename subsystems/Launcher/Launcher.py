@@ -9,8 +9,8 @@ class Launcher(Subsystem):
     class LauncherSpeeds:
         SpeakerLeft = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Left", 14500.0, persistent=True )
         SpeakerRight = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Right", 12000.0, persistent=True )
-        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 2000.0, persistent=True )
-        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 2000.0, persistent=True )
+        AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 3000.0, persistent=True )
+        AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 3000.0, persistent=True )
         TrapLeft = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Left", 8000.0, persistent=True )
         TrapRight = NTTunableFloat( "/Config/LauncherSpeeds/Trap/Right", 8000.0, persistent=True )
         SourceLeft = NTTunableFloat( "/Config/LauncherSpeeds/Source/Left", -8000.0, persistent=True )

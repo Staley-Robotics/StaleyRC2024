@@ -8,8 +8,9 @@ from .PivotIO import PivotIO
 class Pivot(Subsystem):
     class PivotPositions:
         Upward = NTTunableFloat( "/Config/PivotPositions/Upward", 55.041, persistent=True )
+        Speaker = NTTunableFloat( "/Config/PivotPositions/Speaker", 50.000, persistent=True )
         Handoff = NTTunableFloat( "/Config/PivotPositions/Handoff", 32.168, persistent=True )
-        Amp = NTTunableFloat( "/Config/PivotPositions/Amp", -45.0, persistent=True )
+        Amp = NTTunableFloat( "/Config/PivotPositions/Amp", 52.0, persistent=True )
         Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -45.0, persistent=True )
         Source = NTTunableFloat( "/Config/PivotPositions/Source", -45.0, persistent=True )
         Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -52.031, persistent=True )

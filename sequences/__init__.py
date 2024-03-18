@@ -8,6 +8,7 @@ from .Launch import *
 from .NoteAction import *
 from .NoteLaunchAmp import *
 from .NoteLaunchSpeaker import *
+from .NoteLaunchSpeakerAuto import *
 from .NoteLaunchTrap import *
 from .NoteLoadGround import *
 from .NoteLoadSource import *

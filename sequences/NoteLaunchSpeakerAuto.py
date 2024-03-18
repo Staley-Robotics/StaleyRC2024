@@ -4,15 +4,18 @@ from commands import *
 from subsystems import Indexer, Pivot, Elevator, Launcher
 from util import *
 
-class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
+class NoteLaunchSpeakerAuto(commands2.SequentialCommandGroup):
     def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator, getPose:typing.Callable[[],Pose2d]):
         super().__init__()
-        self.setName( "NoteLaunchSpeaker" )
+        self.setName( "NoteLaunchSpeakerAuto" )
 
         self.addCommands(
             commands2.ParallelCommandGroup(
                 ElevatorBottom(elevator)
             )
+        )
+        self.addCommands(
+            PivotSpeaker(pivot)
         )
         self.addCommands(
             commands2.ParallelRaceGroup(

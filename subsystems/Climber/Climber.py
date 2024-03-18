@@ -7,6 +7,7 @@ from .ClimberIO import ClimberIO
 
 class Climber(Subsystem):
     class ClimberPositions:
+        Timer = NTTunableFloat( "/Config/ClimberPositions/Timer", 0.25, persistent=True )
         Bottom = NTTunableFloat( "/Config/ClimberPositions/Bottom", 0.0, persistent=True )
         Top = NTTunableFloat( "/Config/ClimberPositions/Top", 7000.0, persistent=True )
         Reset = NTTunableFloat( "/Config/ClimberPositions/Reset", -5000.0, persistent=True )

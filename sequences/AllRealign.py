@@ -9,9 +9,9 @@ class AllRealign(commands2.ParallelCommandGroup):
         super().__init__(
             commands2.SequentialCommandGroup(
                 PivotHandoff(pivot),
-                commands2.ParallelCommandGroup( 
+                commands2.ParallelCommandGroup(   
                     IntakeHandoff(intake),
-                    IndexerLaunch(indexer)
+                    IndexerRealign(indexer)
                 )
             ),
             LauncherStop(launcher)
