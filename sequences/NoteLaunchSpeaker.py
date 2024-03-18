@@ -16,9 +16,9 @@ class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
         )
         self.addCommands(
             commands2.ParallelRaceGroup(
-                #commands2.RepeatCommand(
-                #    PivotAim(pivot,getPose)
-                #),
+                commands2.RepeatCommand(
+                    PivotAim(pivot,getPose)
+                ),
                 commands2.ParallelCommandGroup(
                     LauncherSpeaker(launcher),
                     commands2.SequentialCommandGroup(

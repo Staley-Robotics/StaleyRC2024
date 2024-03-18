@@ -4,8 +4,8 @@ from wpimath.geometry import *
 from .NTTunableFloat import *
 
 fieldWidth = NTTunableFloat( "Crescendo/FieldWidth", 8.17, persistent=True )
-speakerTargetX = NTTunableFloat( "Crescendo/Speaker/X", 0.25, persistent=True )
-speakerTargetY = NTTunableFloat( "Crescendo/Speaker/Y", 5.50, persistent=True )
+speakerTargetX = NTTunableFloat( "Crescendo/Speaker/X", 0.00, persistent=True )
+speakerTargetY = NTTunableFloat( "Crescendo/Speaker/Y", 5.55, persistent=True )
 speakerTargetH = NTTunableFloat( "Crescendo/Speaker/H", 2.0431, persistent=True )
 robotPivotH = NTTunableFloat( "Crescendo/RobotPivot/H", 0.25, persistent=True )
 

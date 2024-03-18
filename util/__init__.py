@@ -1,4 +1,5 @@
 from .CrescendoUtil import *
+from .LaunchCalc import *
 from .LoggedConsole import *
 from .LoggedPDP import *
 from .LoggedRobot import *

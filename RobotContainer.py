@@ -103,9 +103,11 @@ class RobotContainer:
         self.led = LED( ssLedIO )
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
 
+        self.launchCalc = LaunchCalc( self.drivetrain.getPose )
+
         # Register Pathplanner Commands
         NamedCommands.registerCommand("AutoPivot",
-                                      PivotAim(self.pivot, self.drivetrain.getPose)) 
+                                      PivotAim(self.pivot, self.launchCalc)) 
         NamedCommands.registerCommand("AutoLaunch",
                                       NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
         NamedCommands.registerCommand("AutoPickup",
