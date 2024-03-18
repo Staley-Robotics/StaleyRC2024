@@ -62,6 +62,13 @@ class Indexer(Subsystem):
         self.indexer.setBrake(brake)
 
     def hasHalfNote(self) -> int:
+        """
+        :returns:
+        0 if both sensors detect the note
+        0 if no senesors detect the note
+        1 if ONLY the lower sensor detects the note
+        -1 if ONLY the upper sensor detects the note
+        """
         if self.hasNote():
             return 0
         elif self.indexer.getLowerSensorIsBroken():

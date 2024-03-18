@@ -24,3 +24,6 @@ class NoteLoadGround(commands2.SequentialCommandGroup):
                 IntakeHandoff(intake),
             )
         )
+        self.addCommands(
+            IndexerDefault( indexer )
+        )

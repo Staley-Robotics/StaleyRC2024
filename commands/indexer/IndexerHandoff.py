@@ -31,6 +31,6 @@ class IndexerHandoff(Command):
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool: 
-        return self.indexer.hasNote()
+        return self.indexer.hasHalfNote() == -1
     
     def runsWhenDisabled(self) -> bool: return False
