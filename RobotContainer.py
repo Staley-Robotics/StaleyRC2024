@@ -1,17 +1,11 @@
-import os
 import typing
-from pathlib import Path
 
 import commands2
 import commands2.button
 import commands2.cmd
 import wpilib
 import wpilib.shuffleboard
-import wpimath
 from wpilib.interfaces import GenericHID
-
-from pathplannerlib.auto import NamedCommands, AutoBuilder
-from pathplannerlib.path import PathPlannerPath
 
 from subsystems import *
 from commands import *
@@ -49,6 +43,7 @@ class RobotContainer:
         ssLedIO = None
         ssClimberIOLeft = None
         ssClimberIORight = None
+        ppCommands = {}
 
         # Create IO Systems
         if wpilib.RobotBase.isSimulation() and not self.testing:
@@ -67,6 +62,11 @@ class RobotContainer:
             ssLedIO = LedIOSim( 9 )
             ssClimberIOLeft = ClimberIO()
             ssClimberIORight = ClimberIO()
+            ppCommands = {
+                "AutoPivot": commands.cmd.waitSeconds( 0.50 ),
+                "AutoLaunch": commands.cmd.waitSeconds( 0.50 ),
+                "AutoPickup": commands.cmd.waitSeconds( 0.50 )
+            }
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
@@ -83,6 +83,11 @@ class RobotContainer:
             ssLedIO = LedIO() #LedIOActual( 0 )
             ssClimberIOLeft = ClimberIOTalon( 27, 5 )
             ssClimberIORight = ClimberIOTalon( 28, 6, True )
+            ppCommands = {
+                "AutoPivot": PivotAim(self.pivot, self.launchCalc),
+                "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose),
+                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator)
+            }
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -104,22 +109,11 @@ class RobotContainer:
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
 
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
+        
 
         # Register Pathplanner Commands
-        if not RobotBase.isSimulation():
-            NamedCommands.registerCommand("AutoPivot",
-                                        PivotAim(self.pivot, self.launchCalc)) 
-            NamedCommands.registerCommand("AutoLaunch",
-                                        NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
-            NamedCommands.registerCommand("AutoPickup",
-                                        NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator))
-        else:
-            NamedCommands.registerCommand("AutoPivot",
-                                        commands.cmd.waitSeconds( 0.50 ))
-            NamedCommands.registerCommand("AutoLaunch",
-                                        commands.cmd.waitSeconds( 0.50 ))
-            NamedCommands.registerCommand("AutoPickup",
-                                        commands.cmd.waitSeconds( 0.50 ))
+        self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
+        self.pathPlanner.setNamedCommands( ppCommands )
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -146,28 +140,25 @@ class RobotContainer:
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )
-        p = Path( "/home/lvuser/py/deploy/pathplanner/autos" )
-        if RobotBase.isSimulation():
-            p = Path( "deploy/pathplanner/autos" )
-        for e1 in os.scandir( p ):
-            if not e1.is_dir() and e1.name.endswith(".auto"):
-                f = e1.name.removesuffix(".auto")
-                print( f"Loading Auto: {f}" )
-                self.m_chooser.addOption( f, AutoBuilder.buildAuto( f ) )
+        self.pathPlanner.updatePathPlannerAutoList( self.m_chooser )
         wpilib.SmartDashboard.putData("Autonomous Mode", self.m_chooser)
 
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
         self.m_driver2 = commands2.button.CommandXboxController(1)
+        #self.operatorButtons = wpilib.Joystick(2)
 
         ## Driving
         self.m_driver1.a().whileTrue(
-            commands.DriveAimSpeaker(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
+            self.pathPlanner.getFlyCommand()
         )
+        # self.m_driver1.a().whileTrue(
+        #     commands.DriveAimSpeaker(
+        #         self.drivetrain,
+        #         self.m_driver1.getLeftY,
+        #         self.m_driver1.getLeftX
+        #     )
+        # )
         self.m_driver2.a().whileTrue(
             commands.DriveAimSpeaker(
                 self.drivetrain,
@@ -303,11 +294,6 @@ class RobotContainer:
                 self.launcher,
                 lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
             )
-            # commands2.ConditionalCommand(
-            #     commands.LauncherSpeaker( self.launcher ),
-            #     commands2.cmd.none(),
-            #     lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
-            # )
         )
 
         self.pivot.setDefaultCommand(
@@ -352,7 +338,7 @@ class RobotContainer:
                 commands2.cmd.run(
                     lambda: (
                         self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
-                        #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
+                        self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 1.0 ),
                         self.notifier.set( True ) # Visualization on Dashboard
                     )
                 ).withTimeout( rumbleTime )
@@ -362,7 +348,7 @@ class RobotContainer:
                 commands2.cmd.run(
                     lambda: (
                         self.m_driver1.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
-                        #self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
+                        self.m_driver2.getHID().setRumble( GenericHID.RumbleType.kBothRumble, 0.0 ),
                         self.notifier.set( False ) # Visualization on Dashboard
                     )
                 ).withTimeout( pulseDelay )
@@ -388,3 +374,4 @@ class RobotContainer:
         """
         ClimberResetSwitch( self.climber ).schedule()
         self.drivetrain.syncGyro()
+

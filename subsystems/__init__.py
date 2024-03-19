@@ -33,6 +33,7 @@ from .SwerveDrive.SwerveDrive import *
 from .SwerveDrive.SwerveModuleIO import *
 from .SwerveDrive.SwerveModuleIONeo import *
 from .SwerveDrive.SwerveModuleIOSim import *
+from .SwerveDrive.SwervePath import *
 from .Vision.Vision import *
 from .Vision.VisionCamera import *
 from .Vision.VisionCameraLimelight import *

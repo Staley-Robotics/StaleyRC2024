@@ -24,10 +24,6 @@ from wpimath.trajectory import TrapezoidProfileRadians
 from wpimath import units
 from ntcore import *
 
-from pathplannerlib.auto import AutoBuilder
-from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
-from pathplannerlib.controller import PPHolonomicDriveController
-
 # Our Imports
 from util import *
 from .SwerveModuleIO import SwerveModuleIO
@@ -128,31 +124,31 @@ class SwerveDrive(Subsystem):
         for i in range(len(modulePositions)):
             radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
 
-        AutoBuilder.configureHolonomic(
-            self.getPose, # Robot pose supplier
-            self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
-            self.getChassisSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            self.runChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                PIDConstants(
-                    self.pidX_kP.get(),
-                    self.pidX_kI.get(),
-                    self.pidX_kD.get()
-                ), # Translation PID constants
-                PIDConstants(
-                    self.pidT_kP.get(),
-                    self.pidT_kI.get(),
-                    self.pidT_kD.get()
-                ), # Rotation PID constants
-                self.maxVelocPhysical.get(), # Max module speed, in m/s
-                radius, # Drive base radius in meters. Distance from robot center to furthest module.
-                ReplanningConfig() # Default path replanning config. See the API for the options here
-            ),
-            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
-            self # Reference to this subsystem to set requirements
-        )
+        # AutoBuilder.configureHolonomic(
+        #     self.getPose, # Robot pose supplier
+        #     self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
+        #     self.getChassisSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        #     self.runChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        #     HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+        #         PIDConstants(
+        #             self.pidX_kP.get(),
+        #             self.pidX_kI.get(),
+        #             self.pidX_kD.get()
+        #         ), # Translation PID constants
+        #         PIDConstants(
+        #             self.pidT_kP.get(),
+        #             self.pidT_kI.get(),
+        #             self.pidT_kD.get()
+        #         ), # Rotation PID constants
+        #         self.maxVelocPhysical.get(), # Max module speed, in m/s
+        #         radius, # Drive base radius in meters. Distance from robot center to furthest module.
+        #         ReplanningConfig() # Default path replanning config. See the API for the options here
+        #     ),
+        #     self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+        #     self # Reference to this subsystem to set requirements
+        # )
 
-        #PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
+        # #PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
 
         # NT Publishing
         if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
@@ -220,10 +216,23 @@ class SwerveDrive(Subsystem):
         """
         self.gyro.simulationPeriodic( self.getRotationVelocity() )
 
+    def getRadius(self) -> float:
+        modulePositions = [
+            self.modules[0].getReferencePosition(),
+            self.modules[1].getReferencePosition(),
+            self.modules[2].getReferencePosition(),
+            self.modules[3].getReferencePosition()
+        ]
+        radius = 0.0
+        for i in range(len(modulePositions)):
+            radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
+        return radius
+
     def shouldFlipPath(self):
         """
         Should Path Planning Be Flipped
         """
+        return False
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
     def ppAutoTarget(self):
