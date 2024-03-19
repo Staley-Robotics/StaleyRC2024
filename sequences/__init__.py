@@ -5,6 +5,7 @@ from .DemoSwerveDriveTimedPath import *
 from .EjectAll import *
 from .Handoff import *
 from .Launch import *
+from .LauncherDefault import *
 from .NoteAction import *
 from .NoteLaunchAmp import *
 from .NoteLaunchSpeaker import *

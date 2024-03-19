@@ -69,9 +69,9 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         velocDegPerSec = units.radiansToDegrees( velocity )
         velocDegPer20ms = velocDegPerSec * 0.02 # Rio Loop Cycle
         self.getSimCollection().addHeading( velocDegPer20ms )
-        newYaw = self.getYaw()
-        if newYaw < 0: 
-            self.getSimCollection().setRawHeading( newYaw + 360 )
-        elif newYaw >= 360.0: 
-            self.getSimCollection().setRawHeading( newYaw - 360 )
+        #newYaw = self.getYaw()
+        while self.getYaw() < 0:
+            self.getSimCollection().setRawHeading( self.getYaw() + 360 )
+        while self.getYaw() >= 360.0: 
+            self.getSimCollection().setRawHeading( self.getYaw() - 360 )
 

@@ -106,12 +106,20 @@ class RobotContainer:
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
 
         # Register Pathplanner Commands
-        NamedCommands.registerCommand("AutoPivot",
-                                      PivotAim(self.pivot, self.launchCalc)) 
-        NamedCommands.registerCommand("AutoLaunch",
-                                      NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
-        NamedCommands.registerCommand("AutoPickup",
-                                      NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator)) 
+        if not RobotBase.isSimulation():
+            NamedCommands.registerCommand("AutoPivot",
+                                        PivotAim(self.pivot, self.launchCalc)) 
+            NamedCommands.registerCommand("AutoLaunch",
+                                        NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.elevator, self.drivetrain.getPose)) 
+            NamedCommands.registerCommand("AutoPickup",
+                                        NoteLoadGround(self.intake, self.feeder, self.pivot, self.elevator))
+        else:
+            NamedCommands.registerCommand("AutoPivot",
+                                        commands.cmd.waitSeconds( 0.50 ))
+            NamedCommands.registerCommand("AutoLaunch",
+                                        commands.cmd.waitSeconds( 0.50 ))
+            NamedCommands.registerCommand("AutoPickup",
+                                        commands.cmd.waitSeconds( 0.50 ))
 
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
@@ -291,11 +299,15 @@ class RobotContainer:
         )
 
         self.launcher.setDefaultCommand(
-            commands2.ConditionalCommand(
-                commands.LauncherSpeaker( self.launcher ),
-                commands2.cmd.none(),
+            sequences.LauncherDefault(
+                self.launcher,
                 lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
             )
+            # commands2.ConditionalCommand(
+            #     commands.LauncherSpeaker( self.launcher ),
+            #     commands2.cmd.none(),
+            #     lambda: self.feeder.hasNote() and self.drivetrain.getPose().X() < 4.0
+            # )
         )
 
         self.pivot.setDefaultCommand(
