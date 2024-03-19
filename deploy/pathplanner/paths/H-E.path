@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 8.15,
+        "x": 7.852205533280115,
         "y": 5.78
       },
       "prevControl": {
-        "x": 7.52032749623535,
+        "x": 7.222533029515464,
         "y": 5.775746537542182
       },
       "nextControl": null,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "MID Between",
+  "folder": "Center Zone",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

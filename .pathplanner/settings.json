@@ -4,11 +4,11 @@
   "holonomicMode": true,
   "pathFolders": [
     "AMP",
-    "HOME Between",
-    "Locale Between",
-    "MID Between",
+    "Home Zone",
+    "Zone Transfer",
+    "Center Zone",
     "Red",
-    "ToFrom Shoot"
+    "Shooting Zones"
   ],
   "autoFolders": [],
   "defaultMaxVel": 4.25,
