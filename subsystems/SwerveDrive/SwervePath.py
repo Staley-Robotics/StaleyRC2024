@@ -48,6 +48,7 @@ class SwervePath:
             NamedCommands.registerCommand( key, commandDict[key] )
 
     def getPathPlannerFlipPath(self):
+        # return False
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
     def getPathPlannerTarget(self):
@@ -76,44 +77,44 @@ class SwervePath:
                 chooser.addOption( f, AutoBuilder.buildAuto( f ) )
 
     def getFlyCommand(self) -> commands2.Command:
-        def determineFlyPath():
-            if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
-                alliance = "Blue"
-                side = "Left" if self.drivetrain.getPose().Y() > 4.25 else "Right"
-                state = "Launch" if self.indexer.hasNote() else "Pickup"
-                return f"{alliance}Fly{side}{state}"
-            elif DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-                alliance = "Red"
-                side = "Right" if self.drivetrain.getPose().Y() > 4.25 else "Left"
-                state = "Launch" if True else "Pickup" #self.indexer.hasNote() else "Pickup"
-                return f"{alliance}Fly{side}{state}"
-            else:
-                return f"NoFly"
+        return FlyCommand( self.drivetrain, self.indexer )
+    
+class FlyCommand(commands2.SelectCommand):
+    def __init__(self, drivetrain:SwerveDrive, indexer:Indexer):
+        self.drivetrain = drivetrain
+        self.indexer = indexer
 
         # Paths
-        blueFlyLeftPickup = PathPlannerPath.fromPathFile( "Fly-BL-Pickup" )
-        blueFlyLeftLaunch = PathPlannerPath.fromPathFile( "Fly-BL-Launch" )
-        blueFlyRightPickup = PathPlannerPath.fromPathFile( "Fly-BR-Pickup" )
-        blueFlyRightLaunch = PathPlannerPath.fromPathFile( "Fly-BR-Launch" )
-        redFlyLeftPickup = PathPlannerPath.fromPathFile( "Fly-RL-Pickup" )
-        redFlyLeftLaunch = PathPlannerPath.fromPathFile( "Fly-RL-Launch" )
-        redFlyRightPickup = PathPlannerPath.fromPathFile( "Fly-RR-Pickup" )
-        redFlyRightLaunch = PathPlannerPath.fromPathFile( "Fly-RR-Launch" )
-        
-        # Build Command
-        myCmd = commands2.SelectCommand(
+        ampPickup = PathPlannerPath.fromPathFile( "Fly-AmpPickup" )
+        ampLaunch = PathPlannerPath.fromPathFile( "Fly-AmpLaunch" )
+        sourcePickup = PathPlannerPath.fromPathFile( "Fly-SourcePickup" )
+        sourceLaunch = PathPlannerPath.fromPathFile( "Fly-SourceLaunch" )
+
+        super().__init__(
             commands={
-                "BlueFlyLeftPickup": AutoBuilder.followPath( blueFlyLeftPickup ),
-                "BlueFlyLeftLaunch": AutoBuilder.followPath( blueFlyLeftLaunch ),
-                "BlueFlyRightPickup": AutoBuilder.followPath( blueFlyRightPickup ),
-                "BlueFlyRightLaunch": AutoBuilder.followPath( blueFlyRightLaunch ),
-                "RedFlyLeftPickup": AutoBuilder.followPath( redFlyLeftPickup ),
-                "RedFlyLeftLaunch": AutoBuilder.followPath( redFlyLeftLaunch ),
-                "RedFlyRightPickup": AutoBuilder.followPath( redFlyRightPickup ),
-                "RedFlyRightLaunch": AutoBuilder.followPath( redFlyRightLaunch ),
+                "AmpPickup": AutoBuilder.followPath( ampPickup ).withName("AmpSidePickup"),
+                "AmpLaunch": AutoBuilder.followPath( ampLaunch ).withName("AmpSideLaunch"),
+                "SourcePickup": AutoBuilder.followPath( sourcePickup ).withName("SourceSidePickup"),
+                "SourceLaunch": AutoBuilder.followPath( sourceLaunch ).withName("SourceSideLaunch"),
                 "NoFly": commands2.cmd.none()
             },
-            selector=determineFlyPath
+            selector=self.determineFlyPath
         )
-        myCmd = myCmd.withName( "Fly!" )
-        return myCmd
+
+    def initialize(self):
+        super().initialize()
+        self.setName( f"Fly-{self._selectedCommand.getName()}" )
+
+    def determineFlyPath(self):
+        isBlue = DriverStation.getAlliance() == DriverStation.Alliance.kBlue
+        isRed = DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        isLeft = self.drivetrain.getPose().Y() > 4.14
+        isRight = not isLeft
+        isAmp = (isBlue and isLeft) or (isRed and isRight)
+
+        if isBlue or isRed:
+            side = "Amp" if isAmp else "Source"
+            state = "Launch" if self.indexer.hasNote() else "Pickup"
+            return f"{side}{state}"
+        else:
+            return "NoFly"
