@@ -1,0 +1,121 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R-C"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C-B"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B-A"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A-D"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "D-Q"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Q-E"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-Q"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fancy Business",
+  "choreoAuto": false
+}

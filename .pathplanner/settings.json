@@ -4,13 +4,18 @@
   "holonomicMode": true,
   "pathFolders": [
     "AMP",
-    "Home Zone",
-    "Zone Transfer",
     "Center Zone",
+    "Home Zone",
+    "Self Contained Starting Zones",
     "Red",
-    "Shooting Zones"
+    "Shooting Zones",
+    "Zone Transfer"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "2 Noter",
+    "3 Noter",
+    "Fancy Business"
+  ],
   "defaultMaxVel": 4.25,
   "defaultMaxAccel": 2.125,
   "defaultMaxAngVel": 360.0,

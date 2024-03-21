@@ -1,0 +1,109 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R-H"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoToss"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "H-G"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoToss"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "G-F"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoToss"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-E"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoToss"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-D"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoToss"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fancy Business",
+  "choreoAuto": false
+}
