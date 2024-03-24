@@ -6,15 +6,10 @@ from util import *
 from subsystems import Intake, Indexer, Pivot
 
 class NoteToss(commands2.SequentialCommandGroup):
-    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator):
+    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot):
         super().__init__()
         self.setName( "NoteToss" )
 
-        self.addCommands(
-            commands2.ParallelCommandGroup(
-                ElevatorAmp(elevator)
-            )
-        )
         self.addCommands(
             PivotToss(pivot),
         )

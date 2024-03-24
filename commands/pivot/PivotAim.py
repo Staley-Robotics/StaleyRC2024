@@ -13,12 +13,12 @@ from util import *
 class PivotAim(Command):
     def __init__( self,
                   pivot:Pivot,
-                  launchCalc:LaunchCalc
+                  getAngle:typing.Callable[[],float] = lambda: 0.0
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
         self.pivot = pivot
-        self.launchCalc = launchCalc
+        self.getAngle = getAngle
 
         self.setName( "PivotAim" )
         self.addRequirements( pivot )
@@ -26,7 +26,7 @@ class PivotAim(Command):
     def initialize(self) -> None: pass
 
     def execute(self) -> None:
-        self.pivot.set( self.launchCalc.getLaunchAngle() )
+        self.pivot.set( self.getAngle() )
 
     def end(self, interrupted:bool) -> None:
         pass

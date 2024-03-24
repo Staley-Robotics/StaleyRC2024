@@ -15,7 +15,7 @@ def scandir( dir, recursionText="" ) -> str:
      
     return text
 
-for p in [ 'autonomous', 'commands', 'sequences', 'subsystems', 'util' ]:
+for p in [ 'commands', 'sequences', 'subsystems', 'util' ]:
     dir = Path( p )
     text = scandir( dir )
     (dir / '__init__.py').write_text( text )

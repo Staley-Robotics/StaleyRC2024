@@ -1,4 +1,5 @@
 from commands2 import Command
+from wpimath import applyDeadband
 
 from subsystems import Climber
 from util import *
@@ -24,7 +25,9 @@ class ClimbBySticks(Command):
         pass
 
     def execute(self) -> None:
-        self.climber.set(self.leftStick(), self.rightStick())
+        lStick = applyDeadband( self.leftStick(), 0.05 )
+        rStick = applyDeadband( self.rightStick(), 0.05 )
+        self.climber.set( lStick, rStick )
 
     def end(self, interrupted:bool) -> None:
         pass

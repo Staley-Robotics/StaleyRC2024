@@ -45,6 +45,9 @@ class LaunchCalc(Subsystem):
     def getLaunchAngle(self) -> float:
         return self.launchAngleAdj
 
+    def getDistance(self) -> float:
+        return self.distance
+
     def setPoseFunc(self):
         pass
 

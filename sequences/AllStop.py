@@ -1,18 +1,17 @@
 import commands2
 
-from subsystems import Intake, Indexer, Launcher, Pivot, Elevator
+from subsystems import Intake, Indexer, Launcher, Pivot
 
 class AllStop(commands2.Command):
-    def __init__(self, intake:Intake, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator):
+    def __init__(self, intake:Intake, indexer:Indexer, launcher:Launcher, pivot:Pivot):
         super().__init__()
 
         self.intake = intake
         self.indexer = indexer
         self.launcher = launcher
         self.pivot = pivot
-        self.elevator = elevator
 
-        self.addRequirements( intake, indexer, launcher, pivot, elevator )
+        self.addRequirements( intake, indexer, launcher, pivot )
         self.setName( "AllStop!" )
 
     def initialize(self):
@@ -20,6 +19,5 @@ class AllStop(commands2.Command):
         self.indexer.stop()
         self.launcher.stop()
         self.pivot.stop()
-        self.elevator.stop()
 
     def isFinished(self): return True
