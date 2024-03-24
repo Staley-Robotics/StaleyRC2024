@@ -124,42 +124,7 @@ class SwerveDrive(Subsystem):
         for i in range(len(modulePositions)):
             radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
 
-        # AutoBuilder.configureHolonomic(
-        #     self.getPose, # Robot pose supplier
-        #     self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
-        #     self.getChassisSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        #     self.runChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        #     HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-        #         PIDConstants(
-        #             self.pidX_kP.get(),
-        #             self.pidX_kI.get(),
-        #             self.pidX_kD.get()
-        #         ), # Translation PID constants
-        #         PIDConstants(
-        #             self.pidT_kP.get(),
-        #             self.pidT_kI.get(),
-        #             self.pidT_kD.get()
-        #         ), # Rotation PID constants
-        #         self.maxVelocPhysical.get(), # Max module speed, in m/s
-        #         radius, # Drive base radius in meters. Distance from robot center to furthest module.
-        #         ReplanningConfig() # Default path replanning config. See the API for the options here
-        #     ),
-        #     self.shouldFlipPath, # Supplier to control path flipping based on alliance color
-        #     self # Reference to this subsystem to set requirements
-        # )
-
-        # #PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
-
         # NT Publishing
-        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
-            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleInputs" ):        
-            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleInputs", SwerveModuleIO.SwerveModuleIOInputs ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( SwerveModuleIO.SwerveModuleIOInputs() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-
         self.ntGyroInputs = NetworkTableInstance.getDefault().getStructTopic( "/SwerveDrive/Gyro", GyroIO.GyroIOInputs ).publish()
         self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModuleIO.SwerveModuleIOInputs ).publish()
 
@@ -227,24 +192,6 @@ class SwerveDrive(Subsystem):
         for i in range(len(modulePositions)):
             radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
         return radius
-
-    def shouldFlipPath(self):
-        """
-        Should Path Planning Be Flipped
-        """
-        return False
-        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
-
-    def ppAutoTarget(self):
-        target = -1
-        # target = -1 -> None
-        # target = 0 -> Speaker
-        # target = 1 -> Amp
-        # target = 2 -> Source
-        # target = 3 -> Stage Left
-        # target = 4 -> Stage Center
-        # target = 5 -> Stage Right
-        return None
 
     def syncGyro(self) -> None:
         print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
