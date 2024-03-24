@@ -96,13 +96,13 @@ class RobotContainer:
 
         # Link IO Systems to Subsystems
         self.drivetrain:SwerveDrive = SwerveDrive( ssModulesIO, ssGyroIO )
+        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
         self.intake:Intake = Intake( ssIntakeIO )
         self.feeder:Indexer = Indexer( ssIndexerIO )
-        self.launcher:Launcher = Launcher( ssLauncherIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
-        self.vision = Vision( ssCamerasIO, self.drivetrain.getOdometry )
-        self.led = LED( ssLedIO )
+        self.launcher:Launcher = Launcher( ssLauncherIO )
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
+        self.led = LED( ssLedIO )
 
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
 
@@ -114,14 +114,14 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
         wpilib.SmartDashboard.putData( "Indexer", self.feeder )
-        wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
-        wpilib.SmartDashboard.putData( "LED", self.led )
+        wpilib.SmartDashboard.putData( "Launcher", self.launcher )
         wpilib.SmartDashboard.putData( "Climber", self.climber )
+        wpilib.SmartDashboard.putData( "LED", self.led )
 
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Sync Gyro to Pose", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Set Gyro Offset", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
 
         wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
         #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
@@ -361,4 +361,5 @@ class RobotContainer:
         Adds the calibration commands to the Command Scheduler
         """
         self.drivetrain.syncGyro()
+        pass
 

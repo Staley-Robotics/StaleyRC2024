@@ -13,6 +13,9 @@ from util.LoggedConsole import *
 from util.LoggedSystemStats import *
 
 class MyRobot(wpilib.TimedRobot):
+    calibrationTimer = wpilib.Timer()
+    calibrated = False
+
     def robotInit(self):
         # Start Logging using the built in DataLogManager
         logDir = '/U/logs' if wpilib.RobotBase.isReal() else '.logs'
@@ -51,9 +54,11 @@ class MyRobot(wpilib.TimedRobot):
         commands2.CommandScheduler.getInstance().run()
 
     def autonomousInit(self):
-        self.m_robotContainer.runCalibration()
+        if not self.calibrated:
+            self.m_robotContainer.runCalibration()
+            self.calibrated = True
+        
         self.m_autonomousCommand:commands2.Command = self.m_robotContainer.getAutonomousCommand()
-
         if self.m_autonomousCommand != None:
             self.m_autonomousCommand.schedule()
 
@@ -63,7 +68,9 @@ class MyRobot(wpilib.TimedRobot):
             self.m_autonomousCommand.cancel()
 
     def teleopInit(self):
-        self.m_robotContainer.runCalibration()
+        if not self.calibrated:
+            self.m_robotContainer.runCalibration()
+            self.calibrated = True
         
     def teleopPeriodic(self): pass
     def teleopExit(self): pass
@@ -72,8 +79,16 @@ class MyRobot(wpilib.TimedRobot):
     def testPeriodic(self): pass
     def testExit(self): pass
 
-    def disabledInit(self): pass
-    def disabledPeriodic(self): pass
+    def disabledInit(self): 
+        self.calibrationTimer.reset()
+        self.calibrationTimer.start()
+
+    def disabledPeriodic(self):
+        if self.calibrationTimer.hasElapsed( 15.0 ):
+            self.calibrationTimer.stop()
+            self.m_robotContainer.runCalibration()
+            self.calibrated = True
+
     def disabledExit(self): pass
 
     def _simulationInit(self): pass

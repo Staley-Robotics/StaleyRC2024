@@ -102,9 +102,10 @@ class SwerveDrive(Subsystem):
             self.getKinematics(),
             self.gyro.getRotation2d(),
             self.getModulePositions(),
-            Pose2d(Translation2d(0,0), Rotation2d(0))
+            Pose2d(Translation2d(1.5,3.5), Rotation2d(0).fromDegrees(45))
         )
         self.odometry.setVisionMeasurementStdDevs([1.5, 1.5, 1.5])
+        self.gyroOffset = 0.0
 
         # PID Controllers for Drive Motion
         self.hPid:HolonomicDriveController = None
@@ -132,6 +133,9 @@ class SwerveDrive(Subsystem):
         self.ntChassisSpeedsFieldNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Field/Next", ChassisSpeeds ).publish()
         self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Current", SwerveModuleState ).publish( PubSubOptions() )
         self.ntSwerveModuleStatesNext = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Next", SwerveModuleState ).publish()
+
+        self.ntRobotGyroOffset = NetworkTableInstance.getDefault().getTable( "/Logging/Odometry" )
+        self.ntRobotGyroOffset.putNumber( "GyroOffset", self.gyroOffset )
 
     def periodic(self):
         """
@@ -191,24 +195,20 @@ class SwerveDrive(Subsystem):
         return radius
 
     def syncGyro(self) -> None:
-        print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
-        self.gyro.setYaw( pose.rotation().degrees() )
-        self.odometry.resetPosition(
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            pose
-        )
-        print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
-
+        self.resetOdometry( pose )
+        
     def resetOdometry(self, pose:Pose2d = Pose2d( Translation2d(0, 0), Rotation2d(0) ) ) -> None:
-        self.gyro.setYaw( pose.rotation().degrees() )
+        #poseDeg = pose.rotation().degrees()
+        offset = pose.rotation() - self.gyro.getRotation2d()
+        self.gyroOffset = offset.degrees()
+        self.ntRobotGyroOffset.putNumber( "GyroOffset", self.gyroOffset )
+        
         self.odometry.resetPosition(
             self.gyro.getRotation2d(),
             self.getModulePositions(),
             pose
         )
-        pass
 
     def getKinematics(self) -> SwerveDrive4Kinematics:
         """
@@ -289,7 +289,7 @@ class SwerveDrive(Subsystem):
 
     def getPose(self) -> Pose2d:
         """
-        Get the Current Pose from the Odometry data of this SwerveDrive
+        Get the Current Pose relative to current alliance from the Odometry data of this SwerveDrive
         
         :returns: Pose2d
         """
@@ -301,7 +301,8 @@ class SwerveDrive(Subsystem):
 
         :returns: Rotation2d
         """
-        return self.gyro.getRotation2d()
+        #return self.getOdometry().getEstimatedPosition().rotation()
+        return self.gyro.getRotation2d().rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
 
     def getRotationVelocity(self, fieldRelative:bool = False) -> float:
         """
