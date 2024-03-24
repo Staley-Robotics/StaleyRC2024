@@ -38,8 +38,8 @@ class VisionCameraLimelight(VisionCamera):
         ### No code yet
 
         # Timer for Disconnected Status
-        self.disconnectedTimer = Timer()
-        self.disconnectedTimer.start()
+        #self.disconnectedTimer = Timer()
+        #self.disconnectedTimer.start()
 
     def updateInputs(self, inputs:VisionCamera.VisionCameraInputs):
         """

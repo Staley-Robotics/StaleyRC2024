@@ -51,11 +51,6 @@ class Vision(Subsystem):
 
         # NT Logging
         ntInst = NetworkTableInstance.getDefault()
-        if not ntInst.hasSchema( "VisionCameraInputs" ):        
-            self.ntSwerveModuleStatesCurrent = ntInst.getStructTopic( "/StartSchema/VisionCameraInputs", VisionCamera.VisionCameraInputs ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( VisionCamera.VisionCameraInputs() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-
         self.ntCameraInputs:typing.Tuple[StructPublisher] = []
         for x in range(len(self.cameras)):
             self.ntCameraInputs.append( ntInst.getStructTopic( f"/Vision/{self.cameras[x].name}", VisionCamera.VisionCameraInputs ).publish() )

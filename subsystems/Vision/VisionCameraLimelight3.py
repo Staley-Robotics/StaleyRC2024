@@ -33,14 +33,15 @@ class VisionCameraLimelight3(VisionCamera):
         """
         self.name = name
         self.table:NetworkTable = NetworkTableInstance.getDefault().getTable( name )
-        self.sub = self.table.getSubTable( "abc" ).getDoubleArrayTopic("").subscribe()
+        self.wpiblue = self.table.getDoubleArrayTopic("botpose_wpiblue").subscribe()
+        self.wpired = self.table.getDoubleArrayTopic("botpose_wpired").subscribe()
         
         # Push Configuration to Limelight Here
         ### No code yet
 
         # Timer for Disconnected Status
-        self.disconnectedTimer = Timer()
-        self.disconnectedTimer.start()
+        # self.disconnectedTimer = Timer()
+        # self.disconnectedTimer.start()
 
     def updateInputs(self, inputs:VisionCamera.VisionCameraInputs):
         """
