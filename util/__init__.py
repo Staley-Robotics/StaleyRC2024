@@ -10,5 +10,4 @@ from .NTTunableFloat import *
 from .NTTunableFloatArray import *
 from .NTTunableInt import *
 from .NTTunableString import *
-from .Swerve4ControllerCommand import *
 from .VirtualSubsystem import *

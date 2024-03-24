@@ -53,16 +53,10 @@ class SwerveModuleIONeo(SwerveModuleIO):
 
         ### Tunable Variables
         # Physical Neo Specific Drive Motor PID Values
-        self.driveSmart = NTTunableBoolean( "SwerveModule/Drive/smartMotion", False )
-        self.drive_kSlotIdx = NTTunableInt( "SwerveModule/Drive/PID/kSlotIdx", 0, self.updateDrivePIDController )
-        self.drive_mmMaxVelocity = NTTunableInt( "SwerveModule/Drive/PID/smartVelocity", 20480, self.updateDrivePIDController )
-        self.drive_mmMaxAcceleration = NTTunableInt( "SwerveModule/Drive/PID/smartAccel", 4 * self.drive_mmMaxVelocity.get(), self.updateDrivePIDController )
+        self.drive_kSlotIdx = NTTunableInt( "SwerveModule/DrivePID/kSlotIdx", 0, self.updateDrivePIDController, persistent=True )
 
         # Turn Motor PID Values
-        self.turnSmart = NTTunableBoolean( "SwerveModule/Turn/smartMotion", False )
-        self.turn_kSlotIdx = NTTunableInt( "SwerveModule/Turn/PID/kSlotIdx", 0, self.updateTurnPIDController )
-        self.turn_mmMaxVelocity = NTTunableInt( "SwerveModule/Turn/PID/smartVelocity", 2048, self.updateTurnPIDController )
-        self.turn_mmMaxAcceleration = NTTunableInt( "SwerveModule/Turn/PID/smartAccel", 2 * self.turn_mmMaxVelocity.get(), self.updateTurnPIDController )
+        self.turn_kSlotIdx = NTTunableInt( "SwerveModule/TurnPID/kSlotIdx", 0, self.updateTurnPIDController, persistent=True )
 
         ### Turn Sensor
         self.turnSensor = WPI_CANCoder( sensorId, "canivore1" )

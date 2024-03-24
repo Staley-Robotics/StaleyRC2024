@@ -66,22 +66,19 @@ class SwerveDrive(Subsystem):
 
         self.maxAngVelocPhysical = NTTunableFloat( "SwerveDrive/AngularVelocity/Physical", 2 * math.pi, persistent=True )
         self.maxAngVelocDriver = NTTunableFloat( "SwerveDrive/AngularVelocity/Driver", 2 * math.pi, persistent=True )
-        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, persistent=True )
+        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, self.updateHolonomicDriveController, persistent=True )
 
-        self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
-        self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-
-        self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController )
-        self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController )
-        self.pidX_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kD", 0, self.updateHolonomicDriveController )
-        self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController )
-        self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController )
-        self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController )
-        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController )
-        self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController )
-        self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController )
-        self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController )
-        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController )
+        self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidX_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController, persistent=True )
 
         # Gyro and Modules
         self.gyro = gyro
@@ -250,8 +247,8 @@ class SwerveDrive(Subsystem):
             self.pidT_kI.get(),
             self.pidT_kD.get(),
             TrapezoidProfileRadians.Constraints(
-                self.maxAngularVelocity.get(),
-                self.maxAngularVelocity.get() * 2
+                self.maxAngVelocCode.get(),
+                self.maxAngVelocCode.get() * 2
             )
         )
         theta.enableContinuousInput( -math.pi, math.pi )

@@ -38,20 +38,13 @@ class DriveByStick(Command):
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
         self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
-
-        self.srlV = NTTunableFloat( "/Config/Driver1/SrlVelocity", 3.0, self.updateSlewRateLimiterVelocity )
-        self.srlH = NTTunableFloat( "/Config/Driver1/SrlHolonomic", 3.0, self.updateSlewRateLimiterHolonomic )
-        self.srlR = NTTunableFloat( "/Config/Driver1/SrlRotation", 3.0, self.updateSlewRateLimiterRotation )
+        self.srl = NTTunableFloat( "/Config/Driver1/SlewRateLimiter", 3.0, self.updateSlewRateLimiter, persistent=True )
 
         self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
         self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
         self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
         self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", True, persistent=True )        
         
-        self.isAimingSpeaker = NTTunableBoolean( "/Driver1/isAimingSpeaker", False, persistent=False )
-        self.isAimingAmp = NTTunableBoolean( "/Driver1/isAimingAmp", False, persistent=False )
-        self.isAimingStage = NTTunableBoolean( "/Driver1/isAimingStage", False, persistent=False )
-
         # This Command Global Properties
         self.drive = swerveDrive
         self.vX = velocityX
@@ -61,20 +54,14 @@ class DriveByStick(Command):
         self.rO = rotate
 
         # Slew Rate Limiters
-        self.updateSlewRateLimiterVelocity()
-        self.updateSlewRateLimiterHolonomic()
-        self.updateSlewRateLimiterRotation()
+        self.updateSlewRateLimiter()
 
-    def updateSlewRateLimiterVelocity(self):
-        self.srl_vX = SlewRateLimiter( self.srlV.get() )
-        self.srl_vY = SlewRateLimiter( self.srlV.get() )
-
-    def updateSlewRateLimiterHolonomic(self):
-        self.srl_hX = SlewRateLimiter( self.srlH.get() )
-        self.srl_hY = SlewRateLimiter( self.srlH.get() )
-
-    def updateSlewRateLimiterRotation(self):
-        self.srl_rO = SlewRateLimiter( self.srlR.get() )
+    def updateSlewRateLimiter(self):
+        self.srl_vX = SlewRateLimiter( self.srl.get() )
+        self.srl_vY = SlewRateLimiter( self.srl.get() )
+        self.srl_hX = SlewRateLimiter( self.srl.get() )
+        self.srl_hY = SlewRateLimiter( self.srl.get() )
+        self.srl_rO = SlewRateLimiter( self.srl.get() )
 
     def initialize(self) -> None:
         # Holonomic PID

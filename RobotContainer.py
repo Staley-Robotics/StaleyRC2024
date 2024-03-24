@@ -24,11 +24,12 @@ class RobotContainer:
         Initialization
         """
         ### Tunable Variables
-        self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0 )
-        self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0 )
-        self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
+        self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0, persistent=True )
+        self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0, persistent=True )
         self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
-
+        
+        self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
+        
         # Create Subsystems
         # IO Systems
         ssModulesIO = None

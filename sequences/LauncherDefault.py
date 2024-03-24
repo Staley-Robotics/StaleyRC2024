@@ -13,7 +13,7 @@ class LauncherDefault(commands2.ConditionalCommand):
         super().__init__(
             LauncherSpeaker( launcher, getDistance ),
             commands2.cmd.none().withName("LauncherWait"),
-            hasNote()
+            hasNote
         )
 
     def initialize(self):

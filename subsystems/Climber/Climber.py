@@ -15,12 +15,14 @@ class Climber(Subsystem):
     def __init__(self, lClimber:ClimberIO, rClimber:ClimberIO):
         self.lClimber = lClimber
         self.lClimberInputs = lClimber.ClimberIOInputs()
-        self.lClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Left", ClimberIO.ClimberIOInputs ).publish()
-        self.lClimberMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Climber/Left" )
+        #self.lClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Left", ClimberIO.ClimberIOInputs ).publish()
 
         self.rClimber = rClimber
         self.rClimberInputs = rClimber.ClimberIOInputs()
-        self.rClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Right", ClimberIO.ClimberIOInputs ).publish()
+        #self.rClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Right", ClimberIO.ClimberIOInputs ).publish()
+
+        self.climberLogger = NetworkTableInstance.getDefault().getStructArrayTopic( "/Climber", ClimberIO.ClimberIOInputs ).publish()
+        self.lClimberMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Climber/Left" )
         self.rClimberMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Climber/Right" )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Climber", False, persistent=True )
@@ -28,10 +30,10 @@ class Climber(Subsystem):
     def periodic(self):
         # Logging
         self.lClimber.updateInputs( self.lClimberInputs )
-        self.lClimberLogger.set( self.lClimberInputs )
-
         self.rClimber.updateInputs( self.rClimberInputs )
-        self.rClimberLogger.set( self.rClimberInputs )
+        self.climberLogger.set( [self.lClimberInputs, self.rClimberInputs] )
+        # self.lClimberLogger.set( self.lClimberInputs )
+        # self.rClimberLogger.set( self.rClimberInputs )
         
         # Run Subsystem
         if DriverStation.isDisabled() or self.offline.get():

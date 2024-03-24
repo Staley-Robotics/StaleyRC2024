@@ -4,6 +4,7 @@
 
 # FRC Component Imports
 from commands2 import Command
+from wpilib import Timer
 
 # Our Imports
 from subsystems import Launcher

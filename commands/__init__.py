@@ -8,8 +8,6 @@ from .drive.DriveByStick import *
 from .drive.DriveDistance import *
 from .drive.DriveForTime import *
 from .drive.DriveLockdown import *
-from .drive.DrivePathPP import *
-from .drive.DrivePathWpiTraj import *
 from .drive.DriveSetup import *
 from .drive.DriveToPose import *
 from .indexer.IndexerDefault import *

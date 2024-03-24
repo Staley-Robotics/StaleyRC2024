@@ -32,8 +32,7 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         :param startYaw: Starting Yaw in Degrees once the Pigeon 2 is initialized.
         """
         # Initialize WPI_Pigeon2
-        gyroCanBus = NTTunableString( "/Config/SwerveDrive/Gyro/CanBus", "canivore1", persistent=False )
-        super().__init__( deviceNumber, gyroCanBus.get() )
+        super().__init__( deviceNumber, "canivore1" )
 
         # Configure Default / Start Settings
         self.configFactoryDefault()
