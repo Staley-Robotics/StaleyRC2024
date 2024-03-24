@@ -8,7 +8,7 @@ from util import *
 class ClimbByStickMono(ClimbBySticks):
     def __init__( self,
                   climber:Climber,
-                  stick:typing.Callable[[],None] = lambda: ( 0.0 ),
+                  stick:typing.Callable[[],float] = lambda: ( 0.0 ),
                 ):
         # CommandBase Initiation Configurations
         super().__init__(

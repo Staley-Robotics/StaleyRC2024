@@ -7,8 +7,8 @@ from util import *
 class ClimbBySticks(Command):
     def __init__( self,
                   climber:Climber,
-                  leftStick:typing.Callable[[],None] = lambda: ( 0.0 ),
-                  rightStick:typing.Callable[[],None] = lambda: ( 0.0 )
+                  leftStick:typing.Callable[[],float] = lambda: ( 0.0 ),
+                  rightStick:typing.Callable[[],float] = lambda: ( 0.0 )
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
@@ -24,7 +24,7 @@ class ClimbBySticks(Command):
         pass
 
     def execute(self) -> None:
-        self.climber.move(self.leftStick(), self.rightStick())
+        self.climber.set(self.leftStick(), self.rightStick())
 
     def end(self, interrupted:bool) -> None:
         pass

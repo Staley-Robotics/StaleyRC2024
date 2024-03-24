@@ -44,46 +44,28 @@ class Climber(Subsystem):
              self.rClimber.run()
 
         # Post Run Logging
-        self.lClimberMeasuredLogger.putNumber( "Measured", self.lClimber.getPosition() )
+        self.lClimberMeasuredLogger.putNumber( "Measured", self.lClimber.getRate() )
         self.lClimberMeasuredLogger.putNumber( "Setpoint", self.lClimber.getSetpoint() )
 
-        self.rClimberMeasuredLogger.putNumber( "Measured", self.lClimber.getPosition() )
+        self.rClimberMeasuredLogger.putNumber( "Measured", self.rClimber.getRate() )
         self.rClimberMeasuredLogger.putNumber( "Setpoint", self.rClimber.getSetpoint() )
 
-    def set(self, leftPosition:float, rightPosition:float, override:bool = False):
-        if not override:
-            leftPosition = min( max( leftPosition, Climber.ClimberPositions.Bottom.get() ), Climber.ClimberPositions.Top.get() )
-            rightPosition = min( max( rightPosition, Climber.ClimberPositions.Bottom.get() ), Climber.ClimberPositions.Top.get() )
-        
-        self.lClimber.setPosition( leftPosition )
-        self.rClimber.setPosition( rightPosition )
-
-    def move(self, leftRate:float, rightRate:float):
-        self.lClimber.movePosition( leftRate )
-        self.rClimber.movePosition( rightRate )
+    def set(self, leftRate:float, rightRate:float):        
+        self.lClimber.setRate( leftRate )
+        self.rClimber.setRate( rightRate )
 
     def stop(self):
-        lCurrentPos = self.lClimber.getPosition()
-        rCurrentPos = self.rClimber.getPosition()
-        self.set( lCurrentPos, rCurrentPos )
+        self.set( 0.0, 0.0 )
 
     def setBrake(self, brake:bool) -> None:
         self.lClimber.setBrake(brake)
         self.rClimber.setBrake(brake)
     
-    def getPosition(self) -> [float, float]:
-        return [ self.lClimber.getPosition(), self.rClimber.getPosition() ]
-
-    def atSetpoint(self, errorRange:float = 25.0) -> bool:
-        lStatus = self.lClimber.atSetpoint(errorRange)
-        rStatus = self.rClimber.atSetpoint(errorRange)
-        return ( lStatus and rStatus )
-
-    def reset(self) -> None:
-        self.lClimber.resetPosition( Climber.ClimberPositions.Bottom.get() )
-        self.rClimber.resetPosition( Climber.ClimberPositions.Bottom.get() )
-
+    def getRate(self) -> [float, float]:
+        return [ self.lClimber.getRate(), self.rClimber.getRate() ]
+    
+    def atTop(self) -> bool:
+        return self.lClimber.atTop() and self.rClimber.atTop()
+    
     def atBottom(self) -> bool:
-        lBottom = self.lClimber.atSetpoint()
-        rBottom = self.rClimber.atSetpoint()
-        return lBottom and rBottom
+        return self.lClimber.atBottom() and self.rClimber.atBottom()

@@ -13,7 +13,8 @@ class ClimberIO:
         motorTempCelcius: float = 0.0
         motorVelocity: float = 0.0
         motorPosition: float = 0.0
-        sensor: bool = True
+        sensorTop: bool = True
+        sensorBottom: bool = True
 
     def __init__(self):
         pass
@@ -27,24 +28,17 @@ class ClimberIO:
     def setBrake(self, brake:bool) -> None:
         pass
 
-    def setPosition(self, position:float) -> None:
+    def setRate(self, rate:float) -> None:
         pass
 
-    def movePosition(self, rate:float) -> None:
-        pass
-
-    def resetPosition(self, position:float) -> None:
-        pass
-
-    def getPosition(self) -> float:
+    def getRate(self) -> float:
         return 0.0
 
-    def atSetpoint(self, errorRange:float = 100.0) -> bool:
-        leftPos = self.getPosition()
-        leftSp = self.getSetpoint()
-        leftAtPos = abs( leftSp - leftPos ) < errorRange
-        return leftAtPos
-    
     def getSetpoint(self) -> float:
         return 0.0
     
+    def atTop(self) -> bool:
+        return False
+    
+    def atBottom(self) -> bool:
+        return False

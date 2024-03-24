@@ -109,7 +109,6 @@ class RobotContainer:
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
 
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
-        
 
         # Register Pathplanner Commands
         self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
@@ -372,6 +371,5 @@ class RobotContainer:
         """
         Adds the calibration commands to the Command Scheduler
         """
-        ClimberResetSwitch( self.climber ).schedule()
         self.drivetrain.syncGyro()
 
