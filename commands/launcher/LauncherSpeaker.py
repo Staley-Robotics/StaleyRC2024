@@ -27,7 +27,7 @@ class LauncherSpeaker(Command):
         self.timer.start()
 
     def execute(self) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeft.get(), Launcher.LauncherSpeeds.SpeakerRight.get())
+        self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftLow.get(), Launcher.LauncherSpeeds.SpeakerRightLow.get())
 
     def end(self, interrupted:bool) -> None:
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())

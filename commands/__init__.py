@@ -2,8 +2,6 @@ from .climber.ClimbByStickMono import *
 from .climber.ClimbBySticks import *
 from .climber.ClimberCollapse import *
 from .climber.ClimberExtend import *
-from .climber.ClimberReset import *
-from .climber.ClimberResetSwitch import *
 from .drive.DriveAimAmp import *
 from .drive.DriveAimSpeaker import *
 from .drive.DriveByStick import *
