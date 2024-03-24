@@ -5,7 +5,7 @@ from subsystems import Climber
 from util import *
 
 # Intake Load Command
-class ClimbBySticks(Command):
+class ClimberBySticks(Command):
     def __init__( self,
                   climber:Climber,
                   leftStick:typing.Callable[[],float] = lambda: ( 0.0 ),

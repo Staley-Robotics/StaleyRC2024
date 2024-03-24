@@ -1,11 +1,11 @@
 from commands2 import Command
 
 from subsystems import Climber
-from commands.climber.ClimbBySticks import ClimbBySticks
+from commands.climber.ClimberBySticks import ClimberBySticks
 from util import *
 
 # Intake Load Command
-class ClimbByStickMono(ClimbBySticks):
+class ClimberByStickMono(ClimberBySticks):
     def __init__( self,
                   climber:Climber,
                   stick:typing.Callable[[],float] = lambda: ( 0.0 ),

@@ -8,14 +8,6 @@ from util import *
 
 class ClimberIOTalon(ClimberIO):
     def __init__( self, motorId:int, topSensorId:int, bottomSensorId:int, invert:bool = False ):
-        # Tunable Settings
-        self.extendRate = NTTunableFloat('/Config/Climber/ExtendRate', 10.0, updater=self.resetPid, persistent=True)
-        self.climber_kP = NTTunableFloat('/Config/Climber/PID/kP', 1.0, updater=self.resetPid, persistent=True)
-        self.climber_kI = NTTunableFloat('/Config/Climber/PID/kI', 0.0, updater=self.resetPid, persistent=True)
-        self.climber_Iz = NTTunableFloat('/Config/Climber/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
-        self.climber_kD = NTTunableFloat('/Config/Climber/PID/kD', 0.0, updater=self.resetPid, persistent=True)
-        self.climber_kF = NTTunableFloat('/Config/Climber/PID/kFF', 0.0, updater=self.resetPid, persistent=True)
-
         # Static Variables
         self.actualRate = 0.0
         self.desiredRate = 0.0

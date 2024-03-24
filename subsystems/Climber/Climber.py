@@ -6,20 +6,18 @@ from util import *
 from .ClimberIO import ClimberIO
 
 class Climber(Subsystem):
-    class ClimberPositions:
-        Timer = NTTunableFloat( "/Config/ClimberPositions/Timer", 0.25, persistent=True )
-        Bottom = NTTunableFloat( "/Config/ClimberPositions/Bottom", 0.0, persistent=True )
-        Top = NTTunableFloat( "/Config/ClimberPositions/Top", 7000.0, persistent=True )
-        Reset = NTTunableFloat( "/Config/ClimberPositions/Reset", -5000.0, persistent=True )
+    # class ClimberPositions:
+    #     Timer = NTTunableFloat( "/Config/ClimberPositions/Timer", 0.25, persistent=True )
+    #     Bottom = NTTunableFloat( "/Config/ClimberPositions/Bottom", 0.0, persistent=True )
+    #     Top = NTTunableFloat( "/Config/ClimberPositions/Top", 7000.0, persistent=True )
+    #     Reset = NTTunableFloat( "/Config/ClimberPositions/Reset", -5000.0, persistent=True )
 
     def __init__(self, lClimber:ClimberIO, rClimber:ClimberIO):
         self.lClimber = lClimber
         self.lClimberInputs = lClimber.ClimberIOInputs()
-        #self.lClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Left", ClimberIO.ClimberIOInputs ).publish()
 
         self.rClimber = rClimber
         self.rClimberInputs = rClimber.ClimberIOInputs()
-        #self.rClimberLogger = NetworkTableInstance.getDefault().getStructTopic( "/Climber/Right", ClimberIO.ClimberIOInputs ).publish()
 
         self.climberLogger = NetworkTableInstance.getDefault().getStructArrayTopic( "/Climber", ClimberIO.ClimberIOInputs ).publish()
         self.lClimberMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Climber/Left" )
@@ -32,8 +30,6 @@ class Climber(Subsystem):
         self.lClimber.updateInputs( self.lClimberInputs )
         self.rClimber.updateInputs( self.rClimberInputs )
         self.climberLogger.set( [self.lClimberInputs, self.rClimberInputs] )
-        # self.lClimberLogger.set( self.lClimberInputs )
-        # self.rClimberLogger.set( self.rClimberInputs )
         
         # Run Subsystem
         if DriverStation.isDisabled() or self.offline.get():

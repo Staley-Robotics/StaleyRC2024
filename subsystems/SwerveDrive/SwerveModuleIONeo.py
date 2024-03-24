@@ -191,12 +191,6 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.driveMotorPid.setD( self.drive_kD.get(), slotIdx ) # TalonFX.config_kD()
         self.driveMotorPid.setFF( self.drive_kF.get(), slotIdx ) # TalonFX.config_kF()
 
-        # Drive Integrated PID - Motion Magic Properties
-        self.driveMotorPid.setSmartMotionMaxVelocity( self.drive_mmMaxVelocity.get(), slotIdx ) # TalonFX.configMotionCruiseVelocity()
-        self.driveMotorPid.setSmartMotionMaxAccel( self.drive_mmMaxAcceleration.get(), slotIdx ) # TalonFX.configMotionAcceleration
-        self.driveMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
-        self.driveMotorPid.setSmartMotionAllowedClosedLoopError( self.drive_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
-
     def updateTurnPIDController(self):
         """
         Update the PID Controller for the Turn Motor
@@ -210,12 +204,6 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turnMotorPid.setIZone( self.turn_kIZone.get(), slotIdx ) # TalonFX.config_IntegralZone()
         self.turnMotorPid.setD( self.turn_kD.get(), slotIdx ) # TalonFX.config_kD()
         self.turnMotorPid.setFF( self.turn_kF.get(), slotIdx ) # TalonFX.config_kF()
-
-        # Turn Integrated PID - Smart Motion Properties
-        self.turnMotorPid.setSmartMotionMaxVelocity( self.turn_mmMaxVelocity.get(), slotIdx ) # TalonFX.configMotionCruiseVelocity()
-        self.turnMotorPid.setSmartMotionMaxAccel( self.turn_mmMaxAcceleration.get(), slotIdx ) # TalonFX.configMotionAcceleration
-        self.turnMotorPid.setSmartMotionAccelStrategy( SparkMaxPIDController.AccelStrategy.kTrapezoidal, slotIdx ) # TalonFX.configMotionSCurveStrength
-        self.turnMotorPid.setSmartMotionAllowedClosedLoopError( self.turn_kError.get(), slotIdx ) #TalonFX.configAllowableClosedloopError()
 
     def setDriveVoltage(self, volts:float = 0.0) -> None:
         """

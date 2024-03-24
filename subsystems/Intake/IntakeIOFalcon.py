@@ -5,7 +5,7 @@ from .IntakeIO import IntakeIO
 from util import *
 
 class IntakeIOFalcon(IntakeIO):
-    def __init__(self, upperCanId:int, lowerCanId:int, sensorId:int ):
+    def __init__(self, upperCanId:int, lowerCanId:int, upperSensorId:int, lowerSensorId:int = -1 ):
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
         self.desiredVelocity = [ 0.0, 0.0 ]
@@ -25,7 +25,8 @@ class IntakeIOFalcon(IntakeIO):
         self.lowerMotor.setInverted( False )
 
         # IR sensor
-        self.irSensor = wpilib.DigitalInput(sensorId)
+        self.irSensor = wpilib.DigitalInput(upperSensorId)
+        self.lowerSensor = wpilib.DigitalInput(lowerSensorId)
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()
@@ -65,4 +66,7 @@ class IntakeIOFalcon(IntakeIO):
     def getSensorIsBroken(self) -> bool:
         #inverts bc i think backwards apparently
         return not self.irSensor.get()
+    
+    def foundNote(self) -> bool:
+        return not self.lowerSensor.get()
     

@@ -1,5 +1,5 @@
-from .climber.ClimbByStickMono import *
-from .climber.ClimbBySticks import *
+from .climber.ClimberByStickMono import *
+from .climber.ClimberBySticks import *
 from .climber.ClimberCollapse import *
 from .climber.ClimberExtend import *
 from .drive.DriveAimAmp import *

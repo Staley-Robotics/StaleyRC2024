@@ -17,7 +17,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = False
+    testing:bool = True
 
     def __init__(self):
         """
@@ -60,11 +60,6 @@ class RobotContainer:
             ssLedIO = LedIOSim( 9 )
             ssClimberIOLeft = ClimberIO()
             ssClimberIORight = ClimberIO()
-            ppCommands = {
-                "AutoPivot": commands2.cmd.waitSeconds( 0.50 ),
-                "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ),
-                "AutoPickup": commands2.cmd.waitSeconds( 0.50 )
-            }
         else:
             ssModulesIO = [
                 SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
@@ -73,18 +68,13 @@ class RobotContainer:
                 SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
             ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
-            ssIntakeIO = IntakeIOFalcon( 20, 21, 0 )
+            ssIntakeIO = IntakeIOFalcon( 20, 21, 0, 9 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
             ssLedIO = LedIO() #LedIOActual( 0 )
             ssClimberIOLeft = ClimberIOTalon( 27, 5, 6 )
             ssClimberIORight = ClimberIOTalon( 28, 7, 8, True )
-            ppCommands = {
-                "AutoPivot": PivotAim(self.pivot, self.launchCalc),
-                "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
-                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot)
-            }
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -107,6 +97,18 @@ class RobotContainer:
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
 
         # Register Pathplanner Commands
+        if wpilib.RobotBase.isSimulation() and not self.testing:
+            ppCommands = {
+                "AutoPivot": commands2.cmd.waitSeconds( 0.50 ),
+                "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ),
+                "AutoPickup": commands2.cmd.waitSeconds( 0.50 )
+            }
+        else:
+            ppCommands = {
+                "AutoPivot": PivotAim(self.pivot, self.launchCalc.getLaunchAngle),
+                "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
+                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot)
+            }
         self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
         self.pathPlanner.setNamedCommands( ppCommands )
 
@@ -137,7 +139,7 @@ class RobotContainer:
         # Configure Driver 1 Button Mappings
         self.m_driver1 = commands2.button.CommandXboxController(0)
         self.m_driver2 = commands2.button.CommandXboxController(1)
-        #self.operatorButtons = wpilib.Joystick(2)
+        self.station = wpilib.Joystick(2)
 
         ## Driving
         self.m_driver1.a().whileTrue(
@@ -258,10 +260,8 @@ class RobotContainer:
         # cTab.add( "PivotSource", PivotSource(self.pivot) ).withPosition(4, 4)
         # cTab.add( "IndexerSource", IndexerSource(self.feeder) ).withPosition(5, 4)
         # cTab.add( "LauncherSource", LauncherSource(self.launcher) ).withPosition(6, 4)
-        
-        # End Game Notifications
-        self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
-        self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
+
+        # Operator Station Toggles
 
         # Configure Default Commands
         self.drivetrain.setDefaultCommand(
@@ -274,35 +274,51 @@ class RobotContainer:
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
-
-        self.launcher.setDefaultCommand(
-            LauncherDefault(
-                self.launcher,
-                self.launchCalc.getDistance,
-                self.feeder.hasNote
+        self.intake.setDefaultCommand(
+            IntakeDefault(
+                self.intake,
+                self.feeder.hasNote,
+                self.pivot.atSetpoint,
+                useAutoStart = lambda: self.station.getRawButton(1)
             )
         )
-
         self.pivot.setDefaultCommand(
             PivotDefault(
                 self.pivot,
+                self.feeder.hasNote,
                 self.launchCalc.getLaunchAngle,
-                self.feeder.hasNote
+                self.m_driver2.getLeftY,
+                isTargetAmp = lambda: False,
+                isIntakeWaiting = lambda: self.intake.hasNote() or self.intake.getCurrentCommand() == None or self.intake.getCurrentCommand().getName() != "IntakeWait",
+                useAutoCalculate = lambda: self.station.getRawButton(2),
+                useManualAdjust = lambda: self.station.getRawButton(3)
             )
         )
-        
         self.feeder.setDefaultCommand(
             IndexerDefault(
                 self.feeder
             )
         )
-
-        self.climber.setDefaultCommand(
-            ClimbByStickMono(
-                self.climber,
-                self.m_driver2.getLeftY
+        self.launcher.setDefaultCommand(
+            LauncherDefault(
+                self.launcher,
+                self.launchCalc.getDistance,
+                self.feeder.hasNote,
+                isTargetAmp = lambda: False,
+                useAutoStart = lambda: self.station.getRawButton(4)
             )
         )
+        self.climber.setDefaultCommand(
+            ClimberDefault(
+                self.climber,
+                lambda: self.station.getRawAxis(1),
+                lambda: self.station.getRawButton(5)
+            )
+        )
+
+        # End Game Notifications
+        self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
+        self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
     
     def setEndgameNotification( self,
                                 getAlertTime:typing.Callable[[],float],
