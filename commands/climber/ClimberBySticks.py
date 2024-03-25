@@ -30,10 +30,12 @@ class ClimberBySticks(Command):
         self.climber.set( lStick, rStick )
 
     def end(self, interrupted:bool) -> None:
-        pass
+        self.climber.set( 0.0, 0.0 )
 
     def isFinished(self) -> bool:
-        return False
+        lStick = applyDeadband( self.leftStick(), 0.05 )
+        rStick = applyDeadband( self.rightStick(), 0.05 )
+        return lStick == 0.0 and rStick == 0.0
     
     def runsWhenDisabled(self) -> bool:
         return False

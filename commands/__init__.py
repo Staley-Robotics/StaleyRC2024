@@ -10,10 +10,10 @@ from .drive.DriveForTime import *
 from .drive.DriveLockdown import *
 from .drive.DriveSetup import *
 from .drive.DriveToPose import *
-from .indexer.IndexerDefault import *
 from .indexer.IndexerEject import *
 from .indexer.IndexerHandoff import *
 from .indexer.IndexerLaunch import *
+from .indexer.IndexerLoad import *
 from .indexer.IndexerRealign import *
 from .indexer.IndexerSource import *
 from .intake.IntakeEject import *

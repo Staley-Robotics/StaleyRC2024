@@ -20,5 +20,5 @@ class NoteLoadGround(commands2.SequentialCommandGroup):
             )
         )
         self.addCommands(
-            IndexerDefault( indexer )
+            IndexerLoad( indexer )
         )

@@ -296,7 +296,10 @@ class RobotContainer:
         )
         self.feeder.setDefaultCommand(
             IndexerDefault(
-                self.feeder
+                self.feeder,
+                self.intake.hasNote,
+                self.pivot.atSetpoint,
+                self.launchCalc.isAutoLaunchApproved
             )
         )
         self.launcher.setDefaultCommand(

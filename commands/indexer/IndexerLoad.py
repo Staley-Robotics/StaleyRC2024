@@ -10,7 +10,7 @@ from subsystems import Indexer
 from util import *
 
 # Intake Load Command
-class IndexerDefault(Command):
+class IndexerLoad(Command):
     def __init__( self,
                   indexer:Indexer
                 ):
@@ -18,7 +18,7 @@ class IndexerDefault(Command):
         super().__init__()
         self.indexer = indexer
 
-        self.setName( "IndexerDefault" )
+        self.setName( "IndexerLoad" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
