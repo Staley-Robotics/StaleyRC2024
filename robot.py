@@ -86,8 +86,9 @@ class MyRobot(wpilib.TimedRobot):
     def disabledPeriodic(self):
         if self.calibrationTimer.hasElapsed( 15.0 ):
             self.calibrationTimer.stop()
-            self.m_robotContainer.runCalibration()
-            self.calibrated = True
+            if not self.calibrated:
+                self.m_robotContainer.runCalibration()
+                self.calibrated = True
 
     def disabledExit(self): pass
 

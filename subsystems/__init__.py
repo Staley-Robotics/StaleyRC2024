@@ -32,5 +32,4 @@ from .SwerveDrive.SwerveModuleIOSim import *
 from .SwerveDrive.SwervePath import *
 from .Vision.Vision import *
 from .Vision.VisionCamera import *
-from .Vision.VisionCameraLimelight import *
 from .Vision.VisionCameraLimelight3 import *
