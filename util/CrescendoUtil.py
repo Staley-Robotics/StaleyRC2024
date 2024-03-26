@@ -1,7 +1,7 @@
 from wpilib import DriverStation
-from wpimath.geometry import *
+from wpimath.geometry import Translation2d
 
-from .NTTunableFloat import *
+from .NTTunableFloat import NTTunableFloat
 
 fieldWidth = NTTunableFloat( "Crescendo/FieldWidth", 8.31, persistent=True )
 speakerTargetX = NTTunableFloat( "Crescendo/Speaker/X", 0.00, persistent=True )

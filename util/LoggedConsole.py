@@ -2,7 +2,7 @@ import io
 import sys
 import typing
 
-import wpilib
+from wpilib import reportError
 from ntcore import NetworkTableInstance
 
 class LoggedConsole:
@@ -24,7 +24,7 @@ class LoggedConsoleRIO(LoggedConsole):
         try:
             self.reader = io.TextIOWrapper( io.FileIO(self.filePath, "r") )
         except FileNotFoundError as e:
-            wpilib.reportError( f"Failed to open console file {self.filePath}", True )
+            reportError( f"Failed to open console file {self.filePath}", True )
 
     def getNewData(self) -> str:
         if self.reader == None:
@@ -36,7 +36,7 @@ class LoggedConsoleRIO(LoggedConsole):
             for x in range(len(readlines)):
                 newData += readlines[x]
         except Exception as e:
-            wpilib.reportError( f"Failed to read from console file {self.filePath}", True )
+            reportError( f"Failed to read from console file {self.filePath}", True )
         
         return newData
 
