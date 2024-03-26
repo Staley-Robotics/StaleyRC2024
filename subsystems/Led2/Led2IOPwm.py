@@ -7,14 +7,14 @@ from .Led2IO import Led2IO
 class Led2IOPwm(Led2IO):
     def __init__(self, PWMPort:int):
         # Tunables
-        self.ledLength = NTTunableInt( "/Config/LED/Length", 22, updater=self.configureBuffer, persistent = True )
-        self.strobeDuration = NTTunableFloat( "/Config/LED/Default/Strobe", 0.5, persistent = True )
-        self.breatheDuration = NTTunableFloat( "/Config/LED/Default/Breathe", 1.0, persistent = True )
-        self.rainbowDuration = NTTunableFloat( "/Config/LED/Default/Rainbow", 1.0, persistent = True )
-        self.rainbowBrightness = NTTunableInt( "/Config/LED/Default/RainbowBrightness", 255, persistent = True )
-        self.waveDuration = NTTunableFloat( "/Config/LED/Default/Wave", 1.0, persistent = True )
-        self.stripesDuration = NTTunableFloat( "/Config/LED/Default/Stripes", 1.0, persistent = True )
-        self.waveExponent = NTTunableFloat( "/Config/LED/Default/WaveExponent", 0.4, persistent = True )
+        self.ledLength = NTTunableInt( "/Config/Led/Length", 22, updater=self.configureBuffer, persistent = True )
+        self.strobeDuration = NTTunableFloat( "/Config/Led/DefaultEffects/Strobe/Duration", 0.5, persistent = True )
+        self.breatheDuration = NTTunableFloat( "/Config/Led/DefaultEffects/Breathe/Duration", 1.0, persistent = True )
+        self.rainbowDuration = NTTunableFloat( "/Config/Led/DefaultEffects/Rainbow/Duration", 1.0, persistent = True )
+        self.rainbowBrightness = NTTunableInt( "/Config/Led/DefaultEffects/Rainbow/Brightness", 255, persistent = True )
+        self.waveDuration = NTTunableFloat( "/Config/Led/DefaultEffects/Wave/Duration", 1.0, persistent = True )
+        self.stripesDuration = NTTunableFloat( "/Config/Led/DefaultEffects/Stripes/Duration", 1.0, persistent = True )
+        self.waveExponent = NTTunableFloat( "/Config/Led/DefaultEffects/Wave/Exponent", 0.4, persistent = True )
 
         # Logging
         #self.ledLogger = NetworkTableInstance.getDefault().getStructTopic( "/LED", LedIO.LedIOInputs ).publish()
@@ -24,8 +24,7 @@ class Led2IOPwm(Led2IO):
         self.m_buffer = []
         self.configureBuffer()
 
-    def updateInputs(self, inputs:Led2IO.Led2IOInputs):
-        pass
+    def updateInputs(self, inputs:Led2IO.Led2IOInputs): pass
 
     def run(self):
         self.m_led.setData( self.m_buffer )
@@ -52,14 +51,13 @@ class Led2IOPwm(Led2IO):
             self.m_buffer[i].setLED( color )
     
     def strobe(self, colors:list[Color], duration:float=0.0):
-        if duration == 0.0: duration = self.strobeDuration.get()
+        # Input Validation
+        if duration <= 0.0: duration = self.strobeDuration.get()
         if len(colors) < 2:
             colors.append( Color.kBlack )
 
         i = int(Timer.getFPGATimestamp() % duration / duration * len(colors))
-        print( f"{Timer.getFPGATimestamp()} {Timer.getFPGATimestamp() % duration} {Timer.getFPGATimestamp() % duration / duration} {i}" )
         self.solid( colors[i] )
-        pass
 
     def breathe(self, c1:Color, c2:Color, duration:float=0.0 ):
         # Input Validation

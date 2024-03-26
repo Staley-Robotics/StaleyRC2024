@@ -1,18 +1,46 @@
 from commands2 import Subsystem
-from wpilib import Color, DriverStation, RobotState, RobotBase
+from wpilib import Color, DriverStation, RobotState, RobotBase, Timer
 
 from .Led2IO import Led2IO
-from util import NTTunableBoolean
+from util import NTTunableBoolean, NTTunableFloat
 
 class Led2(Subsystem):
     def __init__(self, led:Led2IO):
         # NT Tunables
-        self.offline = NTTunableBoolean( "/DisableSubsystem/LED", False, persistent=True )
+        self.offline = NTTunableBoolean( "/DisableSubsystem/Led", False, persistent=True )
+
+        self.strobeDurationFast = NTTunableFloat( "/Config/LedEffects/Strobe/FastDuration", 0.1, persistent=True )
+        self.strobeDurationSlow = NTTunableFloat( "/Config/LedEffects/Strobe/SlowDuration", 0.2, persistent=True )
+        self.strobeDurationEStop = NTTunableFloat( "/Config/LedEffects/Strobe/EStopDuration", 1.5, persistent=True )
+        
+        self.breatheDurationFast = NTTunableFloat( "/Config/LedEffects/Breathe/FastDuration", 0.75, persistent=True )
+        self.breatheDurationSlow = NTTunableFloat( "/Config/LedEffects/Breathe/SlowDuration", 1.50, persistent=True )
+        
+        self.rainbowCycleLength = NTTunableFloat( "/Config/LedEffects/Rainbow/CycleLength", 25.0, persistent=True )
+        self.rainbowDuration    = NTTunableFloat( "/Config/LedEffects/Rainbow/Duration", 0.25, persistent=True )
+        
+        self.waveCycleFast        = NTTunableFloat( "/Config/LedEffects/Wave/FastCycleLength", 25.0, persistent=True )
+        self.waveDurationFast     = NTTunableFloat( "/Config/LedEffects/Wave/FastDuration", 0.25, persistent=True )
+        self.waveCycleSlow        = NTTunableFloat( "/Config/LedEffects/Wave/SlowCycleLength", 25.0, persistent=True )
+        self.waveDurationSlow     = NTTunableFloat( "/Config/LedEffects/Wave/SlowDuration", 3.0, persistent=True )
+        self.waveCycleAlliance    = NTTunableFloat( "/Config/LedEffects/Wave/AllianceCycleLength", 15.0, persistent=True )
+        self.waveDurationAlliance = NTTunableFloat( "/Config/LedEffects/Wave/AllianceDuration", 2.0, persistent=True )
+        
+        self.stripesDurationFast = NTTunableFloat( "/Config/LedEffects/Stripes/FastDuration", 2.0, persistent=True )
+        self.stripesDurationSlow = NTTunableFloat( "/Config/LedEffects/Stripes/SlowDuration", 5.0, persistent=True )
+
+        self.autoFadeTime    = NTTunableFloat( "/Config/LedEffects/AutoFade/Time", 2.5, persistent=True )
+        self.autoFadeMaxTime = NTTunableFloat( "/Config/LedEffects/AutoFade/MaxTime", 5.0, persistent=True )
 
         # Global Variables
         self.led = led
         self.allianceColor = Color.kBlack
         self.allianceColorDark = Color.kBlack
+        self.manualButton = False
+        
+        # Color Sets
+        self.staleyColors = [Color.kDarkGreen, Color.kSilver, Color.kGreen, Color.kWhite]
+        self.distractionColors = [Color.kWhite, Color.kBlack, Color.kHotPink, Color.kBlack]
 
     def periodic(self):
         # Logger
@@ -23,8 +51,8 @@ class Led2(Subsystem):
         # Offline State
         if self.offline.get():
             self.led.solid( Color.kBlack )
-        else:
-            self.determineState()
+        elif self.getCurrentCommand() == None:
+            self.runAutomatedState()
 
         # Run LEDs
         self.led.run()
@@ -41,16 +69,29 @@ class Led2(Subsystem):
                 self.allianceColor = Color.kLightYellow
                 self.allianceColorDark = Color.kYellow
 
-    def determineState(self):
+    def runAutomatedState(self):
         # Determine State
         if RobotState.isEStopped():
-            self.led.strobe( [Color.kDarkRed], 0.5 )
+            self.led.strobe( [Color.kDarkRed], self.strobeDurationEStop.get() )
         elif RobotState.isDisabled():
-            self.led.solid( self.allianceColor )
+            self.led.wave( self.allianceColor, self.allianceColorDark, self.waveCycleAlliance.get(), self.waveDurationAlliance.get() )
         elif RobotState.isAutonomous():
-            self.led.wave( self.allianceColor, self.allianceColorDark, 20.0, 1.0 )
+            self.led.wave( self.allianceColor, self.allianceColorDark, self.waveCycleFast.get(), self.waveDurationFast.get() )
         elif RobotState.isTeleop():
-            pass
+            self.led.solid( self.allianceColor )
         else:
-            self.led.solid( Color.kHoneydew )
-            
+            self.led.solid( Color.kHotPink )
+
+    def setManualButton(self, state:bool):
+        self.manualButton = state
+
+    def runDistraction(self):
+        self.led.strobe( self.distractionColors, self.strobeDurationFast.get() )
+
+    def runStaleyCelebration(self):
+        timer = Timer.getFPGATimestamp()
+        x = timer % 6.0 / 6.0
+        if x > 0.5:
+            self.led.stripes( self.staleyColors, duration = self.stripesDurationFast.get() )
+        else: 
+            self.led.strobe( self.staleyColors, self.strobeDurationSlow.get() )

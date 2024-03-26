@@ -27,6 +27,7 @@ from .launcher.LauncherStop import *
 from .launcher.LauncherToss import *
 from .launcher.LauncherTrap import *
 from .led.defaultLED import *
+from .led.LedButton import *
 from .led.LEDUtils import *
 from .pivot.PivotAim import *
 from .pivot.PivotAmp import *

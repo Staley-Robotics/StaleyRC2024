@@ -14,4 +14,4 @@ class Led2IO:
     def breathe(self, c1:Color, c2:Color, duration:float=0.0): pass
     def rainbow(self, cycleLength:float, duration:float=0.0): pass
     def wave(self, c1:Color, c2:Color, cycleLength:float, duration:float=0.0): pass
-    def stripes(self, colors:list[Color], start:int=0, cycleLength:int=0, duration:float=0.0): pass
+    def stripes(self, colors:list[Color], start:int=0, length:int=0, duration:float=0.0): pass
