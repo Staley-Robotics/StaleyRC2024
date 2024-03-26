@@ -130,6 +130,8 @@ class RobotContainer:
         #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
         #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
 
+        wpilib.SmartDashboard.putData( "LedButton", LedButton(self.led))
+
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
         self.m_chooser.setDefaultOption("1 - None", commands2.cmd.none() )

@@ -23,7 +23,13 @@ class LedButton(Command):
             self.led.runDistraction()
     
     def isFinished(self):
-        return not RobotState.isDisabled() and not RobotState.isTeleop()
+        return (
+            RobotState.isEStopped() or
+            not (
+                RobotState.isDisabled() or
+                RobotState.isTeleop()
+            )
+        )
 
     def runsWhenDisabled(self):
         return True
