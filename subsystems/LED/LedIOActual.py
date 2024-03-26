@@ -1,4 +1,4 @@
-from wpilib import *
+from wpilib import AddressableLED
 import wpimath.units
 
 from util import *
@@ -10,20 +10,20 @@ class LedIOActual(LedIO):
         # Tunables
 
         ## init LED
-        self.m_led = wpilib.AddressableLED(PWMPort)
+        self.m_led = AddressableLED(PWMPort)
         self.m_ledLength = 22 # Num of LEDs on strip
         self.m_led.setLength(self.m_ledLength)
 
-        self.m_ledData = [wpilib.AddressableLED.LEDData(255, 0, 0) for i in range(self.m_ledLength)]
+        self.m_ledData = [AddressableLED.LEDData(255, 0, 0) for i in range(self.m_ledLength)]
 
         # init color sequences
         self.color_sqncs = {
-            'default': [wpilib.AddressableLED.LEDData(0, 200, 200) for i in range(self.m_ledLength)], #alliance - red or blue
-            'has note': [wpilib.AddressableLED.LEDData(255, 127, 0) for i in range(self.m_ledLength)],
-            '75-89 chance': [wpilib.AddressableLED.LEDData(255, 255, 0) for i in range(self.m_ledLength)],
-            '90-100 chance': [wpilib.AddressableLED.LEDData(0, 255, 0) for i in range(self.m_ledLength)],
-            'designate amp': [wpilib.AddressableLED.LEDData(255, 0, 255) for i in range(self.m_ledLength)],
-            'endgame': [wpilib.AddressableLED.LEDData(255, 255, 255) for i in range(self.m_ledLength)],
+            'default': [AddressableLED.LEDData(0, 200, 200) for i in range(self.m_ledLength)], #alliance - red or blue
+            'has note': [AddressableLED.LEDData(255, 127, 0) for i in range(self.m_ledLength)],
+            '75-89 chance': [AddressableLED.LEDData(255, 255, 0) for i in range(self.m_ledLength)],
+            '90-100 chance': [AddressableLED.LEDData(0, 255, 0) for i in range(self.m_ledLength)],
+            'designate amp': [AddressableLED.LEDData(255, 0, 255) for i in range(self.m_ledLength)],
+            'endgame': [AddressableLED.LEDData(255, 255, 255) for i in range(self.m_ledLength)],
         }
 
         self.m_led.setData(self.currentColor)

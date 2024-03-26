@@ -15,10 +15,12 @@ from .Launcher.LauncherIO import *
 from .Launcher.LauncherIOFalcon import *
 from .Launcher.LauncherIONeo import *
 from .Launcher.LauncherIOSim import *
-from .LED.Led import *
-from .LED.LedIO import *
-from .LED.LedIOActual import *
-from .LED.LedIOSim import *
+from .Led.Led import *
+from .Led.LedIO import *
+from .Led.LedIOActual import *
+from .Led2.Led2 import *
+from .Led2.Led2IO import *
+from .Led2.Led2IOPwm import *
 from .Pivot.Pivot import *
 from .Pivot.PivotIO import *
 from .Pivot.PivotIOFalcon import *

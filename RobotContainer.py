@@ -57,7 +57,7 @@ class RobotContainer:
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssLedIO = LedIOSim( 9 )
+            ssLedIO = Led2IOPwm( 0 )
             ssClimberIOLeft = ClimberIO()
             ssClimberIORight = ClimberIO()
         else:
@@ -72,7 +72,7 @@ class RobotContainer:
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
-            ssLedIO = LedIO() #LedIOActual( 0 )
+            ssLedIO = Led2IOPwm( 0 )
             ssClimberIOLeft = ClimberIOTalon( 27, 5, 6 )
             ssClimberIORight = ClimberIOTalon( 28, 7, 8, True )
 
@@ -92,7 +92,7 @@ class RobotContainer:
         self.pivot:Pivot = Pivot( ssPivotIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
-        self.led = LED( ssLedIO )
+        self.led = Led2( ssLedIO )
 
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
 
