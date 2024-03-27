@@ -60,6 +60,8 @@ class SwerveDrive(Subsystem):
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/SwerveDrive", False, persistent=True )
         
+        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", True, persistent=True )
+
         self.maxVelocPhysical = NTTunableFloat( "SwerveDrive/Velocity/Physical", 4.50, persistent=True )
         self.maxVelocDriver = NTTunableFloat( "SwerveDrive/Velocity/Driver", 3.50, persistent=True )
         self.maxVelocCode = NTTunableFloat( "SwerveDrive/Velocity/Code", 4.25, persistent=True )
@@ -102,7 +104,8 @@ class SwerveDrive(Subsystem):
             self.getKinematics(),
             self.gyro.getRotation2d(),
             self.getModulePositions(),
-            Pose2d(Translation2d(1.5,3.5), Rotation2d(0).fromDegrees(45))
+            Pose2d(Translation2d(0,0), Rotation2d(0))
+            #Pose2d(Translation2d(1.5,3.5), Rotation2d(0).fromDegrees(45))
         )
         self.odometry.setVisionMeasurementStdDevs([1.5, 1.5, 1.5])
         self.gyroOffset = 0.0
@@ -301,8 +304,10 @@ class SwerveDrive(Subsystem):
 
         :returns: Rotation2d
         """
-        #return self.getOdometry().getEstimatedPosition().rotation()
-        return self.gyro.getRotation2d().rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
+        if self.usePoseRobotAngle.get():
+            return self.getOdometry().getEstimatedPosition().rotation()
+        else:
+            return self.gyro.getRotation2d().rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
 
     def getRotationVelocity(self, fieldRelative:bool = False) -> float:
         """

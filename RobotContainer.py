@@ -17,7 +17,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = False
+    testing:bool = True
 
     def __init__(self):
         """
@@ -26,8 +26,7 @@ class RobotContainer:
         ### Tunable Variables
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0, persistent=True )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0, persistent=True )
-        self.aimAdjust = NTTunableFloat( "/Config/PivotPositions/AutoAimAdjust", 0.0, persistent=True )
-        
+       
         self.notifier = NTTunableBoolean( "/Logging/Game/EndGameNotifications", False )
         
         # Create Subsystems
@@ -61,12 +60,20 @@ class RobotContainer:
             ssClimberIOLeft = ClimberIO()
             ssClimberIORight = ClimberIO()
         else:
-            ssModulesIO = [
-                SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
-                SwerveModuleIONeo("FR", 1, 2, 12,  0.2667, -0.2667,  5.361 ), #125.068) #  35.684)
-                SwerveModuleIONeo("BL", 5, 6, 16, -0.2667,  0.2667,  298.828 ), #223.945)
-                SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
-            ]
+            if wpilib.RobotBase.isSimulation():
+                ssModulesIO = [
+                    SwerveModuleIOSim("FL",  0.25,  0.25 ), 
+                    SwerveModuleIOSim("FR",  0.25, -0.25 ), 
+                    SwerveModuleIOSim("BL", -0.25,  0.25 ),
+                    SwerveModuleIOSim("BR", -0.25, -0.25 ) 
+                ]
+            else:
+                ssModulesIO = [
+                    SwerveModuleIONeo("FL", 7, 8, 18,  0.2667,  0.2667,  97.471 ), #211.289)
+                    SwerveModuleIONeo("FR", 1, 2, 12,  0.2667, -0.2667,  5.361 ), #125.068) #  35.684)
+                    SwerveModuleIONeo("BL", 5, 6, 16, -0.2667,  0.2667,  298.828 ), #223.945)
+                    SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
+                ]
             ssGyroIO = GyroIOPigeon2( 9, 0 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0, 9 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
@@ -92,8 +99,6 @@ class RobotContainer:
         self.pivot:Pivot = Pivot( ssPivotIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
         self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
-        self.led = Led2( ssLedIO )
-
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
 
         # Register Pathplanner Commands
@@ -112,6 +117,18 @@ class RobotContainer:
         self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
         self.pathPlanner.setNamedCommands( ppCommands )
 
+        # LED Configuration
+        self.led = Led2( ssLedIO )
+        self.led.setIntakeIsRunning( self.intake.isRunning )
+        self.led.setIntakeHasNote( self.intake.hasNote )
+        self.led.setIndexerHasNote( self.feeder.hasNote )
+        self.led.setPivotAtSetpoint( self.pivot.atSetpoint )
+        self.led.setLaunchRotation( self.launchCalc.inRotationRange )
+        self.led.setLaunchRangeFar( self.launchCalc.inFarRange )
+        self.led.setLaunchRangeNear( self.launchCalc.inNearRange )
+        self.led.setLaunchRangeAuto( self.launchCalc.inAutoRange )
+        self.led.setIsEndgame( self.notifier.get )
+
         # Add Subsystems to SmartDashboard
         wpilib.SmartDashboard.putData( "SwerveDrive", self.drivetrain )
         wpilib.SmartDashboard.putData( "Intake", self.intake )
@@ -124,12 +141,7 @@ class RobotContainer:
         # Add Commands to SmartDashboard
         wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Set Gyro Offset", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-
         wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
-        #wpilib.SmartDashboard.putData( "Pivot Amp", PivotAmp(self.pivot) )
-        #wpilib.SmartDashboard.putData( "Pivot Load", PivotHandoff( self.pivot) )
-        #wpilib.SmartDashboard.putData( "Pivot Down", PivotBottom(self.pivot) )
-
         wpilib.SmartDashboard.putData( "LedButton", LedButton(self.led))
 
         # Configure and Add Autonomous Mode to SmartDashboard
@@ -142,6 +154,7 @@ class RobotContainer:
         self.m_driver1 = commands2.button.CommandXboxController(0)
         self.m_driver2 = commands2.button.CommandXboxController(1)
         self.station = wpilib.Joystick(2)
+        self.stationCmd = commands2.button.CommandJoystick(2)
 
         ## Driving
         self.m_driver1.a().whileTrue(
@@ -162,110 +175,61 @@ class RobotContainer:
             )
         )
 
-        self.m_driver1.b().whileTrue(
-            DriveAimAmp(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
-        )
-        self.m_driver2.back().whileTrue(
-            DriveAimAmp(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
-        )
+        # self.m_driver1.b().whileTrue(
+        #     DriveAimAmp(
+        #         self.drivetrain,
+        #         self.m_driver1.getLeftY,
+        #         self.m_driver1.getLeftX
+        #     )
+        # )
+        # self.m_driver2.back().whileTrue(
+        #     DriveAimAmp(
+        #         self.drivetrain,
+        #         self.m_driver1.getLeftY,
+        #         self.m_driver1.getLeftX
+        #     )
+        # )
 
         ## Controller Configs for testing
         # Note Action
-        self.m_driver1.x().onTrue(
-            NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc )
+        self.m_driver1.b().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )
+            ).ignoringDisable(True)
         )
-        self.m_driver1.y().onTrue(
-            NoteLaunchAmp( self.feeder, self.launcher, self.pivot )
-        )
-        self.m_driver1.back().onTrue(
-            ToggleFieldRelative()
-        )
-        self.m_driver1.leftBumper().whileTrue(
-            ClimberExtend( self.climber )
-        )
-        self.m_driver1.rightBumper().onTrue(
-            ToggleHalfSpeed()
-        )
-        self.m_driver1.start().onTrue(
-            commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True)
-        )
+        self.m_driver1.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        self.m_driver1.y().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
+        self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
+        self.m_driver1.rightBumper().onTrue( ToggleHalfSpeed() )
+        self.m_driver1.back().onTrue( ToggleFieldRelative() )
+        self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
         
         #  Driver 2
-        self.m_driver2.x().onTrue(
-            NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc )
-        )
-        self.m_driver2.leftBumper().onTrue(
-            NoteLaunchAmp( self.feeder, self.launcher, self.pivot )
-        )
-        self.m_driver2.b().whileTrue(
-            AllRealign( self.intake, self.feeder, self.launcher, self.pivot )
-        )
-        self.m_driver2.rightBumper().onTrue(
-            AllStop( self.intake, self.feeder, self.launcher, self.pivot )
-        )
-        self.m_driver2.y().whileTrue(
-            PivotBottom( self.pivot )
-        )
-        self.m_driver2.start().onTrue(
-            EjectAll( self.intake, self.feeder, self.launcher, self.pivot )
-        )
+        self.m_driver2.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        self.m_driver2.b().whileTrue( AllRealign( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) )
+        self.m_driver2.leftBumper().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
 
         self.m_driver2.povUp().onTrue(
-            commands2.cmd.runOnce(
-                lambda: self.aimAdjust.set( self.aimAdjust.get() + 0.5 )
-            ).ignoringDisable(True)
+            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( 0.5 ) ).ignoringDisable(True)
         )
         self.m_driver2.povDown().onTrue(
-            commands2.cmd.runOnce(
-                lambda: self.aimAdjust.set( self.aimAdjust.get() - 0.5 )
-            ).ignoringDisable(True)
+            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( -0.5 ) ).ignoringDisable(True)
         )
         
-        # # Safety and Other Commands
-        # cTab = wpilib.shuffleboard.Shuffleboard.getTab("Commands")
-        # cTab.add( "AllStop", AllStop( self.intake, self.feeder, self.launcher, self.pivot,  ) ).withPosition(0, 0)
-        # cTab.add( "IntakeEject", IntakeEject(self.intake) ).withPosition(0, 1)
-        # cTab.add( "IndexerEject", IndexerEject(self.feeder) ).withPosition(0, 2)
-        # cTab.add( "PivotBottom", PivotBottom(self.pivot) ).withPosition(1, 2)
-        # cTab.add( "PivotTop", PivotTop(self.pivot) ).withPosition(1, 1)
+        # Operator Station Buttons
+        #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
+        self.stationCmd.button(6).whileTrue( IntakeLoad( self.intake ) )
+        self.stationCmd.button(7).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
+        self.stationCmd.button(8).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(9).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(11).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(12).whileTrue( LedButton(self.led) )
 
-        # # Intake to Ready to Launch Commands
-        # cTab.add( "IntakeLoad", IntakeLoad(self.intake) ).withPosition(3, 0)
-        # cTab.add( "PivotHandoff", PivotHandoff(self.pivot) ).withPosition(5, 0)
-        # cTab.add( "IndexerHandoff", IndexerHandoff(self.feeder) ).withPosition(6, 0)
-        # cTab.add( "IntakeHandoff", IntakeHandoff(self.intake) ).withPosition(7, 0)
-
-        # # Launch to Speaker Commands
-        # cTab.add( "PivotSpeaker", PivotToPosition(self.pivot) ).withPosition(4, 1)
-        # cTab.add( "LauncherSpeaker", LauncherSpeaker(self.launcher) ).withPosition(5, 1)
-        # cTab.add( "IndexerSpeaker", IndexerLaunch(self.feeder) ).withPosition(6, 1)
-
-        # # Launch to Amp Commands
-        # cTab.add( "PivotAmp", PivotAmp(self.pivot) ).withPosition(4, 2)
-        # cTab.add( "LauncherAmp", LauncherAmp(self.launcher) ).withPosition(5, 2)
-        # cTab.add( "IndexerAmp", IndexerLaunch(self.feeder) ).withPosition(6, 2)
-        
-        # # Launch to Trap Commands
-        # cTab.add( "PivotTrap", PivotTrap(self.pivot) ).withPosition(4, 3)
-        # cTab.add( "LauncherTrap", LauncherTrap(self.launcher) ).withPosition(5, 3)
-        # cTab.add( "IndexerTrap", IndexerLaunch(self.feeder) ).withPosition(6, 3)
-        
-        # # Source to Launch Commands
-        # cTab.add( "PivotSource", PivotSource(self.pivot) ).withPosition(4, 4)
-        # cTab.add( "IndexerSource", IndexerSource(self.feeder) ).withPosition(5, 4)
-        # cTab.add( "LauncherSource", LauncherSource(self.launcher) ).withPosition(6, 4)
-
-        # Operator Station Toggles
-
-        # Configure Default Commands
+        # Configure Default Commands (with Operatory Station Toggles integrated)
         self.drivetrain.setDefaultCommand(
             DriveByStick(
                 self.drivetrain,
@@ -290,8 +254,8 @@ class RobotContainer:
                 self.feeder.hasNote,
                 self.launchCalc.getLaunchAngle,
                 self.m_driver2.getLeftY,
-                isTargetAmp = lambda: False,
-                isIntakeWaiting = lambda: self.intake.hasNote() or self.intake.getCurrentCommand() == None or self.intake.getCurrentCommand().getName() != "IntakeWait",
+                isTargetAmp = self.launchCalc.isTargetAmp,
+                isIntakeWaiting = self.intake.isWaiting,
                 useAutoCalculate = lambda: self.station.getRawButton(2),
                 useManualAdjust = lambda: self.station.getRawButton(3)
             )
@@ -309,7 +273,7 @@ class RobotContainer:
                 self.launcher,
                 self.launchCalc.getDistance,
                 self.feeder.hasNote,
-                isTargetAmp = lambda: False,
+                isTargetAmp = self.launchCalc.isTargetAmp,
                 useAutoStart = lambda: self.station.getRawButton(4)
             )
         )
@@ -382,5 +346,5 @@ class RobotContainer:
         Adds the calibration commands to the Command Scheduler
         """
         self.drivetrain.syncGyro()
-        pass
+        
 

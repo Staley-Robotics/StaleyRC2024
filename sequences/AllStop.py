@@ -20,4 +20,4 @@ class AllStop(commands2.Command):
         self.launcher.stop()
         self.pivot.stop()
 
-    def isFinished(self): return True
+    def isFinished(self): return False
