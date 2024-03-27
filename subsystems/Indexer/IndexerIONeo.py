@@ -1,3 +1,4 @@
+from wpilib import DigitalInput
 from rev import *
 
 from .IndexerIO import IndexerIO
@@ -24,8 +25,8 @@ class IndexerIONeo(IndexerIO):
         self.idxEncoder = self.idxMotor.getEncoder()
 
         # ir Sensors
-        self.upperSensor = wpilib.DigitalInput( upperSensorId )
-        self.lowerSensor = wpilib.DigitalInput( lowerSensorId )
+        self.upperSensor = DigitalInput( upperSensorId )
+        self.lowerSensor = DigitalInput( lowerSensorId )
         
     def updateInputs(self, inputs: IndexerIO.IndexerIOInputs) -> None:
         self.actualVelocity = self.idxEncoder.getVelocity()

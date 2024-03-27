@@ -1,3 +1,4 @@
+from wpilib import DigitalInput
 from phoenix5 import *
 
 from .LauncherIO import LauncherIO
@@ -50,7 +51,7 @@ class LauncherIOFalcon(LauncherIO):
         self.resetPid()
 
         # IR Sensor
-        self.irSensor = wpilib.DigitalInput(sensorId)
+        self.irSensor = DigitalInput(sensorId)
         self.lastSensor = self.irSensor.get()
         self.sensorCount = 0
 

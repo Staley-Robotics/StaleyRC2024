@@ -1,3 +1,4 @@
+from wpilib import DigitalInput
 from phoenix5 import WPI_TalonFX, NeutralMode
 
 from .IntakeIO import IntakeIO
@@ -25,8 +26,8 @@ class IntakeIOFalcon(IntakeIO):
         self.lowerMotor.setInverted( False )
 
         # IR sensor
-        self.irSensor = wpilib.DigitalInput(upperSensorId)
-        self.lowerSensor = wpilib.DigitalInput(lowerSensorId)
+        self.irSensor = DigitalInput(upperSensorId)
+        self.lowerSensor = DigitalInput(lowerSensorId)
 
     def updateInputs(self, inputs:IntakeIO.IntakeIOInputs):
         self.actualVelocity[0] = self.upperMotor.getSelectedSensorVelocity()
