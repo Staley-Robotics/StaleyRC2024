@@ -1,8 +1,10 @@
+import typing
+
 from commands2 import Subsystem
 from wpilib import Color, DriverStation, RobotState, RobotBase, Timer
 
 from .Led2IO import Led2IO
-from util import NTTunableBoolean, NTTunableFloat
+from util import NTTunableBoolean, NTTunableFloat, LaunchCalc
 
 class Led2(Subsystem):
     def __init__(self, led:Led2IO):
@@ -34,14 +36,31 @@ class Led2(Subsystem):
 
         # Global Variables
         self.led = led
-        self.allianceColor = Color.kBlack
-        self.allianceColorDark = Color.kBlack
-        self.manualButton = False
+
+        # Lambda Functions
+        self.setIntakeIsRunning()
+        self.setIntakeHasNote()
+        self.setIndexerHasNote()
+        self.setPivotAtSetpoint()
+        self.setLaunchRotation()
+        self.setLaunchRangeFar()
+        self.setLaunchRangeNear()
+        self.setLaunchRangeAuto()
+        self.setIsEndgame()
         
         # Color Sets
+        self.offColors = Color.kBlack
+        self.allianceColor = Color.kBlack
+        self.allianceColorDark = Color.kBlack
+        self.intakeRunColors = Color.kYellow
+        self.hasNoteColors = Color.kOrange
+        self.launchFarColors = Color.kGreen
+        self.launchNearColors = Color.kPurple
+        self.endGameColors = Color.kWhite
         self.staleyColors = [Color.kDarkGreen, Color.kSilver, Color.kGreen, Color.kWhite]
         self.distractionColors = [Color.kWhite, Color.kBlack, Color.kHotPink, Color.kBlack]
-
+        self.invalidColors = Color.kHotPink
+        
     def periodic(self):
         # Logger
 
@@ -50,7 +69,7 @@ class Led2(Subsystem):
         
         # Offline State
         if self.offline.get():
-            self.led.solid( Color.kBlack )
+            self.led.solid( self.offColors )
         elif self.getCurrentCommand() == None:
             self.runAutomatedState()
 
@@ -77,13 +96,72 @@ class Led2(Subsystem):
             self.led.wave( self.allianceColor, self.allianceColorDark, self.waveCycleAlliance.get(), self.waveDurationAlliance.get() )
         elif RobotState.isAutonomous():
             self.led.wave( self.allianceColor, self.allianceColorDark, self.waveCycleFast.get(), self.waveDurationFast.get() )
+        elif self.isEndgame():
+            self.led.strobe( [self.endGameColors], self.strobeDurationFast.get() )
         elif RobotState.isTeleop():
-            self.led.solid( self.allianceColor )
-        else:
-            self.led.solid( Color.kHotPink )
+            # Default State, Rate, and Color
+            blink = False
+            slow = True
+            color = self.allianceColor
 
-    def setManualButton(self, state:bool):
-        self.manualButton = state
+            # Determine State    
+            if self.indexerHasNote() and self.launchAimGood():
+                blink = True
+                slow = False
+            elif self.intakeHasNote():
+                blink = True
+                slow = False
+            elif self.intakeIsRunning():
+                blink = True
+
+            # Determine Color
+            if self.indexerHasNote():
+                if self.launchRangeNear():
+                    color = self.launchNearColors
+                elif self.launchRangeFar():
+                    color = self.launchFarColors
+                else:
+                    color = self.hasNoteColors
+            elif self.intakeIsRunning() or self.intakeHasNote():
+                color = self.intakeRunColors
+
+            # Configure LEDs
+            if blink:
+                self.led.strobe(
+                    color if type(color) == list else [color],
+                    self.strobeDurationSlow.get() if slow else self.strobeDurationFast.get()
+                )
+            else:
+                self.led.solid( color )
+        else:
+            self.led.solid( self.invalidColors )
+
+    def setIntakeIsRunning(self, function:typing.Callable[[],bool] = lambda: False):
+        self.intakeIsRunning = function
+
+    def setIntakeHasNote(self, function:typing.Callable[[],bool] = lambda: False):
+        self.intakeHasNote = function
+
+    def setIndexerHasNote(self, function:typing.Callable[[],bool] = lambda: False):
+        self.indexerHasNote = function
+
+    def setPivotAtSetpoint(self, function:typing.Callable[[],bool] = lambda: False):
+        self.pivotAtSetpoint = function
+
+    def setLaunchRotation(self, function:typing.Callable[[],bool] = lambda: False):
+        self.launchAimGood = function
+
+    def setLaunchRangeFar(self, function:typing.Callable[[],bool] = lambda: False):
+        self.launchRangeFar = function
+
+    def setLaunchRangeNear(self, function:typing.Callable[[],bool] = lambda: False):
+        self.launchRangeNear = function
+
+    def setLaunchRangeAuto(self, function:typing.Callable[[],bool] = lambda: False):
+        self.launchRangeAuto = function
+
+    def setIsEndgame(self, function:typing.Callable[[],bool] = lambda: False):
+        self.isEndgame = function
 
     def runDistraction(self):
         self.led.strobe( self.distractionColors, self.strobeDurationFast.get() )
