@@ -41,6 +41,7 @@ class Led2(Subsystem):
         self.setIntakeIsRunning()
         self.setIntakeHasNote()
         self.setIndexerHasNote()
+        self.setPivotAutoAdjust()
         self.setPivotAtSetpoint()
         self.setLaunchRotation()
         self.setLaunchRangeFar()
@@ -144,6 +145,9 @@ class Led2(Subsystem):
 
     def setIndexerHasNote(self, function:typing.Callable[[],bool] = lambda: False):
         self.indexerHasNote = function
+
+    def setPivotAutoAdjust(self, function:typing.Callable[[],bool] = lambda: False):
+        self.pivotAutoAdjust = function
 
     def setPivotAtSetpoint(self, function:typing.Callable[[],bool] = lambda: False):
         self.pivotAtSetpoint = function
