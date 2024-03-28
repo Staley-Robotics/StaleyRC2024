@@ -51,7 +51,7 @@ class RobotContainer:
                 SwerveModuleIOSim("BL", -0.25,  0.25 ),
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
-            ssGyroIO = GyroIOPigeon2( 9, 0 )
+            ssGyroIO = GyroIOPigeon2( 9 )
             ssIntakeIO = IntakeIOSim()
             ssIndexerIO = IndexerIOSim()
             ssLauncherIO = LauncherIOSim()
@@ -74,10 +74,10 @@ class RobotContainer:
                     SwerveModuleIONeo("BL", 5, 6, 16, -0.2667,  0.2667,  298.828 ), #223.945)
                     SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
                 ]
-            ssGyroIO = GyroIOPigeon2( 9, 0 )
+            ssGyroIO = GyroIOPigeon2( 9 )
             ssIntakeIO = IntakeIOFalcon( 20, 21, 0, 9 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
-            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 ) #LauncherIONeo( 23, 24 , 3 )
+            ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
             ssLedIO = Led2IOPwm( 0 )
             ssClimberIOLeft = ClimberIOTalon( 27, 5, 6 )
