@@ -17,7 +17,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = True
+    testing:bool = False
 
     def __init__(self):
         """
