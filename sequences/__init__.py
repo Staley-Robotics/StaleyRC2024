@@ -5,6 +5,7 @@ from .EjectAll import *
 from .IndexerDefault import *
 from .IntakeDefault import *
 from .LauncherDefault import *
+from .LedAction import *
 from .NoteAction import *
 from .NoteLaunchAmp import *
 from .NoteLaunchSpeaker import *

@@ -142,7 +142,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "Set Gyro Offset", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
-        wpilib.SmartDashboard.putData( "LedButton", LedButton(self.led))
+        wpilib.SmartDashboard.putData( "LedButton", LedAction(self.led))
 
         # Configure and Add Autonomous Mode to SmartDashboard
         self.m_chooser = wpilib.SendableChooser()
@@ -221,13 +221,13 @@ class RobotContainer:
         
         # Operator Station Buttons
         #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
-        self.stationCmd.button(6).whileTrue( IntakeLoad( self.intake ) )
-        self.stationCmd.button(7).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
-        self.stationCmd.button(8).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(9).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        self.stationCmd.button(12).toggleOnTrue( IntakeLoad(self.intake) ) # whileTrue( IntakeLoad( self.intake ) )
+        self.stationCmd.button(11).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
+        self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
         self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(11).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(12).whileTrue( LedButton(self.led) )
+        self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(4).whileTrue( LedAction(self.led) )
 
         # Configure Default Commands (with Operatory Station Toggles integrated)
         self.drivetrain.setDefaultCommand(
@@ -245,7 +245,7 @@ class RobotContainer:
                 self.intake,
                 self.feeder.hasNote,
                 self.pivot.atSetpoint,
-                useAutoStart = lambda: self.station.getRawButton(1)
+                useAutoStart = lambda: self.station.getRawButton(5)
             )
         )
         self.pivot.setDefaultCommand(
@@ -256,8 +256,8 @@ class RobotContainer:
                 self.m_driver2.getLeftY,
                 isTargetAmp = self.launchCalc.isTargetAmp,
                 isIntakeWaiting = self.intake.isWaiting,
-                useAutoCalculate = lambda: self.station.getRawButton(2),
-                useManualAdjust = lambda: self.station.getRawButton(3)
+                useAutoCalculate = lambda: self.station.getRawButton(7),
+                useManualAdjust = lambda: self.station.getRawButton(8)
             )
         )
         self.feeder.setDefaultCommand(
@@ -274,14 +274,14 @@ class RobotContainer:
                 self.launchCalc.getDistance,
                 self.feeder.hasNote,
                 isTargetAmp = self.launchCalc.isTargetAmp,
-                useAutoStart = lambda: self.station.getRawButton(4)
+                useAutoStart = lambda: self.station.getRawButton(6)
             )
         )
         self.climber.setDefaultCommand(
             ClimberDefault(
                 self.climber,
                 lambda: self.station.getRawAxis(1),
-                lambda: self.station.getRawButton(5)
+                lambda: self.station.getRawButton(9)
             )
         )
 
