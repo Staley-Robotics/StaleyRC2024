@@ -6,15 +6,18 @@
     "AMP",
     "Center Zone",
     "Home Zone",
-    "Self Contained Starting Zones",
+    "Hide",
     "Red",
+    "Self Contained Starting Zones",
     "Shooting Zones",
     "Zone Transfer"
   ],
   "autoFolders": [
     "2 Noter",
     "3 Noter",
-    "Fancy Business"
+    "Fancy Business",
+    "4 Noter",
+    "Shoot 'n' Scoot"
   ],
   "defaultMaxVel": 4.25,
   "defaultMaxAccel": 2.125,

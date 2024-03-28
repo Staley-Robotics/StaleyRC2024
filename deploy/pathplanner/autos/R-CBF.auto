@@ -1,0 +1,100 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R-C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C-B"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "B-F"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-Q"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "4 Noter",
+  "choreoAuto": false
+}

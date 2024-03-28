@@ -1,0 +1,38 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L-L"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "L-Hide"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Shoot 'n' Scoot",
+  "choreoAuto": false
+}

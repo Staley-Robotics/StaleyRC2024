@@ -1,0 +1,93 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L-A"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "A-B"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B-E"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-Q"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "4 Noter",
+  "choreoAuto": false
+}
