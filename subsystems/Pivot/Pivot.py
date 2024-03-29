@@ -48,6 +48,9 @@ class Pivot(Subsystem):
         pos = min(max(position, Pivot.PivotPositions.Downward.get()), Pivot.PivotPositions.Upward.get())
         self.pivot.setPosition( pos )
 
+    def get(self):
+        return self.pivot.getPosition()
+
     def stop(self):
         self.set( self.pivot.getPosition() )
 

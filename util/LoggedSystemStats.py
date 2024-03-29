@@ -5,8 +5,7 @@ import hal
 from commands2 import Subsystem
 from ntcore import NetworkTableInstance
 
-from wpilib import CANStatus
-import wpilib
+from wpilib import CANStatus, RobotBase, getTime
 import wpiutil.wpistruct
 
 @wpiutil.wpistruct.make_wpistruct( name="LoggedSystemStatsInputs" )
@@ -62,7 +61,7 @@ class LoggedSystemStats:
         inputs.BatteryVoltage = hal.getVinVoltage()[0]
         inputs.BrownedOut = hal.getBrownedOut()[0]
         # System Data
-        inputs.EpochTimeMicros = wpilib.getTime()
+        inputs.EpochTimeMicros = getTime()
         inputs.SystemActive = hal.getSystemActive()[0]
         #3v3Rail
         inputs.Rail3v3.Active = hal.getUserActive3V3()[0]
@@ -80,7 +79,7 @@ class LoggedSystemStats:
         inputs.Rail6v.CurrentFaults = hal.getUserCurrentFaults6V()[0]
         inputs.Rail6v.Voltage = hal.getUserVoltage6V()[0]
         #CANBus
-        if wpilib.RobotBase.isReal():
+        if RobotBase.isReal():
             canStatus = hal.CAN_GetCANStatus()
             if canStatus[5] == 0:
                 inputs.CANBus.Utilization = canStatus[0]

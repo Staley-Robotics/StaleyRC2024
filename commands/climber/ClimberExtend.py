@@ -19,25 +19,17 @@ class ClimberExtend(Command):
         self.climber = climber
         self.setName( "ClimberExtend" )
         self.addRequirements( climber )
-        
-        self.timer = Timer()
 
     def initialize(self) -> None:
-        self.timer.reset()
-        self.timer.start()
         self.climber.setBrake(True)
 
     def execute(self) -> None:
-        if not self.timer.hasElapsed( Climber.ClimberPositions.Timer.get() ):
-            self.climber.set(Climber.ClimberPositions.Top.get(),Climber.ClimberPositions.Top.get())
-        else:
-            self.climber.stop()
+        self.climber.set( 1.0, 1.0 )
     
     def end(self, interrupted:bool) -> None:
         self.climber.stop()
 
     def isFinished(self) -> bool:
-        return False
-        return not self.climber.atSetpoint()
+        return self.climber.atTop()
     
     def runsWhenDisabled(self) -> bool: return False

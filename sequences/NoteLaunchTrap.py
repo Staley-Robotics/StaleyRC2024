@@ -6,15 +6,10 @@ from util import *
 from subsystems import Intake, Indexer, Pivot
 
 class NoteLaunchTrap(commands2.SequentialCommandGroup):
-    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator):
+    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot):
         super().__init__()
         self.setName( "TrapLaunch" )
 
-        self.addCommands(
-            commands2.ParallelCommandGroup(
-                ElevatorTrap(elevator)
-            )
-        )
         self.addCommands(
             commands2.ParallelRaceGroup(
                 PivotTrap(pivot),

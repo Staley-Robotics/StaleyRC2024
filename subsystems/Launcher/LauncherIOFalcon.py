@@ -1,3 +1,4 @@
+from wpilib import DigitalInput
 from phoenix5 import *
 
 from .LauncherIO import LauncherIO
@@ -7,7 +8,7 @@ from util import *
 class LauncherIOFalcon(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
-        self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 9.0, updater=self.updateVoltageComp, persistent=True)
+        self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 12.0, updater=self.updateVoltageComp, persistent=True)
         self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0450, updater=self.resetPid, persistent=True)
         self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.000003, updater=self.resetPid, persistent=True)
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
@@ -50,7 +51,7 @@ class LauncherIOFalcon(LauncherIO):
         self.resetPid()
 
         # IR Sensor
-        self.irSensor = wpilib.DigitalInput(sensorId)
+        self.irSensor = DigitalInput(sensorId)
         self.lastSensor = self.irSensor.get()
         self.sensorCount = 0
 

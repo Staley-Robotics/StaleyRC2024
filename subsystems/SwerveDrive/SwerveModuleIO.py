@@ -49,25 +49,25 @@ class SwerveModuleIO:
 
     def __init__(self) -> None:
         # Encoder Conversions
-        self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions ) # In Meters
-        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
-        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions ) # 150/7:1
+        self.wheelRadius = NTTunableFloat( "SwerveModule/Drive/wheelRadius", 0.0508, self.updateDriveEncoderConversions, persistent=True ) # In Meters
+        self.driveGearRatio = NTTunableFloat( "SwerveModule/Drive/GearRatio", 1 / 6.75, self.updateDriveEncoderConversions, persistent=True ) # ( L1: 8.14:1 | L2: 6.75:1 | L3: 6.12:1 )
+        self.turnGearRatio = NTTunableFloat( "SwerveModule/Turn/GearRatio", 1 / (150/7), self.updateTurnEncoderConversions, persistent=True ) # 150/7:1
 
         # Drive Motor PID Values
-        self.drive_kP = NTTunableFloat( "SwerveModule/Drive/PID/kP", 0.0, self.updateDrivePIDController, persistent=True ) #0.04
-        self.drive_kI = NTTunableFloat( "SwerveModule/Drive/PID/kI", 0.0, self.updateDrivePIDController, persistent=True )
-        self.drive_kD = NTTunableFloat( "SwerveModule/Drive/PID/kD", 0.0, self.updateDrivePIDController, persistent=True ) #1.0
-        self.drive_kF = NTTunableFloat( "SwerveModule/Drive/PID/kF", 0.22, self.updateDrivePIDController, persistent=True ) #0.065
-        self.drive_kIZone = NTTunableFloat( "SwerveModule/Drive/PID/IZone", 0.0, self.updateDrivePIDController, persistent=True )
-        self.drive_kError = NTTunableFloat( "SwerveModule/Drive/PID/Error", 0.0, self.updateDrivePIDController, persistent=True )
+        self.drive_kP = NTTunableFloat( "SwerveModule/DrivePID/kP", 0.0, self.updateDrivePIDController, persistent=True ) #0.04
+        self.drive_kI = NTTunableFloat( "SwerveModule/DrivePID/kI", 0.0, self.updateDrivePIDController, persistent=True )
+        self.drive_kD = NTTunableFloat( "SwerveModule/DrivePID/kD", 0.0, self.updateDrivePIDController, persistent=True ) #1.0
+        self.drive_kF = NTTunableFloat( "SwerveModule/DrivePID/kF", 0.22, self.updateDrivePIDController, persistent=True ) #0.065
+        self.drive_kIZone = NTTunableFloat( "SwerveModule/DrivePID/IZone", 0.0, self.updateDrivePIDController, persistent=True )
+        self.drive_kError = NTTunableFloat( "SwerveModule/DrivePID/Error", 0.0, self.updateDrivePIDController, persistent=True )
 
         # Turn Motor PID Values
-        self.turn_kP = NTTunableFloat( "SwerveModule/Turn/PID/kP", 0.01, self.updateTurnPIDController, persistent=True ) #0.5
-        self.turn_kI = NTTunableFloat( "SwerveModule/Turn/PID/kI", 0, self.updateTurnPIDController, persistent=True )
-        self.turn_kD = NTTunableFloat( "SwerveModule/Turn/PID/kD", 0, self.updateTurnPIDController, persistent=True )
-        self.turn_kF = NTTunableFloat( "SwerveModule/Turn/PID/kF", 0, self.updateTurnPIDController, persistent=True )
-        self.turn_kIZone = NTTunableFloat( "SwerveModule/Turn/PID/IZone", 0.0, self.updateTurnPIDController, persistent=True )
-        self.turn_kError = NTTunableFloat( "SwerveModule/Turn/PID/Error", 0.0, self.updateTurnPIDController, persistent=True )
+        self.turn_kP = NTTunableFloat( "SwerveModule/TurnPID/kP", 0.01, self.updateTurnPIDController, persistent=True ) #0.5
+        self.turn_kI = NTTunableFloat( "SwerveModule/TurnPID/kI", 0, self.updateTurnPIDController, persistent=True )
+        self.turn_kD = NTTunableFloat( "SwerveModule/TurnPID/kD", 0, self.updateTurnPIDController, persistent=True )
+        self.turn_kF = NTTunableFloat( "SwerveModule/TurnPID/kF", 0, self.updateTurnPIDController, persistent=True )
+        self.turn_kIZone = NTTunableFloat( "SwerveModule/TurnPID/IZone", 0.0, self.updateTurnPIDController, persistent=True )
+        self.turn_kError = NTTunableFloat( "SwerveModule/TurnPID/Error", 0.0, self.updateTurnPIDController, persistent=True )
 
     def updateDriveEncoderConversions(self):
         """

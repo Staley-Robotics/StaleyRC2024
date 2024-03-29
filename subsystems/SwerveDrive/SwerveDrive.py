@@ -24,10 +24,6 @@ from wpimath.trajectory import TrapezoidProfileRadians
 from wpimath import units
 from ntcore import *
 
-from pathplannerlib.auto import AutoBuilder
-from pathplannerlib.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
-from pathplannerlib.controller import PPHolonomicDriveController
-
 # Our Imports
 from util import *
 from .SwerveModuleIO import SwerveModuleIO
@@ -64,28 +60,27 @@ class SwerveDrive(Subsystem):
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/SwerveDrive", False, persistent=True )
         
+        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", True, persistent=True )
+
         self.maxVelocPhysical = NTTunableFloat( "SwerveDrive/Velocity/Physical", 4.50, persistent=True )
         self.maxVelocDriver = NTTunableFloat( "SwerveDrive/Velocity/Driver", 3.50, persistent=True )
         self.maxVelocCode = NTTunableFloat( "SwerveDrive/Velocity/Code", 4.25, persistent=True )
 
         self.maxAngVelocPhysical = NTTunableFloat( "SwerveDrive/AngularVelocity/Physical", 2 * math.pi, persistent=True )
         self.maxAngVelocDriver = NTTunableFloat( "SwerveDrive/AngularVelocity/Driver", 2 * math.pi, persistent=True )
-        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, persistent=True )
+        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, self.updateHolonomicDriveController, persistent=True )
 
-        self.maxVelocity = NTTunableFloat( "SwerveDrive/maxVelocity", 3.70 )
-        self.maxAngularVelocity = NTTunableFloat( "SwerveDrive/maxAngularVelocity", 2 * math.pi )
-
-        self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController )
-        self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController )
-        self.pidX_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kD", 0, self.updateHolonomicDriveController )
-        self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController )
-        self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController )
-        self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController )
-        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController )
-        self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController )
-        self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController )
-        self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController )
-        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController )
+        self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidX_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController, persistent=True )
 
         # Gyro and Modules
         self.gyro = gyro
@@ -110,8 +105,10 @@ class SwerveDrive(Subsystem):
             self.gyro.getRotation2d(),
             self.getModulePositions(),
             Pose2d(Translation2d(0,0), Rotation2d(0))
+            #Pose2d(Translation2d(1.5,3.5), Rotation2d(0).fromDegrees(45))
         )
         self.odometry.setVisionMeasurementStdDevs([1.5, 1.5, 1.5])
+        self.gyroOffset = 0.0
 
         # PID Controllers for Drive Motion
         self.hPid:HolonomicDriveController = None
@@ -128,42 +125,7 @@ class SwerveDrive(Subsystem):
         for i in range(len(modulePositions)):
             radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
 
-        AutoBuilder.configureHolonomic(
-            self.getPose, # Robot pose supplier
-            self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
-            self.getChassisSpeeds, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            self.runChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                PIDConstants(
-                    self.pidX_kP.get(),
-                    self.pidX_kI.get(),
-                    self.pidX_kD.get()
-                ), # Translation PID constants
-                PIDConstants(
-                    self.pidT_kP.get(),
-                    self.pidT_kI.get(),
-                    self.pidT_kD.get()
-                ), # Rotation PID constants
-                self.maxVelocPhysical.get(), # Max module speed, in m/s
-                radius, # Drive base radius in meters. Distance from robot center to furthest module.
-                ReplanningConfig() # Default path replanning config. See the API for the options here
-            ),
-            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
-            self # Reference to this subsystem to set requirements
-        )
-
-        #PPHolonomicDriveController.setRotationTargetOverride( self.ppAutoTarget )
-
         # NT Publishing
-        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleState" ):        
-            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleState", SwerveModuleState ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( SwerveModuleState() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-        if not NetworkTableInstance.getDefault().hasSchema( "SwerveModuleInputs" ):        
-            self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructTopic( "/StartSchema/SwerveModuleInputs", SwerveModuleIO.SwerveModuleIOInputs ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( SwerveModuleIO.SwerveModuleIOInputs() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-
         self.ntGyroInputs = NetworkTableInstance.getDefault().getStructTopic( "/SwerveDrive/Gyro", GyroIO.GyroIOInputs ).publish()
         self.ntModuleInputs = NetworkTableInstance.getDefault().getStructArrayTopic( "/SwerveDrive/Modules", SwerveModuleIO.SwerveModuleIOInputs ).publish()
 
@@ -174,6 +136,9 @@ class SwerveDrive(Subsystem):
         self.ntChassisSpeedsFieldNext = NetworkTableInstance.getDefault().getStructTopic( "/Logging/ChassisSpeeds/Field/Next", ChassisSpeeds ).publish()
         self.ntSwerveModuleStatesCurrent = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Current", SwerveModuleState ).publish( PubSubOptions() )
         self.ntSwerveModuleStatesNext = NetworkTableInstance.getDefault().getStructArrayTopic( "/Logging/SwerveModuleStates/Next", SwerveModuleState ).publish()
+
+        self.ntRobotGyroOffset = NetworkTableInstance.getDefault().getTable( "/Logging/Odometry" )
+        self.ntRobotGyroOffset.putNumber( "GyroOffset", self.gyroOffset )
 
     def periodic(self):
         """
@@ -220,42 +185,33 @@ class SwerveDrive(Subsystem):
         """
         self.gyro.simulationPeriodic( self.getRotationVelocity() )
 
-    def shouldFlipPath(self):
-        """
-        Should Path Planning Be Flipped
-        """
-        return DriverStation.getAlliance() == DriverStation.Alliance.kRed
-
-    def ppAutoTarget(self):
-        target = -1
-        # target = -1 -> None
-        # target = 0 -> Speaker
-        # target = 1 -> Amp
-        # target = 2 -> Source
-        # target = 3 -> Stage Left
-        # target = 4 -> Stage Center
-        # target = 5 -> Stage Right
-        return None
+    def getRadius(self) -> float:
+        modulePositions = [
+            self.modules[0].getReferencePosition(),
+            self.modules[1].getReferencePosition(),
+            self.modules[2].getReferencePosition(),
+            self.modules[3].getReferencePosition()
+        ]
+        radius = 0.0
+        for i in range(len(modulePositions)):
+            radius = max( radius, modulePositions[i].distance( Translation2d(0,0) ) )
+        return radius
 
     def syncGyro(self) -> None:
-        print( f"Old Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
         pose = self.getPose()
-        self.gyro.setYaw( pose.rotation().degrees() )
-        self.odometry.resetPosition(
-            self.gyro.getRotation2d(),
-            self.getModulePositions(),
-            pose
-        )
-        print( f"New Gyro: {self.gyro.getRotation2d().degrees()} Pose: {self.getPose().rotation().degrees() }")
-
+        self.resetOdometry( pose )
+        
     def resetOdometry(self, pose:Pose2d = Pose2d( Translation2d(0, 0), Rotation2d(0) ) ) -> None:
-        self.gyro.setYaw( pose.rotation().degrees() )
+        #poseDeg = pose.rotation().degrees()
+        offset = pose.rotation() - self.gyro.getRotation2d()
+        self.gyroOffset = offset.degrees()
+        self.ntRobotGyroOffset.putNumber( "GyroOffset", self.gyroOffset )
+        
         self.odometry.resetPosition(
             self.gyro.getRotation2d(),
             self.getModulePositions(),
             pose
         )
-        pass
 
     def getKinematics(self) -> SwerveDrive4Kinematics:
         """
@@ -294,8 +250,8 @@ class SwerveDrive(Subsystem):
             self.pidT_kI.get(),
             self.pidT_kD.get(),
             TrapezoidProfileRadians.Constraints(
-                self.maxAngularVelocity.get(),
-                self.maxAngularVelocity.get() * 2
+                self.maxAngVelocCode.get(),
+                self.maxAngVelocCode.get() * 2
             )
         )
         theta.enableContinuousInput( -math.pi, math.pi )
@@ -336,7 +292,7 @@ class SwerveDrive(Subsystem):
 
     def getPose(self) -> Pose2d:
         """
-        Get the Current Pose from the Odometry data of this SwerveDrive
+        Get the Current Pose relative to current alliance from the Odometry data of this SwerveDrive
         
         :returns: Pose2d
         """
@@ -348,7 +304,10 @@ class SwerveDrive(Subsystem):
 
         :returns: Rotation2d
         """
-        return self.gyro.getRotation2d()
+        if self.usePoseRobotAngle.get():
+            return self.getOdometry().getEstimatedPosition().rotation()
+        else:
+            return self.gyro.getRotation2d().rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
 
     def getRotationVelocity(self, fieldRelative:bool = False) -> float:
         """

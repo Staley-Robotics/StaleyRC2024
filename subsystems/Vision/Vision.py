@@ -39,6 +39,7 @@ class Vision(Subsystem):
         Initialization
         """
         self.offline = NTTunableBoolean( "/DisableSubsystem/Vision", False, persistent=True )
+        self.stdDev = NTTunableFloat( "/Config/Vision/StdDev", 1.25, persistent=True )
 
         # Camera Configuration
         self.cameras:typing.Tuple[VisionCamera] = cameras
@@ -51,11 +52,6 @@ class Vision(Subsystem):
 
         # NT Logging
         ntInst = NetworkTableInstance.getDefault()
-        if not ntInst.hasSchema( "VisionCameraInputs" ):        
-            self.ntSwerveModuleStatesCurrent = ntInst.getStructTopic( "/StartSchema/VisionCameraInputs", VisionCamera.VisionCameraInputs ).publish( PubSubOptions() )
-            self.ntSwerveModuleStatesCurrent.set( VisionCamera.VisionCameraInputs() ) 
-            self.ntSwerveModuleStatesCurrent.close()
-
         self.ntCameraInputs:typing.Tuple[StructPublisher] = []
         for x in range(len(self.cameras)):
             self.ntCameraInputs.append( ntInst.getStructTopic( f"/Vision/{self.cameras[x].name}", VisionCamera.VisionCameraInputs ).publish() )
@@ -71,20 +67,20 @@ class Vision(Subsystem):
             # Logging Inputs
             self.cameras[x].updateInputs( self.cameraInputs[x] )
             self.ntCameraInputs[x].set( self.cameraInputs[x] )
-           
+
+            # Run
+            self.cameras[x].run()
+
             # Fuse Data with Odometry
-            if DriverStation.getAlliance() == DriverStation.Alliance.kBlue and self.cameraInputs[x].blueHasData:
+            poses = self.cameras[x].getPoseQueue( DriverStation.getAlliance() )
+            for y in range(len(poses)):
                 self.getOdometry().addVisionMeasurement(
-                    self.cameraInputs[x].blueRobotPose2d,
-                    Timer.getFPGATimestamp() - self.cameraInputs[x].blueLatencySecs
-                )
-            elif DriverStation.getAlliance() == DriverStation.Alliance.kRed and self.cameraInputs[x].redHasData:
-                self.getOdometry().addVisionMeasurement(
-                    self.cameraInputs[x].redRobotPose2d,
-                    Timer.getFPGATimestamp() - self.cameraInputs[x].redLatencySecs
+                    poses[y]['pose2d'],
+                    poses[y]['poseTimestamp'],
+                    [ self.stdDev.get(), self.stdDev.get(), self.stdDev.get() ]
                 )
 
-            self.cameras[x].run()
+
 
 
             

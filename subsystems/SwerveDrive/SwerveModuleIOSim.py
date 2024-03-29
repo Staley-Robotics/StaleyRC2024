@@ -37,9 +37,9 @@ class SwerveModuleIOSim(SwerveModuleIO):
         super().__init__()
         self.name = subsystemName
 
-        self.drive_kS = NTTunableFloat( "SwerveModule/Drive/PID/kS", 0, self.updateDrivePIDController ) #0.065
-        self.drive_kV = NTTunableFloat( "SwerveModule/Drive/PID/kV", 0.22, self.updateDrivePIDController ) #0.065
-        self.drive_kA = NTTunableFloat( "SwerveModule/Drive/PID/kA", 0, self.updateDrivePIDController ) #0.065
+        self.drive_kS = NTTunableFloat( "SwerveModule/DrivePID/kS", 0, self.updateDrivePIDController ) #0.065
+        self.drive_kV = NTTunableFloat( "SwerveModule/DrivePID/kV", 0.22, self.updateDrivePIDController ) #0.065
+        self.drive_kA = NTTunableFloat( "SwerveModule/DrivePID/kA", 0, self.updateDrivePIDController ) #0.065
 
         # Create Motors
         self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.060 )
