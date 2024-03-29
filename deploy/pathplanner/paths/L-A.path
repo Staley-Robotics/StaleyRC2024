@@ -8,11 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-<<<<<<< HEAD
         "x": 2.05,
-=======
-        "x": 1.95,
->>>>>>> origin/main
         "y": 6.75
       },
       "isLocked": false,
@@ -20,37 +16,12 @@
     },
     {
       "anchor": {
-<<<<<<< HEAD
         "x": 2.548447785697655,
         "y": 6.751022616628567
       },
       "prevControl": {
         "x": 2.238755445702856,
         "y": 6.756118454573219
-=======
-        "x": 2.52,
-        "y": 6.75
-      },
-      "prevControl": {
-        "x": 2.34,
-        "y": 6.75
-      },
-      "nextControl": {
-        "x": 2.7038063264009162,
-        "y": 6.75
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.85,
-        "y": 6.95
-      },
-      "prevControl": {
-        "x": 2.54,
-        "y": 6.95
->>>>>>> origin/main
       },
       "nextControl": null,
       "isLocked": false,
@@ -68,22 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-<<<<<<< HEAD
     "rotation": 27.5528116,
     "rotateFast": true
-=======
-    "rotation": 30.0,
-    "rotateFast": false
->>>>>>> origin/main
   },
   "reversed": false,
   "folder": "Home Zone",
   "previewStartingState": {
-<<<<<<< HEAD
     "rotation": 0.0,
-=======
-    "rotation": 25.0,
->>>>>>> origin/main
     "velocity": 0
   },
   "useDefaultConstraints": false
