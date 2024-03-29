@@ -1,5 +1,5 @@
 import typing
-from ntcore import *
+from ntcore import NetworkTableInstance, Event, EventFlags
 
 class NTTunableFloat:
     """

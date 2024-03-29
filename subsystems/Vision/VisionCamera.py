@@ -8,9 +8,8 @@ import typing
 import dataclasses
 
 # FRC Imports
-from ntcore import NetworkTable
+from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Pose3d
-import wpimath.geometry
 import wpiutil.wpistruct
 
 class VisionCamera:
@@ -30,12 +29,14 @@ class VisionCamera:
         #frames:typing.ClassVar[list[int]] = []
         #demoFrame:typing.ClassVar[list[int]] = []
         #fps:float = 0.0
-        blueHasData:bool = False
+        blueLastTimestamp:float = 0.0
         blueLatencySecs:float = 0.0
+        blueDistance:float = 0.0
         blueRobotPose2d:Pose2d = dataclasses.field( default_factory= Pose2d )
         blueRobotPose3d:Pose3d = dataclasses.field( default_factory= Pose3d )
-        redHasData:bool = False
+        redLastTimestamp:float = 0.0
         redLatencySecs:float = 0.0
+        redDistance:float = 0.0
         redRobotPose2d:Pose2d = dataclasses.field( default_factory= Pose2d )
         redRobotPose3d:Pose3d = dataclasses.field( default_factory= Pose3d )
         #tagPoses:typing.Tuple[Pose2d] = None #[]
@@ -50,3 +51,6 @@ class VisionCamera:
 
     def run(self):
         pass
+
+    def getPoseQueue(self, alliance:DriverStation.Alliance):
+        return []

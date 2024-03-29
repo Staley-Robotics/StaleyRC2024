@@ -1,8 +1,6 @@
 import dataclasses
 import typing
 
-from commands2 import Subsystem
-import hal
 from ntcore import NetworkTableInstance
 from wpilib import PowerDistribution
 

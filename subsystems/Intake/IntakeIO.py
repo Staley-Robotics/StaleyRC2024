@@ -51,3 +51,6 @@ class IntakeIO:
     
     def getSensorIsBroken(self) -> float:
         return False
+    
+    def foundNote(self) -> float:
+        return False

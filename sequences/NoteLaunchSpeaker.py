@@ -1,26 +1,24 @@
 import commands2
 
 from commands import *
-from subsystems import Indexer, Pivot, Elevator, Launcher
+from subsystems import Indexer, Pivot, Launcher
 from util import *
 
 class NoteLaunchSpeaker(commands2.SequentialCommandGroup):
-    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, elevator:Elevator, getPose:typing.Callable[[],Pose2d]):
+    def __init__(self, indexer:Indexer, launcher:Launcher, pivot:Pivot, launchCalc:LaunchCalc):
         super().__init__()
         self.setName( "NoteLaunchSpeaker" )
+        self.addRequirements(
+            indexer, launcher, pivot
+        )
 
         self.addCommands(
-            commands2.ParallelCommandGroup(
-                ElevatorBottom(elevator)
-            )
-        )
-        self.addCommands(
             commands2.ParallelRaceGroup(
-                #commands2.RepeatCommand(
-                #    PivotAim(pivot,getPose)
-                #),
+                commands2.RepeatCommand(
+                    PivotAim(pivot,launchCalc.getLaunchAngle)
+                ),
                 commands2.ParallelCommandGroup(
-                    LauncherSpeaker(launcher),
+                    LauncherSpeaker(launcher, launchCalc.getDistance),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
                         commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(1000) ),
