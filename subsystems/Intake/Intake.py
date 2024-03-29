@@ -22,6 +22,7 @@ class Intake(Subsystem):
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
         self.intakeMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Intake" )
+        self.simHasNote = False
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
@@ -42,6 +43,7 @@ class Intake(Subsystem):
         # Post Run Logging
         self.intakeMeasuredLogger.putNumberArray( "Setpoint", self.intake.getSetpoint() )
         self.intakeMeasuredLogger.putNumberArray( "Measured", self.intake.getVelocity() )
+        self.intakeMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
 
     def set(self, speed:float):
         self.intake.setVelocity( speed, speed )
@@ -62,7 +64,7 @@ class Intake(Subsystem):
         self.intake.setBrake( brake )
 
     def hasNote(self) -> bool:
-        return self.intake.getSensorIsBroken()
+        return self.intake.getSensorIsBroken() or self.simHasNote
     
     def foundNote(self) -> bool:
         return self.intake.foundNote()
@@ -77,3 +79,6 @@ class Intake(Subsystem):
             self.getCurrentCommand() == None or
             self.getCurrentCommand().getName() != "IntakeWait"
         )
+
+    def setHasNote(self, hasNote:bool) -> None:
+        self.simHasNote = hasNote

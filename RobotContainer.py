@@ -103,11 +103,11 @@ class RobotContainer:
         self.led = Led2( ssLedIO )
 
         # Register Pathplanner Commands
-        if wpilib.RobotBase.isSimulation() and not self.testing:
+        if wpilib.RobotBase.isSimulation():
             ppCommands = {
                 "AutoPivot": commands2.cmd.waitSeconds( 0.50 ),
-                "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ),
-                "AutoPickup": commands2.cmd.waitSeconds( 0.50 )
+                "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(False) )),
+                "AutoPickup": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(True) ))
             }
         else:
             ppCommands = {

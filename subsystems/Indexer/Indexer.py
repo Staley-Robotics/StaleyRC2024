@@ -20,6 +20,7 @@ class Indexer(Subsystem):
         self.indexerInputs = indexer.IndexerIOInputs()
         self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
         self.indexerMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Indexer" )
+        self.simHasNote = True
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Indexer", False, persistent=True )
 
@@ -42,6 +43,7 @@ class Indexer(Subsystem):
         # Post Run Logging
         self.indexerMeasuredLogger.putNumber( "Measured", self.indexer.getVelocity() )
         self.indexerMeasuredLogger.putNumber( "Setpoint", self.indexer.getSetpoint() )
+        self.indexerMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
 
     def set(self, speed:float):
         self.indexer.setVelocity( speed )
@@ -79,10 +81,13 @@ class Indexer(Subsystem):
             return 0
     
     def hasNote(self) -> bool:
-        return self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()
+        return (self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()) or self.simHasNote
     
     def hasReleasedNote(self) -> bool:
         return not( self.indexer.getLowerSensorIsBroken() or self.indexer.getUpperSensorIsBroken() )
     
     def isRunning(self) -> bool:
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )
+
+    def setHasNote(self, hasNote:bool) -> None:
+        self.simHasNote = hasNote
