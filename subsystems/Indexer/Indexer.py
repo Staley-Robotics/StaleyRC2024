@@ -1,6 +1,6 @@
 from commands2 import Subsystem
 from ntcore import NetworkTableInstance
-from wpilib import DriverStation
+from wpilib import DriverStation, RobotBase
 
 from util import *
 from .IndexerIO import IndexerIO
@@ -20,7 +20,9 @@ class Indexer(Subsystem):
         self.indexerInputs = indexer.IndexerIOInputs()
         self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
         self.indexerMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Indexer" )
-        self.simHasNote = True
+
+        if RobotBase.isSimulation(): 
+            self.simHasNote = NTTunableBoolean( "/Logging/Indexer/HasNote", True, persistent=False )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Indexer", False, persistent=True )
 
@@ -43,7 +45,7 @@ class Indexer(Subsystem):
         # Post Run Logging
         self.indexerMeasuredLogger.putNumber( "Measured", self.indexer.getVelocity() )
         self.indexerMeasuredLogger.putNumber( "Setpoint", self.indexer.getSetpoint() )
-        self.indexerMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
+        #self.indexerMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
 
     def set(self, speed:float):
         self.indexer.setVelocity( speed )
@@ -81,7 +83,11 @@ class Indexer(Subsystem):
             return 0
     
     def hasNote(self) -> bool:
-        return (self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken()) or self.simHasNote
+        hasNote = (self.indexer.getLowerSensorIsBroken() and self.indexer.getUpperSensorIsBroken())
+        if RobotBase.isSimulation():
+            return hasNote or self.simHasNote.get()
+        else:
+            return hasNote
     
     def hasReleasedNote(self) -> bool:
         return not( self.indexer.getLowerSensorIsBroken() or self.indexer.getUpperSensorIsBroken() )
@@ -90,4 +96,4 @@ class Indexer(Subsystem):
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )
 
     def setHasNote(self, hasNote:bool) -> None:
-        self.simHasNote = hasNote
+        self.simHasNote.set( hasNote )

@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.8,
+        "y": 0.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8,
+        "y": 1.0
+      },
+      "isLocked": false,
+      "linkedName": "Fly-ToTarget-StartD"
+    },
+    {
+      "anchor": {
+        "x": 0.8,
+        "y": 4.5
+      },
+      "prevControl": {
+        "x": 1.2999999999999998,
+        "y": 3.6339745962155607
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Fly-ToSpeaker-FrontD"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.25,
+    "maxAcceleration": 2.125,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -60.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Teleop",
+  "previewStartingState": {
+    "rotation": -90.0,
+    "velocity": 0.0
+  },
+  "useDefaultConstraints": true
+}

@@ -2,10 +2,12 @@ from .climber.ClimberByStickMono import *
 from .climber.ClimberBySticks import *
 from .climber.ClimberCollapse import *
 from .climber.ClimberExtend import *
+from .drive.DriveAim import *
 from .drive.DriveAimAmp import *
 from .drive.DriveAimSpeaker import *
 from .drive.DriveByStick import *
 from .drive.DriveDistance import *
+from .drive.DriveFlyByPath import *
 from .drive.DriveForTime import *
 from .drive.DriveLockdown import *
 from .drive.DriveSetup import *

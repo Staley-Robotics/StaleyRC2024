@@ -2,20 +2,26 @@ import os
 import typing
 from pathlib import Path
 
-from wpilib import DriverStation, RobotBase, SendableChooser, getOperatingDirectory
-import commands2
+from wpilib import DriverStation, SendableChooser, getOperatingDirectory
+from wpimath.geometry import Rotation2d
+
 from pathplannerlib_custom.auto import AutoBuilder, NamedCommands
 from pathplannerlib_custom.config import HolonomicPathFollowerConfig, ReplanningConfig, PIDConstants
 from pathplannerlib_custom.controller import PPHolonomicDriveController
-from pathplannerlib_custom.path import PathPlannerPath
-
 from subsystems import SwerveDrive, LaunchCalc, Indexer
 
 class SwervePath:
-    def __init__(self, drivetrain:SwerveDrive, launchCalc:LaunchCalc, indexer:Indexer):
+    def __init__( self,
+                  drivetrain:SwerveDrive,
+                  launchRotation:typing.Callable[[],Rotation2d] = lambda: Rotation2d(0),
+                  hasNote:typing.Callable[[],bool] = lambda: False
+                ):
+        # Subsystems
         self.drivetrain = drivetrain
-        self.launchCalc = launchCalc
-        self.indexer = indexer
+        self.launchRotation = launchRotation
+        
+        # Callable Functions
+        self.hasNote = hasNote
       
         if not AutoBuilder.isConfigured():
             AutoBuilder.configureHolonomic(
@@ -55,8 +61,8 @@ class SwervePath:
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
     def getPathPlannerTarget(self):
-        if self.indexer.hasNote():
-            return self.launchCalc.getRotateAngle()
+        if self.hasNote():
+            return self.launchRotation()
         else:
             return None
 
@@ -68,46 +74,4 @@ class SwervePath:
                 f = e1.name.removesuffix(".auto")
                 print( f"Loading Auto: {f}" )
                 chooser.addOption( f, AutoBuilder.buildAuto( f ) )
-
-    def getFlyCommand(self) -> commands2.Command:
-        return FlyCommand( self.drivetrain, self.indexer )
     
-class FlyCommand(commands2.SelectCommand):
-    def __init__(self, drivetrain:SwerveDrive, indexer:Indexer):
-        self.drivetrain = drivetrain
-        self.indexer = indexer
-
-        # Paths
-        ampPickup = PathPlannerPath.fromPathFile( "Fly-AmpPickup" )
-        ampLaunch = PathPlannerPath.fromPathFile( "Fly-AmpLaunch" )
-        sourcePickup = PathPlannerPath.fromPathFile( "Fly-SourcePickup" )
-        sourceLaunch = PathPlannerPath.fromPathFile( "Fly-SourceLaunch" )
-
-        super().__init__(
-            commands={
-                "AmpPickup": AutoBuilder.followPath( ampPickup ).withName("AmpSidePickup"),
-                "AmpLaunch": AutoBuilder.followPath( ampLaunch ).withName("AmpSideLaunch"),
-                "SourcePickup": AutoBuilder.followPath( sourcePickup ).withName("SourceSidePickup"),
-                "SourceLaunch": AutoBuilder.followPath( sourceLaunch ).withName("SourceSideLaunch"),
-                "NoFly": commands2.cmd.none()
-            },
-            selector=self.determineFlyPath
-        )
-
-    def initialize(self):
-        super().initialize()
-        self.setName( f"Fly-{self._selectedCommand.getName()}" )
-
-    def determineFlyPath(self):
-        isBlue = DriverStation.getAlliance() == DriverStation.Alliance.kBlue
-        isRed = DriverStation.getAlliance() == DriverStation.Alliance.kRed
-        isLeft = self.drivetrain.getPose().Y() > 4.14
-        isRight = not isLeft
-        isAmp = (isBlue and isLeft) or (isRed and isRight)
-
-        if isBlue or isRed:
-            side = "Amp" if isAmp else "Source"
-            state = "Launch" if self.indexer.hasNote() else "Pickup"
-            return f"{side}{state}"
-        else:
-            return "NoFly"

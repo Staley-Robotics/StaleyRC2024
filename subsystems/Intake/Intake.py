@@ -1,6 +1,6 @@
 from commands2 import Subsystem
 from ntcore import NetworkTableInstance
-from wpilib import RobotState
+from wpilib import RobotState, RobotBase
 
 from util import *
 from .IntakeIO import IntakeIO
@@ -22,7 +22,9 @@ class Intake(Subsystem):
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
         self.intakeMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Intake" )
-        self.simHasNote = False
+        
+        if RobotBase.isSimulation():
+            self.simHasNote = NTTunableBoolean( "/Logging/Intake/HasNote", False, persistent=False )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
@@ -43,7 +45,6 @@ class Intake(Subsystem):
         # Post Run Logging
         self.intakeMeasuredLogger.putNumberArray( "Setpoint", self.intake.getSetpoint() )
         self.intakeMeasuredLogger.putNumberArray( "Measured", self.intake.getVelocity() )
-        self.intakeMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
 
     def set(self, speed:float):
         self.intake.setVelocity( speed, speed )
@@ -64,7 +65,10 @@ class Intake(Subsystem):
         self.intake.setBrake( brake )
 
     def hasNote(self) -> bool:
-        return self.intake.getSensorIsBroken() or self.simHasNote
+        if RobotBase.isSimulation():
+            return self.intake.getSensorIsBroken() or self.simHasNote.get()
+        else:
+            return self.intake.getSensorIsBroken()
     
     def foundNote(self) -> bool:
         return self.intake.foundNote()
@@ -81,4 +85,4 @@ class Intake(Subsystem):
         )
 
     def setHasNote(self, hasNote:bool) -> None:
-        self.simHasNote = hasNote
+        self.simHasNote.set( hasNote )

@@ -115,7 +115,7 @@ class RobotContainer:
                 "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
                 "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot)
             }
-        self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
+        self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc.getRotateAngle, self.feeder.hasNote )   
         self.pathPlanner.setNamedCommands( ppCommands )
 
         # Add Subsystems to SmartDashboard
@@ -144,79 +144,6 @@ class RobotContainer:
         self.m_driver2 = commands2.button.CommandXboxController(1)
         self.station = wpilib.Joystick(2)
         self.stationCmd = commands2.button.CommandJoystick(2)
-
-        ## Driving
-        self.m_driver1.a().whileTrue(
-            self.pathPlanner.getFlyCommand()
-        )
-        # self.m_driver1.a().whileTrue(
-        #     DriveAimSpeaker(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
-        self.m_driver2.a().whileTrue(
-            DriveAimSpeaker(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
-        )
-
-        # self.m_driver1.b().whileTrue(
-        #     DriveAimAmp(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
-        # self.m_driver2.back().whileTrue(
-        #     DriveAimAmp(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
-
-        ## Controller Configs for testing
-        # Note Action
-        self.m_driver1.b().onTrue(
-            commands2.cmd.runOnce(
-                lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )
-            ).ignoringDisable(True)
-        )
-        self.m_driver1.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.m_driver1.y().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
-        self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
-        self.m_driver1.rightBumper().onTrue( ToggleHalfSpeed() )
-        self.m_driver1.back().onTrue( ToggleFieldRelative() )
-        self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-        
-        #  Driver 2
-        self.m_driver2.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.m_driver2.b().whileTrue( AllRealign( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) )
-        self.m_driver2.leftBumper().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
-
-        self.m_driver2.povUp().onTrue(
-            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( 0.5 ) ).ignoringDisable(True)
-        )
-        self.m_driver2.povDown().onTrue(
-            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( -0.5 ) ).ignoringDisable(True)
-        )
-        
-        # Operator Station Buttons
-        #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
-        self.stationCmd.button(12).toggleOnTrue( IntakeLoad(self.intake) ) # whileTrue( IntakeLoad( self.intake ) )
-        self.stationCmd.button(11).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
-        self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(4).whileTrue( LedAction(self.led) )
 
         # Operator Switches
         if RobotBase.isSimulation():
@@ -247,7 +174,6 @@ class RobotContainer:
             def toggleSwitchClimb(): self.swClimb = not self.swClimb; updateNtLogging()
 
             updateNtLogging()
-
             self.stationCmd.button(5).onTrue( commands2.cmd.runOnce( toggleSwitchIntakeAuto ).ignoringDisable(True) )
             self.stationCmd.button(6).onTrue( commands2.cmd.runOnce( toggleSwitchLaunchSpinAuto ).ignoringDisable(True) )
             self.stationCmd.button(7).onTrue( commands2.cmd.runOnce( toggleSwitchPivotAuto ).ignoringDisable(True) )
@@ -260,6 +186,45 @@ class RobotContainer:
             def getSwitchPivotManual() -> bool: return self.station.getRawButton(8)
             def getSwitchClimb() -> bool: return self.station.getRawButton(9)
         
+        ## Controller Configs
+        self.m_driver1.a().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, getSwitchPivotAuto ) ) # Drive - FlyByPath
+        self.m_driver1.b().onTrue(
+            commands2.cmd.runOnce(
+                lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )
+            ).ignoringDisable(True)
+        ) # Toggle Target
+        self.m_driver1.x().toggleOnTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) ) # NoteAction:  NoteLoadGround, NoteLaunchSpeaker, NoteLaunchAmp, NoteLaunchToss
+        self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
+        self.m_driver1.rightBumper().onTrue( ToggleHalfSpeed() )  # Toggle Half Speed
+        self.m_driver1.back().onTrue( ToggleFieldRelative() ) # Toggle Field Relative
+        self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) ) # Resync Gyro - Do we need this?
+        
+        #  Driver 2
+        self.m_driver2.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) ) # Drive - Force Aiming
+        self.m_driver2.x().toggleOnTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) ) # NoteAction: NoteLoadGround, NoteLaunchSpeaker, NoteLaunchAmp, NoteLaunchToss
+        self.m_driver2.b().whileTrue( AllRealign( self.intake, self.feeder, self.launcher, self.pivot ) ) # Realign Pivot with Intake
+        self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
+        #self.m_driver2.leftBumper().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) ) 
+        self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+
+        self.m_driver2.povUp().onTrue(
+            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( 0.5 ) ).ignoringDisable(True)
+        )
+        self.m_driver2.povDown().onTrue(
+            commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( -0.5 ) ).ignoringDisable(True)
+        )
+        
+        # Operator Station Buttons 
+        #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
+        self.stationCmd.button(12).toggleOnTrue( IntakeLoad(self.intake).onlyIf( lambda: not self.feeder.hasNote() ) ) # whileTrue( IntakeLoad( self.intake ) )
+        self.stationCmd.button(11).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
+        self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.stationCmd.button(4).whileTrue( LedAction(self.led) )
+
         # Configure Default Commands (with Operatory Station Toggles integrated)
         self.drivetrain.setDefaultCommand(
             DriveByStick(
