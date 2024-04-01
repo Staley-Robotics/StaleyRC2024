@@ -187,7 +187,7 @@ class RobotContainer:
             def getSwitchClimb() -> bool: return self.station.getRawButton(9)
         
         ## Controller Configs
-        self.m_driver1.a().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, getSwitchPivotAuto ) ) # Drive - FlyByPath
+        self.m_driver1.a().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
         self.m_driver1.b().onTrue(
             commands2.cmd.runOnce(
                 lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )

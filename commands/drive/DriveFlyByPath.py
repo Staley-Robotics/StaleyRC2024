@@ -67,46 +67,36 @@ class DriveFlyByPath(SelectCommand):
 
         isBlue = DriverStation.getAlliance() == DriverStation.Alliance.kBlue
         isRed = DriverStation.getAlliance() == DriverStation.Alliance.kRed
-        isLeft = pose.Y() > 4.14
-        isRight = not isLeft
-        isAmpSide = (isBlue and isLeft) or (isRed and isRight)
+        isFar = pose.X() > ( 10.75 if not self.hasNote() else ( 5.85 if self.getTarget() == LaunchCalc.Targets.AMP else ( 2.00 if self.getTarget() == LaunchCalc.Targets.SPEAKER else 0.0 ) ) )
+        isLeft = pose.Y() > ( 4.14 if not ( self.getTarget() == LaunchCalc.Targets.SPEAKER and not isFar ) else ( 5.25 if isBlue else ( 8.31 - 5.25 if isRed else 0.0 ) ) )
+        isAmpSide = (isBlue and isLeft) or (isRed and not isLeft)
 
         # Determine Target and Zone
         if not self.hasNote():
             returnStr = "ToSource"
             
             if isAmpSide:
-                if pose.X() > 10.75:
-                    returnStr += "-A"
-                else:
-                    returnStr += "-C"
-            else:
-                returnStr += "-D"
+                if isFar: returnStr += "-A"
+                else: returnStr += "-C"
+            else: returnStr += "-D"
         elif self.getTarget() == LaunchCalc.Targets.SPEAKER:
             returnStr = "ToSpeaker"
-            if pose.X() > 2.00:
-                if self.driveToSpeaker():
-                    returnStr += "Fixed"
+            
+            if isFar:
+                if self.driveToSpeaker(): returnStr += "Fixed"
                 
-                if isAmpSide:
-                    returnStr += "-A"
-                else:
-                    returnStr += "-B"
+                if isAmpSide: returnStr += "-A"
+                else: returnStr += "-B"
             else:
-                if isAmpSide:
-                    returnStr += "-C"
-                else:
-                    returnStr += "-D"
+                if isAmpSide: returnStr += "-C"
+                else: returnStr += "-D"
         elif self.getTarget() == LaunchCalc.Targets.AMP:
             returnStr = "ToAmp"
             
-            if isAmpSide:
-                returnStr += "-A"
+            if isAmpSide: returnStr += "-A"
             else:
-                if pose.X() > 5.85:
-                    returnStr += "-B"
-                else:
-                    returnStr += "-D"
+                if isFar: returnStr += "-B"
+                else: returnStr += "-D"
         else:
             returnStr = "NoFly"
 
