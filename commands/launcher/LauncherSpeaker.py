@@ -4,7 +4,6 @@
 
 # FRC Component Imports
 from commands2 import Command
-from wpilib import Timer
 
 # Our Imports
 from subsystems import Launcher
@@ -23,27 +22,24 @@ class LauncherSpeaker(Command):
 
         self.setName( "LauncherSpeaker" )
         self.addRequirements( launcher )
-        self.timer = Timer()
 
     def initialize(self) -> None:
-        self.timer.reset()
-        self.timer.start()
+        pass
 
     def execute(self) -> None:
-        if self.getDistance() < 4.0:
+        if self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceLow.get():
             self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftLow.get(), Launcher.LauncherSpeeds.SpeakerRightLow.get())
-        # elif self.getDistance() < 5.0:
-        #     self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftMedium.get(), Launcher.LauncherSpeeds.SpeakerLeftMedium.get())
-        # elif self.getDistance() < 6.0:
-        #     self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftHigh.get(), Launcher.LauncherSpeeds.SpeakerLeftHigh.get())
+        elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceMedium.get():
+            self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftMedium.get(), Launcher.LauncherSpeeds.SpeakerLeftMedium.get())
+        elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
+            self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftHigh.get(), Launcher.LauncherSpeeds.SpeakerLeftHigh.get())
         else:
             self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def end(self, interrupted:bool) -> None:
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
-        self.timer.stop()
 
     def isFinished(self) -> bool:
-        return self.timer.hasElapsed( Launcher.LauncherSpeeds.TimeDelay.get() ) or self.launcher.hasLaunched()
+        return self.launcher.hasLaunched()
     
     def runsWhenDisabled(self) -> bool: return False

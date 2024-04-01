@@ -30,6 +30,6 @@ class LauncherStop(Command):
         self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
-        False
+        return True
     
     def runsWhenDisabled(self) -> bool: return False

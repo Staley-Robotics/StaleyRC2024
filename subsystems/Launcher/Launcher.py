@@ -1,6 +1,6 @@
 from commands2 import Subsystem
 from ntcore import NetworkTableInstance
-from wpilib import RobotState
+from wpilib import RobotState, Timer
 
 from .LauncherIO import LauncherIO
 from util import *
@@ -13,6 +13,9 @@ class Launcher(Subsystem):
         SpeakerRightMedium = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Medium/Right", 12000.0, persistent=True )
         SpeakerLeftLow = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Low/Left", 14500.0, persistent=True )
         SpeakerRightLow = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Low/Right", 12000.0, persistent=True )
+        SpeakerDistanceHigh = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/High/Distance", 5.0, persistent=True )
+        SpeakerDistanceMedium = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Medium/Distance", 4.0, persistent=True )
+        SpeakerDistanceLow = NTTunableFloat( "/Config/LauncherSpeeds/Speaker/Low/Distance", 3.0, persistent=True )
         
         AmpLeft = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Left", 3000.0, persistent=True )
         AmpRight = NTTunableFloat( "/Config/LauncherSpeeds/Amp/Right", 3000.0, persistent=True )
@@ -29,12 +32,23 @@ class Launcher(Subsystem):
         ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 350.0, persistent=True )
 
     def __init__(self, launcher:LauncherIO):
+        # Tunables
+        self.detectSensor = NTTunableBoolean( "/Config/Launcher/LaunchDetection/A-Sensor", True, persistent=True )
+        self.detectVeloc = NTTunableBoolean( "/Config/Launcher/LaunchDetection/B-Veloc", True, persistent=True )
+        self.detectVelocCount = NTTunableInt( "/Config/Launcher/LaunchDetection/B-VelocCount", 5, persistent=True )
+        self.detectTimer = NTTunableFloat( "/Config/Launcher/LaunchDetection/C-Timer", 10.0, persistent=True )
+
         self.launcher = launcher
         self.launcherInputs = launcher.LauncherIOInputs
         self.launcherLogger = NetworkTableInstance.getDefault().getStructTopic( "/Launcher", LauncherIO.LauncherIOInputs ).publish()
         self.launcherMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Launcher" )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Launcher", False, persistent=True )
+
+        self.launchTimer = Timer()
+        self.launchAtSpeedCount = 0
+        self.launchDipDetected = False
+        self.launchDetected = False
 
     def periodic(self):
         # Logging
@@ -49,11 +63,34 @@ class Launcher(Subsystem):
             self.intake.runCharacterization( self.charSettingsVolts.get(), self.charSettingsRotation.get() )
         else:
             self.launcher.run()
+            
+            if self.isRunning():
+                self.launchTimer.start()
+
+                if self.atSpeed():
+                    self.launchAtSpeedCount += 1
+                    if self.launchAtSpeedCount > self.detectVelocCount.get() and self.launchDipDetected:
+                        self.launchDetected = True
+                else:
+                    if self.launchAtSpeedCount > self.detectVelocCount.get():
+                        self.launchDipDetected = True
+                    self.launchAtSpeedCount = 0
+            else:
+                self.launchAtSpeedCount = 0
+                self.launchDipDetected = False
+                self.launchDetected = False
+                self.launchTimer.stop()
+                self.launchTimer.reset()
 
         # Post Run Logging
         self.launcherMeasuredLogger.putNumberArray( "Setpoint", self.launcher.getSetpoint() )
         self.launcherMeasuredLogger.putNumberArray( "Measured", self.launcher.getVelocity() )
         self.launcherMeasuredLogger.putNumber( "SensorCount", self.launcher.getSensorCount() )
+        
+        self.launcherMeasuredLogger.putBoolean( "LaunchDetect/AtSpeed", self.atSpeed() )
+        self.launcherMeasuredLogger.putNumber( "LaunchDetect/AtSpeedCount", self.launchAtSpeedCount )
+        self.launcherMeasuredLogger.putBoolean( "LaunchDetect/DipDetected", self.launchDipDetected )
+        self.launcherMeasuredLogger.putBoolean( "LaunchDetect/LaunchDetected", self.launchDetected )
 
     def set(self, leftSpeed:float, rightSpeed:float):
         self.launcher.setVelocity( leftSpeed, rightSpeed )
@@ -61,24 +98,20 @@ class Launcher(Subsystem):
     def stop(self):
         self.set( Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get() )
 
-    # def speaker(self):
-    #     self.set( self.LauncherSpeeds.SpeakerLeft, self.LauncherSpeeds.SpeakerRight )
-
-    # def amp(self):
-    #     self.set( self.LauncherSpeeds.AmpLeft, self.LauncherSpeeds.AmpRight )
-
-    # def trap(self):
-    #     self.set( self.LauncherSpeeds.TrapLeft, self.LauncherSpeeds.TrapRight )
-
-    # def source(self):
-    #     self.set( self.LauncherSpeeds.SourceLeft, self.LauncherSpeeds.SourceRight )
+    def setBrake(self, brake:bool):
+        self.launcher.setBrake( brake )
 
     def isRunning(self) -> bool:
         left, right = self.launcher.getVelocity()
         return ( left != Launcher.LauncherSpeeds.Stop.get() or right != Launcher.LauncherSpeeds.Stop.get())
 
     def hasLaunched(self) -> bool:
-        return self.launcher.hasLaunched()
+        if self.detectSensor.get() and self.launcher.hasLaunched():
+            return True
+        elif self.detectVeloc.get() and self.launchDetected:
+            return True
+        else:
+            return self.launchTimer.hasElapsed( self.detectTimer.get() )
 
     def atSpeed(self, errorRange:float = 100.00) -> bool:
         status = self.launcher.atSetpoint(errorRange)

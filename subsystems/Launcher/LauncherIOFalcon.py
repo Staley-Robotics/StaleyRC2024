@@ -8,12 +8,13 @@ from util import *
 class LauncherIOFalcon(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
-        self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 12.0, updater=self.updateVoltageComp, persistent=True)
         self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0450, updater=self.resetPid, persistent=True)
         self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.000003, updater=self.resetPid, persistent=True)
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kD = NTTunableFloat('/Config/Launcher/Falcon/PID/kD', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.065, updater=self.resetPid, persistent=True)
+        self.brakeMode = NTTunableBoolean('/Config/Launcher/Falcon/BrakeMode', True, update=lambda: self.setBrake( self.brakeMode.get() ), persistent=True)
+        self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 12.0, updater=self.updateVoltageComp, persistent=True)
 
         # Static Variables
         self.actualVelocity = [ 0.0, 0.0 ]
@@ -23,7 +24,6 @@ class LauncherIOFalcon(LauncherIO):
         self.leftMotor = WPI_TalonFX( leftCanId, "canivore1" )
         self.leftMotor.clearStickyFaults( 250 )
         self.leftMotor.configFactoryDefault( 250 )
-        self.leftMotor.setNeutralMode( NeutralMode.Coast )
         self.leftMotor.setInverted( False )
 
         # Falcon Current Limit???
@@ -36,9 +36,9 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor = WPI_TalonFX( rightCanId, "canivore1" )
         self.rightMotor.clearStickyFaults( 250 )
         self.rightMotor.configFactoryDefault( 250 )
-        self.rightMotor.setNeutralMode( NeutralMode.Coast )
         self.rightMotor.setInverted( True )
 
+        self.setBrake( self.brakeMode.get() )
         self.updateVoltageComp()
 
         # Falcon Current Limit???
@@ -84,6 +84,11 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.config_kD( 0, self.launcher_kD.get(), 250 )
         self.rightMotor.config_kF( 0, self.launcher_kF.get(), 250 )
         self.rightMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
+
+    def setBrake(self, brake:bool):
+        mode = NeutralMode.Brake if brake else NeutralMode.Coast
+        self.leftMotor.setNeutralMode( mode )
+        self.rightMotor.setNeutralMode( mode )
 
     def updateVoltageComp(self):
         value = self.voltageComp.get()
