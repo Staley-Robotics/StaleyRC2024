@@ -25,6 +25,7 @@ from .launcher.LauncherAmp import *
 from .launcher.LauncherEject import *
 from .launcher.LauncherSource import *
 from .launcher.LauncherSpeaker import *
+from .launcher.LauncherSpeakerAuto import *
 from .launcher.LauncherStop import *
 from .launcher.LauncherToss import *
 from .launcher.LauncherTrap import *

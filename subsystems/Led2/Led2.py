@@ -106,12 +106,16 @@ class Led2(Subsystem):
             color = self.allianceColor
 
             # Determine State    
-            if self.indexerHasNote() and self.launchAimGood():
-                blink = True
-                slow = False
+            if self.indexerHasNote():
+                if self.launchAimGood():
+                    if self.launchRangeFar():
+                        blink = True
+                    if self.launchRangeNear():
+                        slow = False
             elif self.intakeHasNote():
                 blink = True
-                slow = False
+                if not self.intakeIsRunning():
+                    slow = False
             elif self.intakeIsRunning():
                 blink = True
 

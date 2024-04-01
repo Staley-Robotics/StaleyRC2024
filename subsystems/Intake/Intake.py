@@ -24,7 +24,7 @@ class Intake(Subsystem):
         self.intakeMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Intake" )
         
         if RobotBase.isSimulation():
-            self.simHasNote = NTTunableBoolean( "/Logging/Intake/HasNote", False, persistent=False )
+            self.simHasNote = NTTunableBoolean( "/Testing/Intake/HasNote", False, persistent=False )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
@@ -45,6 +45,10 @@ class Intake(Subsystem):
         # Post Run Logging
         self.intakeMeasuredLogger.putNumberArray( "Setpoint", self.intake.getSetpoint() )
         self.intakeMeasuredLogger.putNumberArray( "Measured", self.intake.getVelocity() )
+        
+        self.intakeMeasuredLogger.putBoolean( "hasNote", self.hasNote() )
+        self.intakeMeasuredLogger.putBoolean( "isRunning", self.isRunning() )
+        self.intakeMeasuredLogger.putBoolean( "isWaiting", self.isWaiting() )
 
     def set(self, speed:float):
         self.intake.setVelocity( speed, speed )
@@ -79,9 +83,9 @@ class Intake(Subsystem):
 
     def isWaiting(self) -> bool:
         return (
-            self.hasNote() or
-            self.getCurrentCommand() == None or
-            self.getCurrentCommand().getName() != "IntakeWait"
+            self.hasNote() and
+            ( self.getCurrentCommand() == None or
+            self.getCurrentCommand().getName() == "IntakeWait" )
         )
 
     def setHasNote(self, hasNote:bool) -> None:

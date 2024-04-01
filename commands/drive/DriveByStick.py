@@ -35,7 +35,7 @@ class DriveByStick(Command):
         # Tunables
         self.deadband = NTTunableFloat( "/Config/Driver1/Deadband", 0.04, persistent=True )
 
-        self.velocLinearTurbo = NTTunableFloat( "Config/Driver1/TubroLinear", 3.0, persistent=True )
+        self.velocLinearTurbo = NTTunableFloat( "/Config/Driver1/TubroLinear", 3.0, persistent=True )
         self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 1.50, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
@@ -45,7 +45,7 @@ class DriveByStick(Command):
         self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
         self.isTurbo = NTTunableBoolean( "/Driver1/isTurbo", False, persistent=False )
         self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
-        self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
+        self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", False, persistent=True )       
         self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", True, persistent=True )        
         
         # This Command Global Properties

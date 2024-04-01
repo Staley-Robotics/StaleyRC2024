@@ -52,8 +52,8 @@ class RobotContainer:
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
             ssGyroIO = GyroIOPigeon2( 9 )
-            ssIntakeIO = IntakeIOSim()
-            ssIndexerIO = IndexerIOSim()
+            ssIntakeIO = IntakeIO()
+            ssIndexerIO = IndexerIO()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
             ssLedIO = Led2IOPwm( 0 )
@@ -220,8 +220,14 @@ class RobotContainer:
         
         # Operator Station Buttons 
         #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
-        self.stationCmd.button(12).toggleOnTrue( IntakeLoad(self.intake).onlyIf( lambda: not self.feeder.hasNote() ) ) # whileTrue( IntakeLoad( self.intake ) )
-        self.stationCmd.button(11).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
+        self.stationCmd.button(12
+            ).and_( lambda: not self.feeder.hasNote()
+            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.launcher.getCurrentCommand().cancel() )
+            ).toggleOnFalse( IntakeLoad(self.intake) )
+        self.stationCmd.button(11
+            ).and_( lambda: not self.feeder.hasNote()
+            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.intake.getCurrentCommand().cancel() )
+            ).toggleOnFalse( LauncherSource( self.launcher ) )
         self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
         self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
         self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )

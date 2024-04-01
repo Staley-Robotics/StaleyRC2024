@@ -22,7 +22,7 @@ class Indexer(Subsystem):
         self.indexerMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Indexer" )
 
         if RobotBase.isSimulation(): 
-            self.simHasNote = NTTunableBoolean( "/Logging/Indexer/HasNote", True, persistent=False )
+            self.simHasNote = NTTunableBoolean( "/Testing/Indexer/HasNote", True, persistent=False )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Indexer", False, persistent=True )
 
@@ -45,22 +45,15 @@ class Indexer(Subsystem):
         # Post Run Logging
         self.indexerMeasuredLogger.putNumber( "Measured", self.indexer.getVelocity() )
         self.indexerMeasuredLogger.putNumber( "Setpoint", self.indexer.getSetpoint() )
-        #self.indexerMeasuredLogger.putBoolean( "HasNote", self.hasNote() )
+        self.indexerMeasuredLogger.putBoolean( "hasNote", self.hasNote() )
+        self.indexerMeasuredLogger.putNumber( "hasHalfNote", self.hasHalfNote() )
+        self.indexerMeasuredLogger.putBoolean( "isRunning", self.isRunning() )
 
     def set(self, speed:float):
         self.indexer.setVelocity( speed )
 
     def stop(self) -> None:
         self.set( Indexer.IndexerSpeeds.Stop.get() )
-
-    # def handoff(self) -> None:
-    #     self.set( self.IndexerSpeeds.Handoff )
-
-    # def launch(self) -> None:
-    #     self.set( self.IndexerSpeeds.Launch )
-
-    # def eject(self) -> None:
-    #     self.set( self.IndexerSpeeds.Eject )
 
     def setBrake(self, brake:bool) -> None:
         self.indexer.setBrake(brake)
