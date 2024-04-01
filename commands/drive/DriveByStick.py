@@ -24,7 +24,8 @@ class DriveByStick(Command):
                   velocityY:typing.Callable[[], float],
                   holonomicX:typing.Callable[[], float] = ( lambda: 0.0 ),
                   holonomicY:typing.Callable[[], float] = ( lambda: 0.0 ), 
-                  rotate:typing.Callable[[], float] = ( lambda: 0.0 )
+                  rotate:typing.Callable[[], float] = ( lambda: 0.0 ),
+                  turbo:typing.Callable[[], bool] = ( lambda: False )
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
@@ -34,13 +35,15 @@ class DriveByStick(Command):
         # Tunables
         self.deadband = NTTunableFloat( "/Config/Driver1/Deadband", 0.04, persistent=True )
 
-        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 3.7, persistent=True )
+        self.velocLinearTurbo = NTTunableFloat( "Config/Driver1/TubroLinear", 3.0, persistent=True )
+        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 1.50, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
         self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
         self.srl = NTTunableFloat( "/Config/Driver1/SlewRateLimiter", 3.0, self.updateSlewRateLimiter, persistent=True )
 
         self.isFieldRelative = NTTunableBoolean( "/Driver1/isFieldRelative", True, persistent=False )
+        self.isTurbo = NTTunableBoolean( "/Driver1/isTurbo", False, persistent=False )
         self.isHalfSpeed = NTTunableBoolean( "/Driver1/isHalfSpeed", False, persistent=False )
         self.isSqrInputs = NTTunableBoolean( "/Driver1/isSquaredInputs", True, persistent=True )       
         self.isSrl = NTTunableBoolean( "/Driver1/isSlewRateLimited", True, persistent=True )        
@@ -66,6 +69,7 @@ class DriveByStick(Command):
     def initialize(self) -> None:
         # Holonomic PID
         self.tPid = self.drive.getHolonomicDriveController().getThetaController()
+        self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
 
         # Verify Max Speeds
         linear, angular = self.drive.getVelocityConfig()
@@ -95,8 +99,8 @@ class DriveByStick(Command):
         # Calculate Deadband
         x = applyDeadband( x, self.deadband.get() ) 
         y = applyDeadband( y, self.deadband.get() )
-        hX = applyDeadband( hX, self.deadband.get() )
-        hY = applyDeadband( hY, self.deadband.get() )
+        hX = applyDeadband( hX, self.deadband.get(), 100.0 )
+        hY = applyDeadband( hY, self.deadband.get(), 100.0 )
         r = applyDeadband( r, self.deadband.get() )
 
         # Apply Clamped Values
@@ -118,13 +122,13 @@ class DriveByStick(Command):
         if self.isSrl.get():
             x = self.srl_vX.calculate( x )
             y = self.srl_vY.calculate( y )
-            hX = self.srl_hX.calculate( hX )
-            hY = self.srl_hY.calculate( hY )
+            #hX = self.srl_hX.calculate( hX )
+            #hY = self.srl_hY.calculate( hY )
             r = self.srl_rO.calculate( r )
 
         # Calculate Half Speed Controls
         magH = 1.0
-        if self.isHalfSpeed.get():
+        if self.isHalfSpeed.get() and not self.isTurbo.get():
             x *= self.halfSpeedLinear.get()
             y *= self.halfSpeedLinear.get()
             r *= self.halfSpeedAngular.get()
@@ -143,8 +147,8 @@ class DriveByStick(Command):
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
         
         # Determine Velocities
-        veloc_x = x * self.velocLinear.get()
-        veloc_y = y * self.velocLinear.get()
+        veloc_x = x * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
+        veloc_y = y * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
         veloc_r = r * self.velocAngular.get()
 
         # Determine when ChassisSpeeds capability to use

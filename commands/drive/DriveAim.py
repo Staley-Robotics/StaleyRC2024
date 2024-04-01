@@ -15,6 +15,7 @@ class DriveAim(SelectCommand):
                   velocityY:typing.Callable[[], float],
                   getTarget:typing.Callable[[], LaunchCalc.Targets]
                 ):
+        self.getTarget = getTarget
         super().__init__(
             {
                 LaunchCalc.Targets.SPEAKER: DriveAimSpeaker(
@@ -31,8 +32,17 @@ class DriveAim(SelectCommand):
             },
             getTarget
         )
-        pass
+
+    def getTargetFunction(self):
+        match self.getTarget():
+            case LaunchCalc.Targets.SPEAKER:
+                return "Speaker"
+            case LaunchCalc.Targets.AMP:
+                return "Amp"
+            case _:
+                return "None"
 
     def initialize(self):
         # Write New Name
         self.setName( self._selectedCommand.getName() )
+        super().initialize()

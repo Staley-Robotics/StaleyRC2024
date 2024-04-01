@@ -187,6 +187,7 @@ class RobotContainer:
             def getSwitchClimb() -> bool: return self.station.getRawButton(9)
         
         ## Controller Configs
+        self.m_driver1.rightStick().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) ) # Drive - Force Aiming
         self.m_driver1.a().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
         self.m_driver1.b().onTrue(
             commands2.cmd.runOnce(
@@ -194,8 +195,10 @@ class RobotContainer:
             ).ignoringDisable(True)
         ) # Toggle Target
         self.m_driver1.x().toggleOnTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) ) # NoteAction:  NoteLoadGround, NoteLaunchSpeaker, NoteLaunchAmp, NoteLaunchToss
-        self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
-        self.m_driver1.rightBumper().onTrue( ToggleHalfSpeed() )  # Toggle Half Speed
+        #self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
+        self.m_driver1.leftBumper().onTrue( ToggleHalfSpeed() )  # Toggle Half Speed
+        self.m_driver1.rightBumper().toggleOnTrue( ToggleTurboOn() )  # Toggle Turbo On
+        self.m_driver1.rightBumper().toggleOnFalse( ToggleTurboOff() )  # Toggle Turbo Off
         self.m_driver1.back().onTrue( ToggleFieldRelative() ) # Toggle Field Relative
         self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) ) # Resync Gyro - Do we need this?
         
