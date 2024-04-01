@@ -1,10 +1,12 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+
+from commands import PivotHandoff, PivotAim, PivotAmp, PivotSpeaker, PivotToss, PivotByStick
 from subsystems import Pivot
-from util import *
 
-class PivotDefault(commands2.SelectCommand):
+class PivotDefault(SelectCommand):
     def __init__( self,
                   pivot:Pivot,
                   hasNote:typing.Callable[[],bool],

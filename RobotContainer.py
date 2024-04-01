@@ -185,16 +185,84 @@ class RobotContainer:
             def getSwitchPivotAuto() -> bool: return self.station.getRawButton(7)
             def getSwitchPivotManual() -> bool: return self.station.getRawButton(8)
             def getSwitchClimb() -> bool: return self.station.getRawButton(9)
-        
+
+        def addIntakeCommands( button:commands2.button.Trigger ):
+            button.and_( lambda: not self.feeder.hasNote()
+                ).and_( self.launcher.isRunning
+                ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.launcher.getCurrentCommand().cancel() ) )
+            button.and_( lambda: not self.feeder.hasNote()
+                ).toggleOnTrue( IntakeLoad(self.intake) )
+
+        def addSourceCommands( button:commands2.button.Trigger ):
+            button.and_( lambda: not self.feeder.hasNote()
+                ).and_( self.launcher.isRunning
+                ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.intake.getCurrentCommand().cancel() ) )
+            button.and_( lambda: not self.feeder.hasNote()
+                ).toggleOnTrue( LauncherSource(self.launcher) )
+            
+        def addLaunchSpeakerCommands( button:commands2.button.Trigger ):
+            button.and_( self.feeder.hasNote
+                ).and_( lambda: not self.launcher.isRunning()
+                ).and_( self.launchCalc.inFarRange
+                ).and_( self.launchCalc.isTargetSpeaker
+                ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) )
+            button.and_( self.feeder.hasNote
+                ).and_( self.launcher.isRunning
+                ).and_( self.launchCalc.inFarRange
+                ).and_( self.launchCalc.isTargetSpeaker
+                ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+
+        def addLaunchAmpCommands( button:commands2.button.Trigger ):
+            button.and_( self.feeder.hasNote
+                ).and_( lambda: not self.launcher.isRunning()
+                ).and_( self.launchCalc.inFarRange
+                ).and_( self.launchCalc.isTargetAmp
+                ).onTrue( LauncherAmp( self.launcher ) )
+            button.and_( self.feeder.hasNote
+                ).and_( self.launcher.isRunning 
+                ).and_( self.launchCalc.inFarRange
+                ).and_( self.launchCalc.isTargetAmp
+                ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+
+        def addLaunchTossCommands( button:commands2.button.Trigger ):
+            button.and_( self.feeder.hasNote
+                ).and_( lambda: not self.launcher.isRunning()
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).toggleOnTrue( LauncherToss( self.launcher ) )
+            button.and_( self.feeder.hasNote
+                ).and_( self.launcher.isRunning
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+
+        def addSetTargetCommands( button:commands2.button.Trigger ):
+            button.onTrue(
+                commands2.cmd.runOnce(
+                    lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.isTargetAmp() else LaunchCalc.Targets.SPEAKER )
+                )
+            )
+
+        def addLedCommands( button:commands2.button.Trigger ):
+            button.and_( RobotState.isDisabled
+                ).whileTrue( LedCelebration(self.led) )
+            button.and_( RobotState.isTeleop
+                ).and_( lambda: not RobotState.isEStopped()
+                ).whileTrue( LedDistraction(self.led) )
+            
+        def addDriveAimCommands( button:commands2.button.Trigger ):
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).whileTrue( DriveAimSpeaker( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
+            button.and_( self.launchCalc.isTargetAmp
+                ).whileTrue( DriveAimAmp( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
+
+
         ## Controller Configs
-        self.m_driver1.rightStick().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) ) # Drive - Force Aiming
         self.m_driver1.a().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
-        self.m_driver1.b().onTrue(
-            commands2.cmd.runOnce(
-                lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )
-            ).ignoringDisable(True)
-        ) # Toggle Target
-        self.m_driver1.x().toggleOnTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) ) # NoteAction:  NoteLoadGround, NoteLaunchSpeaker, NoteLaunchAmp, NoteLaunchToss
+        addDriveAimCommands( self.m_driver1.rightStick() )
+        addSetTargetCommands( self.m_driver1.b() ) # Toggle Target
+        addIntakeCommands( self.m_driver1.x() ) # Intake (When No Note)
+        addLaunchSpeakerCommands( self.m_driver1.x() ) # Launch Speaker
+        addLaunchAmpCommands( self.m_driver1.x() ) # Launch Amp
+        addLaunchTossCommands( self.m_driver1.x() ) # Launch Toss
         #self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
         self.m_driver1.leftBumper().onTrue( ToggleHalfSpeed() )  # Toggle Half Speed
         self.m_driver1.rightBumper().toggleOnTrue( ToggleTurboOn() )  # Toggle Turbo On
@@ -203,11 +271,13 @@ class RobotContainer:
         self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) ) # Resync Gyro - Do we need this?
         
         #  Driver 2
-        self.m_driver2.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) ) # Drive - Force Aiming
-        self.m_driver2.x().toggleOnTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) ) # NoteAction: NoteLoadGround, NoteLaunchSpeaker, NoteLaunchAmp, NoteLaunchToss
-        self.m_driver2.b().whileTrue( AllRealign( self.intake, self.feeder, self.launcher, self.pivot ) ) # Realign Pivot with Intake
+        addDriveAimCommands( self.m_driver2.a() )
+        addSetTargetCommands( self.m_driver2.b() )
+        addIntakeCommands( self.m_driver1.x() )
+        addLaunchSpeakerCommands( self.m_driver1.x() )
+        addLaunchAmpCommands( self.m_driver1.x() )
+        addLaunchTossCommands( self.m_driver1.x() )
         self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
-        #self.m_driver2.leftBumper().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) ) 
         self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
         self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
 
@@ -219,20 +289,14 @@ class RobotContainer:
         )
         
         # Operator Station Buttons 
-        #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
-        self.stationCmd.button(12
-            ).and_( lambda: not self.feeder.hasNote()
-            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.launcher.getCurrentCommand().cancel() )
-            ).toggleOnFalse( IntakeLoad(self.intake) )
-        self.stationCmd.button(11
-            ).and_( lambda: not self.feeder.hasNote()
-            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.intake.getCurrentCommand().cancel() )
-            ).toggleOnFalse( LauncherSource( self.launcher ) )
-        self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
+        addIntakeCommands( self.stationCmd.button(12) )
+        addSourceCommands( self.stationCmd.button(11) )
+        addLaunchTossCommands( self.stationCmd.button(2) )
+        addLaunchSpeakerCommands( self.stationCmd.button(1) )
+        addLaunchAmpCommands( self.stationCmd.button(1) )
         self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
         self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(4).whileTrue( LedAction(self.led) )
+        addLedCommands( self.stationCmd.button(4) )
 
         # Configure Default Commands (with Operatory Station Toggles integrated)
         self.drivetrain.setDefaultCommand(

@@ -17,9 +17,8 @@ class NoteToss(commands2.SequentialCommandGroup):
             commands2.ParallelCommandGroup(
                 LauncherToss(launcher),
                 commands2.SequentialCommandGroup(
-                    commands2.WaitCommand( 0.025 ),
-                    commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(300) ),
-                    IndexerLaunch(indexer)
+                    commands2.WaitCommand( 0.02 ),
+                    IndexerLaunch(indexer, lambda: launcher.atSpeed(300) )
                 )
             )
         )

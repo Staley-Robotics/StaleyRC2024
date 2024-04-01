@@ -1,11 +1,12 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+
+from commands import IndexerHandoff, IndexerLoad, IndexerLaunch
 from subsystems import Indexer
-from util import *
 
-
-class IndexerDefault(commands2.SelectCommand):
+class IndexerDefault(SelectCommand):
     def __init__( self,
                   indexer: Indexer,
                   intakeHasNote: typing.Callable[[], bool],
@@ -21,7 +22,7 @@ class IndexerDefault(commands2.SelectCommand):
             {
                 "handoff": IndexerHandoff(indexer),
                 "load": IndexerLoad(indexer),
-                "launch": IndexerLaunch(indexer),
+                "launch": IndexerLaunch(indexer, lambda:True),
                 "wait": commands2.cmd.none().withName("IndexerWait"),
             },
             self.getState,

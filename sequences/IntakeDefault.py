@@ -1,10 +1,12 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+
+from commands import IntakeHandoff, IntakeLoad
 from subsystems import Intake
-from util import *
 
-class IntakeDefault(commands2.SelectCommand):
+class IntakeDefault(SelectCommand):
     def __init__( self,
                   intake:Intake,
                   indexerHasNote:typing.Callable[[],bool],
