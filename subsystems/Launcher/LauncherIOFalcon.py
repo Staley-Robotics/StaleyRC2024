@@ -13,7 +13,7 @@ class LauncherIOFalcon(LauncherIO):
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kD = NTTunableFloat('/Config/Launcher/Falcon/PID/kD', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.065, updater=self.resetPid, persistent=True)
-        self.brakeMode = NTTunableBoolean('/Config/Launcher/Falcon/BrakeMode', True, update=lambda: self.setBrake( self.brakeMode.get() ), persistent=True)
+        self.brakeMode = NTTunableBoolean('/Config/Launcher/Falcon/BrakeMode', True, updater=lambda: self.setBrake( self.brakeMode.get() ), persistent=True)
         self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 12.0, updater=self.updateVoltageComp, persistent=True)
 
         # Static Variables

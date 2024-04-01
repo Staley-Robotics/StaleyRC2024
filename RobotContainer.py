@@ -105,15 +105,19 @@ class RobotContainer:
         # Register Pathplanner Commands
         if wpilib.RobotBase.isSimulation():
             ppCommands = {
+                "AutoAmp": commands2.cmd.waitSeconds( 0.50 ), 
                 "AutoPivot": commands2.cmd.waitSeconds( 0.50 ),
                 "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(False) )),
-                "AutoPickup": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(True) ))
+                "AutoPickup": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(True) )),
+                "AutoToss": commands2.cmd.waitSeconds( 0.50 )
             }
         else:
             ppCommands = {
+                "AutoAmp": NoteLaunchAmp(self.feeder, self.launcher, self.pivot),
                 "AutoPivot": PivotAim(self.pivot, self.launchCalc.getLaunchAngle),
                 "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
-                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot)
+                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot),
+                "AutoToss": NoteToss( self.feeder, self.launcher, self.pivot )
             }
         self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc.getRotateAngle, self.feeder.hasNote )   
         self.pathPlanner.setNamedCommands( ppCommands )
