@@ -268,8 +268,8 @@ class RobotContainer:
         self.m_driver1.rightBumper().toggleOnTrue( ToggleTurboOn() )  # Toggle Turbo On
         self.m_driver1.rightBumper().toggleOnFalse( ToggleTurboOff() )  # Toggle Turbo Off
         self.m_driver1.back().onTrue( ToggleFieldRelative() ) # Toggle Field Relative
-        self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) ) # Resync Gyro - Do we need this?
-        
+        addLedCommands( self.m_driver1.start() )
+
         #  Driver 2
         addDriveAimCommands( self.m_driver2.a() )
         addSetTargetCommands( self.m_driver2.b() )
@@ -279,7 +279,8 @@ class RobotContainer:
         addLaunchTossCommands( self.m_driver1.x() )
         self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
         self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+        #self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+        addLedCommands( self.m_driver2.start() )
 
         self.m_driver2.povUp().onTrue(
             commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( 0.5 ) ).ignoringDisable(True)
