@@ -85,12 +85,14 @@ class Launcher(Subsystem):
         # Post Run Logging
         self.launcherMeasuredLogger.putNumberArray( "Setpoint", self.launcher.getSetpoint() )
         self.launcherMeasuredLogger.putNumberArray( "Measured", self.launcher.getVelocity() )
-        self.launcherMeasuredLogger.putNumber( "SensorCount", self.launcher.getSensorCount() )
         
         self.launcherMeasuredLogger.putBoolean( "LaunchDetect/AtSpeed", self.atSpeed() )
         self.launcherMeasuredLogger.putNumber( "LaunchDetect/AtSpeedCount", self.launchAtSpeedCount )
         self.launcherMeasuredLogger.putBoolean( "LaunchDetect/DipDetected", self.launchDipDetected )
         self.launcherMeasuredLogger.putBoolean( "LaunchDetect/LaunchDetected", self.launchDetected )
+        
+        self.launcherMeasuredLogger.putBoolean( "LaunchDetect/SensorDetected", self.launcher.hasLaunched() )
+        self.launcherMeasuredLogger.putNumber( "LaunchDetect/SensorCount", self.launcher.getSensorCount() )
 
     def set(self, leftSpeed:float, rightSpeed:float):
         self.launcher.setVelocity( leftSpeed, rightSpeed )
@@ -116,7 +118,7 @@ class Launcher(Subsystem):
         else:
             return self.launchTimer.hasElapsed( self.detectTimer.get() )
 
-    def atSpeed(self, errorRange:float = 300.00) -> bool:
+    def atSpeed(self, errorRange:float = 250.00) -> bool:
         spL, spR = self.launcher.getSetpoint()
         if spL == 0.0 and spR == 0.0:
             return False

@@ -54,6 +54,7 @@ class LauncherIOFalcon(LauncherIO):
         self.irSensor = DigitalInput(sensorId)
         self.lastSensor = self.irSensor.get()
         self.sensorCount = 0
+        self.sensorDetected = False
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
         inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()
@@ -105,16 +106,24 @@ class LauncherIOFalcon(LauncherIO):
 
 
     def run(self):
+        # Control Mode
         controlMode = ControlMode.Velocity
-
-        if self.lastSensor != self.irSensor.get():
-            self.lastSensor = self.irSensor.get()
-            self.sensorCount += 1
-
         if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
-            self.sensorCount = 0
             controlMode = ControlMode.PercentOutput
 
+        # Launch Sensor Detection
+        if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
+            pass
+            #self.sensorCount = 0
+        elif self.lastSensor != self.irSensor.get():
+            self.sensorCount += 1
+            if self.sensorCount % 2 == 0:
+                self.sensorDetected = True
+            else:
+                self.sensorDetected = False
+        self.lastSensor = self.irSensor.get()
+
+        # Set Motor
         self.leftMotor.set( controlMode, self.desiredVelocity[0] )
         self.rightMotor.set( controlMode, self.desiredVelocity[1] )
 
@@ -131,4 +140,7 @@ class LauncherIOFalcon(LauncherIO):
         return self.desiredVelocity
     
     def hasLaunched(self):
-        return self.sensorCount >= 2
+        if self.sensorDetected and self.sensorCount % 2 == 0:
+            self.sensorDetected = False
+            return True
+        #return self.sensorCount >= 2
