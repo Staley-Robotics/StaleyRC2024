@@ -223,22 +223,28 @@ class RobotContainer:
             button.and_( self.launchCalc.isTargetSpeaker
                 ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
                 ).and_( self.launchCalc.inFarRange
-                ).and_( self.launcher.isRunning
+                #).and_( self.launcher.isRunning
                 ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
 
         def addLaunchAmpCommands( button:commands2.button.Trigger ):
             # Start Launcher
             button.and_( self.launchCalc.isTargetAmp
                 ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
-                ).and_( lambda: not self.launcher.isRunning()
                 ).and_( self.launchCalc.inFarRange
+                ).and_( lambda: not self.launcher.isRunning()
                 ).toggleOnTrue( LauncherAmp( self.launcher ) )
+            # Move Pivot
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).and_( lambda: not self.pivot.atPositionAmp()
+                ).toggleOnTrue( PivotAmp( self.pivot ) )
             # Launch Object
             button.and_( self.launchCalc.isTargetAmp
                 ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
-                ).and_( self.launcher.isRunning
                 ).and_( self.launchCalc.inFarRange
-                ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+                #).and_( self.launcher.isRunning
+                ).toggleOnTrue( IndexerLaunch( self.feeder, lambda: ( self.launcher.atSpeed() and self.pivot.atPositionAmp() ) ) )
 
         def addLaunchTossCommands( button:commands2.button.Trigger ):
             # Start Launcher
