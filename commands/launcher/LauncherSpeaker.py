@@ -31,13 +31,16 @@ class LauncherSpeaker(Command):
             self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftLow.get(), Launcher.LauncherSpeeds.SpeakerRightLow.get())
         elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceMedium.get():
             self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftMedium.get(), Launcher.LauncherSpeeds.SpeakerLeftMedium.get())
-        elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
+        # elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
+        #     self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftHigh.get(), Launcher.LauncherSpeeds.SpeakerLeftHigh.get())
+        else: 
+            # self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
             self.launcher.set(Launcher.LauncherSpeeds.SpeakerLeftHigh.get(), Launcher.LauncherSpeeds.SpeakerLeftHigh.get())
-        else:
-            self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+
 
     def end(self, interrupted:bool) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        if not interrupted:
+            self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.launcher.hasLaunched()

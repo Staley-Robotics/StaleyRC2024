@@ -193,6 +193,7 @@ class RobotContainer:
         def addIntakeCommands( button:commands2.button.Trigger ):
             button.and_( lambda: not self.feeder.hasNote()
                 ).and_( self.launcher.isRunning
+                ).and_( lambda: self.launcher.getCurrentCommand() != None
                 ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.launcher.getCurrentCommand().cancel() ) )
             button.and_( lambda: not self.feeder.hasNote()
                 ).toggleOnTrue( IntakeLoad(self.intake) )
@@ -200,6 +201,7 @@ class RobotContainer:
         def addSourceCommands( button:commands2.button.Trigger ):
             button.and_( lambda: not self.feeder.hasNote()
                 ).and_( self.launcher.isRunning
+                ).and_( lambda: self.launcher.getCurrentCommand() != None
                 ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.intake.getCurrentCommand().cancel() ) )
             button.and_( lambda: not self.feeder.hasNote()
                 ).toggleOnTrue( LauncherSource(self.launcher) )
@@ -214,7 +216,7 @@ class RobotContainer:
                 ).and_( self.launcher.isRunning
                 ).and_( self.launchCalc.inFarRange
                 ).and_( self.launchCalc.isTargetSpeaker
-                ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+                ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
 
         def addLaunchAmpCommands( button:commands2.button.Trigger ):
             button.and_( self.feeder.hasNote
@@ -239,11 +241,16 @@ class RobotContainer:
                 ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
 
         def addSetTargetCommands( button:commands2.button.Trigger ):
+            #button.onTrue( commands2.cmd.runOnce( lambda: print( self.launchCalc.isTargetSpeaker() ) ))
             button.onTrue(
                 commands2.cmd.runOnce(
-                    lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.isTargetAmp() else LaunchCalc.Targets.SPEAKER )
+                    lambda: self.launchCalc.setTarget( 
+                        LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER
+                    )
                 )
             )
+            # button.and_( self.launchCalc.isTargetAmp
+            #     ).onTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.SPEAKER ) ) )
 
         def addLedCommands( button:commands2.button.Trigger ):
             button.and_( RobotState.isDisabled
@@ -254,9 +261,9 @@ class RobotContainer:
             
         def addDriveAimCommands( button:commands2.button.Trigger ):
             button.and_( self.launchCalc.isTargetSpeaker
-                ).whileTrue( DriveAimSpeaker( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
+                ).onTrue( DriveAimSpeaker( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
             button.and_( self.launchCalc.isTargetAmp
-                ).whileTrue( DriveAimAmp( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
+                ).onTrue( DriveAimAmp( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX ) )
 
 
         ## Controller Configs
@@ -277,10 +284,10 @@ class RobotContainer:
         #  Driver 2
         addDriveAimCommands( self.m_driver2.a() )
         addSetTargetCommands( self.m_driver2.b() )
-        addIntakeCommands( self.m_driver1.x() )
-        addLaunchSpeakerCommands( self.m_driver1.x() )
-        addLaunchAmpCommands( self.m_driver1.x() )
-        addLaunchTossCommands( self.m_driver1.x() )
+        addIntakeCommands( self.m_driver2.x() )
+        addLaunchSpeakerCommands( self.m_driver2.x() )
+        addLaunchAmpCommands( self.m_driver2.x() )
+        addLaunchTossCommands( self.m_driver2.x() )
         self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
         self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
         #self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
@@ -318,7 +325,7 @@ class RobotContainer:
             IntakeDefault(
                 self.intake,
                 self.feeder.hasNote,
-                self.pivot.atSetpoint,
+                pivotAtHandoff = self.pivot.atPositionHandoff,
                 useAutoStart = getSwitchIntakeAuto
             )
         )
@@ -329,7 +336,7 @@ class RobotContainer:
                 self.launchCalc.getLaunchAngle,
                 self.m_driver2.getLeftY,
                 isTargetAmp = self.launchCalc.isTargetAmp,
-                isIntakeWaiting = self.intake.isWaiting,
+                isIntakeQueued = lambda: (self.intake.isRunning() or self.intake.hasNote()),
                 useAutoCalculate = getSwitchPivotAuto,
                 useManualAdjust = getSwitchPivotManual
             )
@@ -338,7 +345,7 @@ class RobotContainer:
             IndexerDefault(
                 self.feeder,
                 self.intake.hasNote,
-                self.pivot.atSetpoint,
+                self.pivot.atPositionHandoff,
                 self.launchCalc.isAutoLaunchApproved
             )
         )
@@ -346,7 +353,7 @@ class RobotContainer:
             LauncherDefault(
                 self.launcher,
                 self.launchCalc.getDistance,
-                self.feeder.hasNote,
+                isIndexerReady = lambda: ( self.feeder.hasNote() and not self.feeder.isRunning() ),
                 isTargetAmp = self.launchCalc.isTargetAmp,
                 useAutoStart = getSwitchLaunchSpinAuto
             )

@@ -78,6 +78,9 @@ class Intake(Subsystem):
         return self.intake.foundNote()
     
     def isRunning(self) -> bool:
+        if self.getCurrentCommand() == None or self.getCurrentCommand().getName() == "IntakeWait":
+            return False
+        
         upper, lower = self.intake.getVelocity()
         return ( upper != Intake.IntakeSpeeds.Stop.get() or lower != Intake.IntakeSpeeds.Stop.get() )
 

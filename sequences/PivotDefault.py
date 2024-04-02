@@ -13,7 +13,7 @@ class PivotDefault(SelectCommand):
                   getAngle:typing.Callable[[],float],
                   getAdjustAxis:typing.Callable[[],float] = lambda: 0.0,
                   isTargetAmp:typing.Callable[[],bool] = lambda: False,
-                  isIntakeWaiting:typing.Callable[[],bool] = lambda: False,
+                  isIntakeQueued:typing.Callable[[],bool] = lambda: False,
                   useAutoCalculate:typing.Callable[[],bool] = lambda: True,
                   useManualAdjust:typing.Callable[[],bool] = lambda: False
                 ):
@@ -21,7 +21,7 @@ class PivotDefault(SelectCommand):
         self.launchAngle = getAngle
         self.getAdjustAxis = getAdjustAxis
         self.isTargetAmp = isTargetAmp
-        self.isIntakeWaiting = isIntakeWaiting
+        self.isIntakeQueued = isIntakeQueued
         self.useAutoCalculate = useAutoCalculate
         self.useManualAdjust = useManualAdjust
 
@@ -52,14 +52,14 @@ class PivotDefault(SelectCommand):
         elif self.useManualAdjust():
             if self.indexerHasNote():
                 return "adjust"
-            elif self.isIntakeWaiting():
+            elif self.isIntakeQueued():
                 return "handoff"
             else:
                 return "wait"
         else:
             if self.indexerHasNote():
                 return "fixed"
-            elif self.isIntakeWaiting():
+            elif self.isIntakeQueued():
                 return "handoff"
             else:
                 return "wait"

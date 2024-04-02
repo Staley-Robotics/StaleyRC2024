@@ -31,7 +31,7 @@ class IndexerLaunch(WaitUntilCommand):
         self.indexer.set(Indexer.IndexerSpeeds.Launch.get())
 
     def end(self, interrupted:bool) -> None:
-        super().end()
+        super().end(interrupted)
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:

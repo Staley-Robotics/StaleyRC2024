@@ -102,6 +102,9 @@ class Launcher(Subsystem):
         self.launcher.setBrake( brake )
 
     def isRunning(self) -> bool:
+        if self.getCurrentCommand() == None or self.getCurrentCommand().getName() == "LauncherWait":
+            return False
+        
         left, right = self.launcher.getVelocity()
         return ( left != Launcher.LauncherSpeeds.Stop.get() or right != Launcher.LauncherSpeeds.Stop.get())
 
@@ -113,6 +116,10 @@ class Launcher(Subsystem):
         else:
             return self.launchTimer.hasElapsed( self.detectTimer.get() )
 
-    def atSpeed(self, errorRange:float = 100.00) -> bool:
+    def atSpeed(self, errorRange:float = 300.00) -> bool:
+        spL, spR = self.launcher.getSetpoint()
+        if spL == 0.0 and spR == 0.0:
+            return False
+        
         status = self.launcher.atSetpoint(errorRange)
         return ( status[0] and status[1] )

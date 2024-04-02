@@ -86,6 +86,9 @@ class Indexer(Subsystem):
         return not( self.indexer.getLowerSensorIsBroken() or self.indexer.getUpperSensorIsBroken() )
     
     def isRunning(self) -> bool:
+        if self.getCurrentCommand() == None or self.getCurrentCommand() == "IndexerWait":
+            return False
+        
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )
 
     def setHasNote(self, hasNote:bool) -> None:

@@ -27,7 +27,8 @@ class LauncherSource(Command):
         self.launcher.set(Launcher.LauncherSpeeds.SourceLeft.get(), Launcher.LauncherSpeeds.SourceRight.get())
 
     def end(self, interrupted:bool) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        if not interrupted:
+            self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.launcher.hasLaunched()

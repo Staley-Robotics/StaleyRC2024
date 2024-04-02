@@ -10,12 +10,12 @@ class IndexerDefault(SelectCommand):
     def __init__( self,
                   indexer: Indexer,
                   intakeHasNote: typing.Callable[[], bool],
-                  pivotAtPosition: typing.Callable[[], bool],
+                  pivotAtHandoff: typing.Callable[[], bool],
                   isLaunchApproved: typing.Callable[[], bool] = lambda: False
                 ):
         self.indexer = indexer
         self.intakeHasNote = intakeHasNote
-        self.pivotAtPosition = pivotAtPosition
+        self.pivotAtPosition = pivotAtHandoff
         self.useAutoLaunch = isLaunchApproved
 
         super().__init__(

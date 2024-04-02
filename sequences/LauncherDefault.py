@@ -10,11 +10,11 @@ class LauncherDefault(SelectCommand):
     def __init__( self, 
                   launcher:Launcher, 
                   getDistance:typing.Callable[[],float] = lambda: 0.0, 
-                  hasNote:typing.Callable[[],bool] = lambda: False,
+                  isIndexerReady:typing.Callable[[],bool] = lambda: False,
                   isTargetAmp:typing.Callable[[],bool] = lambda: False,
                   useAutoStart:typing.Callable[[],bool] = lambda: True
                 ):
-        self.indexerHasNote = hasNote
+        self.isIndexerReady = isIndexerReady
         self.getDistance = getDistance
         self.isTargetAmp = isTargetAmp
         self.useAutoStart = useAutoStart
@@ -30,14 +30,14 @@ class LauncherDefault(SelectCommand):
         )
 
     def getState(self):
-        if not self.indexerHasNote() or not self.useAutoStart():
+        if not self.isIndexerReady() or not self.useAutoStart():
             return "wait"
-        elif self.getDistance() > 6.0:
-            return "toss"
         elif self.isTargetAmp():
             return "amp"
-        else:
+        elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
             return "speaker"
+        else:
+            return "toss"
 
     def initialize(self):
         super().initialize()

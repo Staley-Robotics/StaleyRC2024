@@ -10,12 +10,12 @@ class IntakeDefault(SelectCommand):
     def __init__( self,
                   intake:Intake,
                   indexerHasNote:typing.Callable[[],bool],
-                  pivotAtPosition:typing.Callable[[],bool],
+                  pivotAtHandoff:typing.Callable[[],bool],
                   useAutoStart:typing.Callable[[],bool]
                 ):
         self.intake = intake
         self.indexerHasNote = indexerHasNote
-        self.pivotAtPosition = pivotAtPosition
+        self.pivotAtPosition = pivotAtHandoff
         self.useAutoStart = useAutoStart
 
         super().__init__(
