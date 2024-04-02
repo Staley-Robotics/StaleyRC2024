@@ -191,66 +191,82 @@ class RobotContainer:
             def getSwitchClimb() -> bool: return self.station.getRawButton(9)
 
         def addIntakeCommands( button:commands2.button.Trigger ):
-            button.and_( lambda: not self.feeder.hasNote()
-                ).and_( self.launcher.isRunning
-                ).and_( lambda: self.launcher.getCurrentCommand() != None
-                ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.launcher.getCurrentCommand().cancel() ) )
-            button.and_( lambda: not self.feeder.hasNote()
+            # Stop Intake
+            button.and_( self.intake.isRunning
+                ).toggleOnTrue( IntakeStop(self.intake) )
+            
+            # Start Intake
+            button.and_( lambda: not self.intake.isRunning()
+                ).and_( lambda: not ( self.feeder.hasNote() or self.feeder.isRunning() )
+                ).and_( lambda: not self.launcher.isRunning()
                 ).toggleOnTrue( IntakeLoad(self.intake) )
 
         def addSourceCommands( button:commands2.button.Trigger ):
-            button.and_( lambda: not self.feeder.hasNote()
-                ).and_( self.launcher.isRunning
-                ).and_( lambda: self.launcher.getCurrentCommand() != None
-                ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.intake.getCurrentCommand().cancel() ) )
-            button.and_( lambda: not self.feeder.hasNote()
+            # Start Launcher
+            button.and_( lambda: not ( self.feeder.hasNote() or self.feeder.isRunning() )
                 ).toggleOnTrue( LauncherSource(self.launcher) )
-            
+        
+        def addLaunchStopCommands( button:commands2.button.Trigger ):
+            # Stop Launcher (Only When You Don't Have A Note)
+            button.and_( self.launcher.isRunning
+                ).and_( lambda: not ( self.feeder.hasNote() or self.feeder.isRunning() )
+                ).toggleOnTrue( LauncherStop(self.launcher) )
+
         def addLaunchSpeakerCommands( button:commands2.button.Trigger ):
-            button.and_( self.feeder.hasNote
+            # Start Launcher
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
+                ).and_( self.launchCalc.inFarRange
                 ).and_( lambda: not self.launcher.isRunning()
-                ).and_( self.launchCalc.inFarRange
-                ).and_( self.launchCalc.isTargetSpeaker
                 ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) )
-            button.and_( self.feeder.hasNote
-                ).and_( self.launcher.isRunning
+            # Launch Object
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
                 ).and_( self.launchCalc.inFarRange
-                ).and_( self.launchCalc.isTargetSpeaker
+                ).and_( self.launcher.isRunning
                 ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
 
         def addLaunchAmpCommands( button:commands2.button.Trigger ):
-            button.and_( self.feeder.hasNote
+            # Start Launcher
+            button.and_( self.launchCalc.isTargetAmp
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
                 ).and_( lambda: not self.launcher.isRunning()
                 ).and_( self.launchCalc.inFarRange
-                ).and_( self.launchCalc.isTargetAmp
-                ).onTrue( LauncherAmp( self.launcher ) )
-            button.and_( self.feeder.hasNote
-                ).and_( self.launcher.isRunning 
-                ).and_( self.launchCalc.inFarRange
-                ).and_( self.launchCalc.isTargetAmp
-                ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
-
-        def addLaunchTossCommands( button:commands2.button.Trigger ):
-            button.and_( self.feeder.hasNote
-                ).and_( lambda: not self.launcher.isRunning()
-                ).and_( lambda: not self.launchCalc.inFarRange()
-                ).toggleOnTrue( LauncherToss( self.launcher ) )
-            button.and_( self.feeder.hasNote
+                ).toggleOnTrue( LauncherAmp( self.launcher ) )
+            # Launch Object
+            button.and_( self.launchCalc.isTargetAmp
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
                 ).and_( self.launcher.isRunning
-                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).and_( self.launchCalc.inFarRange
                 ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
 
+        def addLaunchTossCommands( button:commands2.button.Trigger ):
+            # Start Launcher
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).and_( lambda: not self.launcher.isRunning()
+                ).toggleOnTrue( LauncherToss( self.launcher ) )
+            # Move Pivot
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).and_( lambda: not self.pivot.atPositionToss()
+                ).toggleOnTrue( PivotToss( self.pivot ) )
+            # Launch Object
+            button.and_( self.launchCalc.isTargetSpeaker
+                ).and_( lambda: ( self.feeder.hasNote and not self.feeder.isRunning() )
+                ).and_( lambda: not self.launchCalc.inFarRange()
+                ).toggleOnTrue( IndexerLaunch( self.feeder, lambda: ( self.launcher.atSpeed() and self.pivot.atPositionToss() ) ) )
+
         def addSetTargetCommands( button:commands2.button.Trigger ):
-            #button.onTrue( commands2.cmd.runOnce( lambda: print( self.launchCalc.isTargetSpeaker() ) ))
-            button.onTrue(
+            button.toggleOnTrue(
                 commands2.cmd.runOnce(
                     lambda: self.launchCalc.setTarget( 
                         LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER
                     )
                 )
             )
-            # button.and_( self.launchCalc.isTargetAmp
-            #     ).onTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.SPEAKER ) ) )
 
         def addLedCommands( button:commands2.button.Trigger ):
             button.and_( RobotState.isDisabled
@@ -271,11 +287,12 @@ class RobotContainer:
         addDriveAimCommands( self.m_driver1.rightStick() )
         addSetTargetCommands( self.m_driver1.b() ) # Toggle Target
         addIntakeCommands( self.m_driver1.x() ) # Intake (When No Note)
+        addLaunchStopCommands( self.m_driver1.x() ) # Launch Stop
         addLaunchSpeakerCommands( self.m_driver1.x() ) # Launch Speaker
         addLaunchAmpCommands( self.m_driver1.x() ) # Launch Amp
         addLaunchTossCommands( self.m_driver1.x() ) # Launch Toss
         #self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
-        self.m_driver1.leftBumper().onTrue( ToggleHalfSpeed() )  # Toggle Half Speed
+        self.m_driver1.leftBumper().toggleOnTrue( ToggleHalfSpeed() )  # Toggle Half Speed
         self.m_driver1.rightBumper().toggleOnTrue( ToggleTurboOn() )  # Toggle Turbo On
         self.m_driver1.rightBumper().toggleOnFalse( ToggleTurboOff() )  # Toggle Turbo Off
         self.m_driver1.back().onTrue( ToggleFieldRelative() ) # Toggle Field Relative
@@ -285,6 +302,7 @@ class RobotContainer:
         addDriveAimCommands( self.m_driver2.a() )
         addSetTargetCommands( self.m_driver2.b() )
         addIntakeCommands( self.m_driver2.x() )
+        addLaunchStopCommands( self.m_driver2.x() )
         addLaunchSpeakerCommands( self.m_driver2.x() )
         addLaunchAmpCommands( self.m_driver2.x() )
         addLaunchTossCommands( self.m_driver2.x() )
@@ -300,12 +318,21 @@ class RobotContainer:
             commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( -0.5 ) ).ignoringDisable(True)
         )
         
-        # Operator Station Buttons 
+        ### Operator Station Buttons 
+        # Intake
         addIntakeCommands( self.stationCmd.button(12) )
+        addLaunchStopCommands( self.stationCmd.button(12) )
+        # Source
         addSourceCommands( self.stationCmd.button(11) )
+        addLaunchStopCommands( self.stationCmd.button(11) )
+        # Toss
+        addLaunchStopCommands( self.stationCmd.button(2) )
         addLaunchTossCommands( self.stationCmd.button(2) )
+        # Launch Speaker/Amp
+        addLaunchStopCommands( self.stationCmd.button(1) )
         addLaunchSpeakerCommands( self.stationCmd.button(1) )
         addLaunchAmpCommands( self.stationCmd.button(1) )
+        # Eject
         self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
         self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
         addLedCommands( self.stationCmd.button(4) )

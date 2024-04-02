@@ -21,6 +21,7 @@ from .indexer.IndexerSource import *
 from .intake.IntakeEject import *
 from .intake.IntakeHandoff import *
 from .intake.IntakeLoad import *
+from .intake.IntakeStop import *
 from .launcher.LauncherAmp import *
 from .launcher.LauncherEject import *
 from .launcher.LauncherSource import *
