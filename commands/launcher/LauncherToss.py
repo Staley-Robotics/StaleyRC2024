@@ -32,8 +32,7 @@ class LauncherToss(Command):
 
     def end(self, interrupted:bool) -> None:
         self.timer.stop()
-        if not interrupted:
-            self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
         
 
     def isFinished(self) -> bool:

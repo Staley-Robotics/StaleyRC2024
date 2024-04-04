@@ -19,6 +19,7 @@ class IndexerLaunch(WaitUntilCommand):
         super().__init__( launcherAtSpeed )
         
         self.indexer = indexer
+        self.launcherAtSpeed = launcherAtSpeed
         self.setName( "IndexerLaunch" )
         self.addRequirements( indexer )
 
@@ -28,7 +29,8 @@ class IndexerLaunch(WaitUntilCommand):
 
     def execute(self) -> None:
         super().execute()
-        self.indexer.set(Indexer.IndexerSpeeds.Launch.get())
+        if self.launcherAtSpeed():
+            self.indexer.set(Indexer.IndexerSpeeds.Launch.get())
 
     def end(self, interrupted:bool) -> None:
         super().end(interrupted)

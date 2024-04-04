@@ -17,6 +17,7 @@ from .indexer.IndexerHandoff import *
 from .indexer.IndexerLaunch import *
 from .indexer.IndexerLoad import *
 from .indexer.IndexerRealign import *
+from .indexer.IndexerSafeHandoff import *
 from .indexer.IndexerSource import *
 from .intake.IntakeEject import *
 from .intake.IntakeHandoff import *

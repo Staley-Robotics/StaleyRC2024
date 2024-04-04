@@ -2,6 +2,7 @@ import typing
 
 from commands2 import SelectCommand
 import commands2.cmd
+from wpilib import RobotState
 
 from commands import IntakeHandoff, IntakeLoad
 from subsystems import Intake
@@ -30,8 +31,13 @@ class IntakeDefault(SelectCommand):
     def getState(self) -> str:
         if self.useAutoStart() and self.intake.foundNote() and not self.indexerHasNote() and not self.intake.hasNote():
             return "load"
-        elif self.intake.hasNote() and self.pivotAtPosition():
-            return "handoff"
+        elif self.intake.hasNote():
+            if self.pivotAtPosition():
+                return "handoff"
+            else:
+                return "wait"
+        elif RobotState.isAutonomous():
+            return "load"
         else:
             return "wait"
 

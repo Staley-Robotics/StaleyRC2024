@@ -41,7 +41,7 @@ class PivotDefault(SelectCommand):
     def getState(self):
         if self.useAutoCalculate():
             if self.indexerHasNote():
-                if self.launchAngle() < 10.0:
+                if self.launchAngle() < 15.5:
                     return "toss"
                 elif self.isTargetAmp():
                     return "amp"

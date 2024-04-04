@@ -12,15 +12,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "L-A"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoPickup"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L-A"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoPickup"
+                }
+              }
+            ]
           }
         },
         {

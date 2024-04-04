@@ -35,8 +35,8 @@ class Launcher(Subsystem):
         # Tunables
         self.detectSensor = NTTunableBoolean( "/Config/Launcher/LaunchDetection/A-Sensor", True, persistent=True )
         self.detectVeloc = NTTunableBoolean( "/Config/Launcher/LaunchDetection/B-Veloc", True, persistent=True )
-        self.detectVelocCount = NTTunableInt( "/Config/Launcher/LaunchDetection/B-VelocCount", 5, persistent=True )
-        self.detectTimer = NTTunableFloat( "/Config/Launcher/LaunchDetection/C-Timer", 10.0, persistent=True )
+        self.detectVelocCount = NTTunableInt( "/Config/Launcher/LaunchDetection/B-VelocCount", 2, persistent=True )
+        self.detectTimer = NTTunableFloat( "/Config/Launcher/LaunchDetection/C-Timer", 30.0, persistent=True )
 
         self.launcher = launcher
         self.launcherInputs = launcher.LauncherIOInputs
@@ -64,7 +64,7 @@ class Launcher(Subsystem):
         else:
             self.launcher.run()
             
-            if self.isRunning():
+            if self.isRunning() and not self.launchDetected:
                 self.launchTimer.start()
 
                 if self.atSpeed():

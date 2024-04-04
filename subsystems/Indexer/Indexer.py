@@ -11,7 +11,7 @@ class Indexer(Subsystem):
         Handoff = NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.50, persistent=True )
         Launch = NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True )
         Source = NTTunableFloat( "/Config/IndexerSpeeds/Source", -0.35, persistent=True )
-        Eject = NTTunableFloat( "/Config/IndexerSpeeds/Eject", -1.0, persistent=True )
+        Eject = NTTunableFloat( "/Config/IndexerSpeeds/Eject", 1.0, persistent=True )
         SelfIn = NTTunableFloat( "/Config/IndexerSpeeds/SelfIn", -0.1, persistent=True )
         SelfOut = NTTunableFloat( "/Config/IndexerSpeeds/SelfOut", 0.1, persistent=True )
 
@@ -86,7 +86,7 @@ class Indexer(Subsystem):
         return not( self.indexer.getLowerSensorIsBroken() or self.indexer.getUpperSensorIsBroken() )
     
     def isRunning(self) -> bool:
-        if self.getCurrentCommand() == None or self.getCurrentCommand() == "IndexerWait":
+        if self.getCurrentCommand() == None or self.getCurrentCommand().getName() == "IndexerWait":
             return False
         
         return ( self.indexer.getVelocity() != Indexer.IndexerSpeeds.Stop.get() )

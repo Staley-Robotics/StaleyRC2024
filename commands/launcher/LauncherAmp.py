@@ -4,6 +4,7 @@
 
 # FRC Component Imports
 from commands2 import Command
+from wpilib import RobotState
 
 # Our Imports
 from subsystems import Launcher
@@ -27,7 +28,7 @@ class LauncherAmp(Command):
         self.launcher.set(Launcher.LauncherSpeeds.AmpLeft.get(), Launcher.LauncherSpeeds.AmpRight.get())
 
     def end(self, interrupted:bool) -> None:
-        if not interrupted:
+        if not RobotState.isAutonomous():
             self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
