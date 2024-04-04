@@ -20,6 +20,7 @@ class Indexer(Subsystem):
         self.indexerInputs = indexer.IndexerIOInputs()
         self.indexerLogger = NetworkTableInstance.getDefault().getStructTopic( "/Indexer", IndexerIO.IndexerIOInputs ).publish()
         self.indexerMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Indexer" )
+        self.simHasNote = True
 
         if RobotBase.isSimulation(): 
             self.simHasNote = NTTunableBoolean( "/Testing/Indexer/HasNote", True, persistent=False )
