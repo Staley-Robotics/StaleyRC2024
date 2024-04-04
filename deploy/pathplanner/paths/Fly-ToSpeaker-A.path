@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 16.5,
+        "y": 6.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 15.5,
+        "y": 6.5
+      },
+      "isLocked": false,
+      "linkedName": "Fly-ToTarget-StartA"
+    },
+    {
+      "anchor": {
+        "x": 2.9,
+        "y": 6.5
+      },
+      "prevControl": {
+        "x": 4.8999999999999995,
+        "y": 6.5
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.25,
+    "maxAcceleration": 2.125,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 20.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Teleop",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0.0
+  },
+  "useDefaultConstraints": true
+}

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.85,
-        "y": 6.95
+        "x": 2.548447785697655,
+        "y": 6.751022616628567
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.45,
-        "y": 6.95
+        "x": 3.148447785697655,
+        "y": 6.751022616628567
       },
       "isLocked": false,
       "linkedName": "A"
@@ -65,7 +65,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Locale Between",
+  "folder": "Zone Transfer",
   "previewStartingState": {
     "rotation": 27.55,
     "velocity": 0

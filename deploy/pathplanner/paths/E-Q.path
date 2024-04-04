@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.15,
+        "x": 7.852205533280115,
         "y": 5.78
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.629695716273874,
-        "y": 5.938957573599671
+        "x": 7.202390047451226,
+        "y": 6.675546526316267
       },
       "isLocked": false,
       "linkedName": "E"
     },
     {
       "anchor": {
-        "x": 4.565245837150901,
-        "y": 6.33321197910997
+        "x": 4.283917123451807,
+        "y": 6.238890903191033
       },
       "prevControl": {
-        "x": 5.361831070574344,
-        "y": 6.501230409454866
+        "x": 5.08050235687525,
+        "y": 6.406909333535928
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 10.0,
-    "rotateFast": true
+    "rotation": 0,
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "ToFrom Shoot",
+  "folder": "Shooting Zones",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

@@ -1,6 +1,6 @@
 from commands2 import Subsystem
 from ntcore import NetworkTableInstance
-from wpilib import RobotState
+from wpilib import RobotState, RobotBase
 
 from util import *
 from .IntakeIO import IntakeIO
@@ -22,6 +22,9 @@ class Intake(Subsystem):
         self.intakeInputs = intake.IntakeIOInputs()
         self.intakeLogger = NetworkTableInstance.getDefault().getStructTopic( "/Intake", IntakeIO.IntakeIOInputs ).publish()
         self.intakeMeasuredLogger = NetworkTableInstance.getDefault().getTable( "/Logging/Intake" )
+        
+        if RobotBase.isSimulation():
+            self.simHasNote = NTTunableBoolean( "/Testing/Intake/HasNote", False, persistent=False )
 
         self.offline = NTTunableBoolean( "/DisableSubsystem/Intake", False, persistent=True )
 
@@ -42,6 +45,10 @@ class Intake(Subsystem):
         # Post Run Logging
         self.intakeMeasuredLogger.putNumberArray( "Setpoint", self.intake.getSetpoint() )
         self.intakeMeasuredLogger.putNumberArray( "Measured", self.intake.getVelocity() )
+        
+        self.intakeMeasuredLogger.putBoolean( "hasNote", self.hasNote() )
+        self.intakeMeasuredLogger.putBoolean( "isRunning", self.isRunning() )
+        self.intakeMeasuredLogger.putBoolean( "isWaiting", self.isWaiting() )
 
     def set(self, speed:float):
         self.intake.setVelocity( speed, speed )
@@ -62,18 +69,27 @@ class Intake(Subsystem):
         self.intake.setBrake( brake )
 
     def hasNote(self) -> bool:
-        return self.intake.getSensorIsBroken()
+        if RobotBase.isSimulation():
+            return self.intake.getSensorIsBroken() or self.simHasNote.get()
+        else:
+            return self.intake.getSensorIsBroken()
     
     def foundNote(self) -> bool:
         return self.intake.foundNote()
     
     def isRunning(self) -> bool:
+        if self.getCurrentCommand() == None or self.getCurrentCommand().getName() == "IntakeWait":
+            return False
+        
         upper, lower = self.intake.getVelocity()
         return ( upper != Intake.IntakeSpeeds.Stop.get() or lower != Intake.IntakeSpeeds.Stop.get() )
 
     def isWaiting(self) -> bool:
         return (
-            self.hasNote() or
-            self.getCurrentCommand() == None or
-            self.getCurrentCommand().getName() != "IntakeWait"
+            self.hasNote() and
+            ( self.getCurrentCommand() == None or
+            self.getCurrentCommand().getName() == "IntakeWait" )
         )
+
+    def setHasNote(self, hasNote:bool) -> None:
+        self.simHasNote.set( hasNote )

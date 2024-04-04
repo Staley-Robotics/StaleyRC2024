@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 4.565245837150901,
-        "y": 6.33321197910997
+        "x": 4.283917123451807,
+        "y": 6.238890903191033
       },
       "prevControl": {
-        "x": 5.1652458371509,
-        "y": 6.33321197910997
+        "x": 4.883917123451806,
+        "y": 6.238890903191033
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "ToFrom Shoot",
+  "folder": "Shooting Zones",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

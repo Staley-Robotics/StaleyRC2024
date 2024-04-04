@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0500000000000007,
+        "x": 2.05,
         "y": 6.75
       },
       "isLocked": false,
@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 8.15,
+        "x": 7.852205533280115,
         "y": 5.78
       },
       "prevControl": {
-        "x": 7.84026573806598,
+        "x": 7.542471271346095,
         "y": 5.78
       },
       "nextControl": null,
@@ -43,7 +43,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "Locale Between",
+  "folder": "Zone Transfer",
   "previewStartingState": {
     "rotation": 0.0,
     "velocity": 0

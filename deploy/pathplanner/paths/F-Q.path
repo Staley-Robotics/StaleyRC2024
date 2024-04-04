@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.335984840573016,
-        "y": 4.1
+        "x": 4.731341309780834,
+        "y": 3.8415395199465996
       },
       "isLocked": false,
       "linkedName": "F"
     },
     {
       "anchor": {
-        "x": 4.565245837150901,
-        "y": 6.33321197910997
+        "x": 4.283917123451807,
+        "y": 6.238890903191033
       },
       "prevControl": {
-        "x": 7.212341353626161,
-        "y": 6.350085933058771
+        "x": 4.429004283045769,
+        "y": 4.3410758603511255
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "ToFrom Shoot",
+  "folder": "Shooting Zones",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

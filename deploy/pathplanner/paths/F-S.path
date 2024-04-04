@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.335984840573016,
-        "y": 4.1
+        "x": 6.30811856210766,
+        "y": 4.092437427806403
       },
       "isLocked": false,
       "linkedName": "F"
@@ -20,8 +20,8 @@
         "y": 1.4996173928359764
       },
       "prevControl": {
-        "x": 7.147095516475257,
-        "y": 1.5164913467847767
+        "x": 8.59927460554326,
+        "y": 1.5163471249561546
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "ToFrom Shoot",
+  "folder": "Shooting Zones",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

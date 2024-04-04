@@ -1,37 +1,99 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.45,
-      "y": 4.1
-    },
-    "rotation": 0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "R-C"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R-C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C-H"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-H"
+            "pathName": "H-S"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-G"
+            "pathName": "S-G"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "G-S"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "4 Noter",
   "choreoAuto": false
 }

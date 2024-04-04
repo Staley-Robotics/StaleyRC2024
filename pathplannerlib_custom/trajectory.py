@@ -280,7 +280,11 @@ class PathPlannerTrajectory:
             if nextTarget.rotateFast:
                 state.targetHolonomicRotation = nextTarget.target
             else:
-                t = (path.getPoint(i).distanceAlongPath - prevRotationTargetDist) / distanceBetweenTargets
+                if distanceBetweenTargets != 0.0:
+                    t = (path.getPoint(i).distanceAlongPath - prevRotationTargetDist) / distanceBetweenTargets
+                else:
+                    t = 0.0
+                
                 t = min(max(0.0, t), 1.0)
                 if not math.isfinite(t):
                     t = 0.0

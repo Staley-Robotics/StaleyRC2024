@@ -1,27 +1,30 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+from wpilib import RobotBase
+
+from commands import IndexerHandoff, IndexerLoad, IndexerLaunch, IndexerSafeHandoff
 from subsystems import Indexer
-from util import *
 
-
-class IndexerDefault(commands2.SelectCommand):
+class IndexerDefault(SelectCommand):
     def __init__( self,
                   indexer: Indexer,
                   intakeHasNote: typing.Callable[[], bool],
-                  pivotAtPosition: typing.Callable[[], bool],
+                  pivotAtHandoff: typing.Callable[[], bool],
                   isLaunchApproved: typing.Callable[[], bool] = lambda: False
                 ):
         self.indexer = indexer
         self.intakeHasNote = intakeHasNote
-        self.pivotAtPosition = pivotAtPosition
+        self.pivotAtPosition = pivotAtHandoff
         self.useAutoLaunch = isLaunchApproved
 
         super().__init__(
             {
                 "handoff": IndexerHandoff(indexer),
+                "safehandoff": IndexerSafeHandoff(indexer, self.intakeHasNote ),
                 "load": IndexerLoad(indexer),
-                "launch": IndexerLaunch(indexer),
+                "launch": IndexerLaunch(indexer, lambda:True),
                 "wait": commands2.cmd.none().withName("IndexerWait"),
             },
             self.getState,
@@ -31,6 +34,8 @@ class IndexerDefault(commands2.SelectCommand):
         if self.indexer.hasNote() and self.useAutoLaunch():
             return "launch"
         elif self.intakeHasNote() and self.pivotAtPosition():
+            if RobotBase.isAutonomous():
+                return "safehandoff"
             return "handoff"
         elif self.indexer.hasHalfNote() != 0:
             return "load"

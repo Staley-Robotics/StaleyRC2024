@@ -11,7 +11,10 @@ class NoteLoadGround(commands2.SequentialCommandGroup):
         self.setName( "NoteLoadGround" )
 
         self.addCommands(
-            PivotHandoff(pivot)
+            commands2.ParallelCommandGroup(
+                PivotHandoff(pivot),
+                IntakeLoad(intake)
+            )
         )
         self.addCommands(
             commands2.ParallelDeadlineGroup(

@@ -1,43 +1,37 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.45,
-      "y": 5.55
-    },
-    "rotation": 0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "M-C"
+            "name": "AutoLaunch"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C-B"
+            "pathName": "M-B"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "B-A"
+            "name": "AutoPickup"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "A-H"
+            "name": "AutoLaunch"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "2 Noter",
   "choreoAuto": false
 }

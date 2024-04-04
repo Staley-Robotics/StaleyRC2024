@@ -6,9 +6,28 @@
     "data": {
       "commands": [
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R-C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "AutoLaunch"
+            "name": "AutoPickup"
           }
         },
         {
@@ -18,13 +37,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R_L-A"
+                  "pathName": "C-B"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoPickup"
+                  "name": "AutoLaunch"
                 }
               }
             ]
@@ -33,7 +52,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoLaunch"
+            "name": "AutoPickup"
           }
         },
         {
@@ -43,22 +62,28 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "R_A-E"
+                  "pathName": "B-E"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoPickup"
+                  "name": "AutoLaunch"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "R_E-Q"
+            "pathName": "E-Q"
           }
         },
         {
@@ -70,6 +95,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "4 Noter",
   "choreoAuto": false
 }

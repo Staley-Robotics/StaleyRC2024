@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.85,
-        "y": 6.95
+        "x": 2.548447785697655,
+        "y": 6.751022616628567
       },
       "prevControl": {
-        "x": 2.540307660005201,
-        "y": 6.955095837944652
+        "x": 2.238755445702856,
+        "y": 6.756118454573219
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "HOME Between",
+  "folder": "Home Zone",
   "previewStartingState": {
     "rotation": -27.55000000000001,
     "velocity": 0

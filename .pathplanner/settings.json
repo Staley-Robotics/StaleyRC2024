@@ -4,14 +4,22 @@
   "holonomicMode": true,
   "pathFolders": [
     "AMP",
-    "HOME Between",
-    "Locale Between",
-    "MID Between",
+    "Center Zone",
+    "Home Zone",
+    "Hide",
     "Teleop",
     "Red",
-    "ToFrom Shoot"
+    "Self Contained Starting Zones",
+    "Shooting Zones",
+    "Zone Transfer"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "2 Noter",
+    "3 Noter",
+    "Fancy Business",
+    "4 Noter",
+    "Shoot 'n' Scoot"
+  ],
   "defaultMaxVel": 4.25,
   "defaultMaxAccel": 2.125,
   "defaultMaxAngVel": 360.0,

@@ -6,9 +6,28 @@
     "data": {
       "commands": [
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "R-C"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoLaunch"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "AutoLaunch"
+            "name": "AutoPickup"
           }
         },
         {
@@ -18,13 +37,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "L-A"
+                  "pathName": "C-G"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoPickup"
+                  "name": "AutoLaunch"
                 }
               }
             ]
@@ -33,32 +52,37 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoLaunch"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "A-E"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoPickup"
-                }
-              }
-            ]
+            "name": "AutoPickup"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "E-Q"
+            "pathName": "G-S"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S-F"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-S"
           }
         },
         {
@@ -70,6 +94,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "4 Noter",
   "choreoAuto": false
 }

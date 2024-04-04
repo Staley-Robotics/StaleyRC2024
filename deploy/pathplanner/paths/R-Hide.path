@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.45,
+        "y": 4.1
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.45,
+        "y": 3.5999999999999996
+      },
+      "isLocked": false,
+      "linkedName": "R"
+    },
+    {
+      "anchor": {
+        "x": 2.6302696364693325,
+        "y": 0.5314562572949552
+      },
+      "prevControl": {
+        "x": 2.3802696364693325,
+        "y": 2.031456257294961
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "R-Hide"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.25,
+    "maxAcceleration": 2.125,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Hide",
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

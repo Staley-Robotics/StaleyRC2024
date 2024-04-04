@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.565245837150901,
-        "y": 6.33321197910997
+        "x": 4.283917123451807,
+        "y": 6.238890903191033
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.166444652457758,
-        "y": 6.423879435370478
+        "x": 8.066374948784125,
+        "y": 6.635693227673658
       },
       "isLocked": false,
       "linkedName": "Q"
     },
     {
       "anchor": {
-        "x": 8.15,
+        "x": 7.852205533280115,
         "y": 5.78
       },
       "prevControl": {
-        "x": 6.673120400965504,
-        "y": 6.386381759928699
+        "x": 6.782271860674674,
+        "y": 5.631668930748575
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "ToFrom Shoot",
+  "folder": "Shooting Zones",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

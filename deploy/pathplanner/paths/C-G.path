@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0256897290231706,
-        "y": 2.247106361909121
+        "x": 1.7094613346592766,
+        "y": 2.28889538694256
       },
       "isLocked": false,
       "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 5.626526200039008,
-        "y": 1.9125725621242902
+        "x": 5.551290479441079,
+        "y": 1.7074891218234813
       },
       "prevControl": {
-        "x": 4.922879194869278,
-        "y": 1.9371444569953808
+        "x": 4.722832221892123,
+        "y": 1.70758526970923
       },
       "nextControl": {
-        "x": 6.572747190151193,
-        "y": 1.8795297970403293
+        "x": 6.498088226786958,
+        "y": 1.7073792398821652
       },
       "isLocked": false,
       "linkedName": null
@@ -59,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Locale Between",
+  "folder": "Zone Transfer",
   "previewStartingState": {
     "rotation": -27.55000000000001,
     "velocity": 0.0

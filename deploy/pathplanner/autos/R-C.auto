@@ -12,20 +12,26 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 7.0
+            "pathName": "R-C"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "L-AmpOut"
+            "name": "AutoPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "2 Noter",
   "choreoAuto": false
 }

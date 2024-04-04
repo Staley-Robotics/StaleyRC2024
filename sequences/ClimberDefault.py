@@ -1,10 +1,12 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import ConditionalCommand
+import commands2.cmd
+
+from commands import ClimberByStickMono
 from subsystems import Climber
-from util import *
 
-class ClimberDefault(commands2.ConditionalCommand):
+class ClimberDefault(ConditionalCommand):
     def __init__(self, climber:Climber, axis:typing.Callable[[],float], useAxis:typing.Callable[[],bool]):
         super().__init__(
             #PivotSpeaker(pivot),
