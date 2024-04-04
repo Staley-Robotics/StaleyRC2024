@@ -1,0 +1,106 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 16.0,
+        "y": 1.5
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 15.0,
+        "y": 1.5
+      },
+      "isLocked": false,
+      "linkedName": "Fly-ToTarget-StartB"
+    },
+    {
+      "anchor": {
+        "x": 8.5,
+        "y": 2.25
+      },
+      "prevControl": {
+        "x": 9.207106781186548,
+        "y": 1.5428932188134523
+      },
+      "nextControl": {
+        "x": 7.792893218813453,
+        "y": 2.957106781186547
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.0,
+        "y": 5.5
+      },
+      "prevControl": {
+        "x": 8.707106781186548,
+        "y": 4.792893218813452
+      },
+      "nextControl": {
+        "x": 7.292893218813452,
+        "y": 6.207106781186548
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.9,
+        "y": 6.5
+      },
+      "prevControl": {
+        "x": 3.9,
+        "y": 6.5
+      },
+      "nextControl": {
+        "x": 1.9,
+        "y": 6.5
+      },
+      "isLocked": false,
+      "linkedName": "Fly-ToAmp-Pivot"
+    },
+    {
+      "anchor": {
+        "x": 1.82,
+        "y": 7.7
+      },
+      "prevControl": {
+        "x": 1.82,
+        "y": 6.95
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Fly-ToAmp-Goal"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.25,
+    "maxAcceleration": 2.125,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Teleop",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0.0
+  },
+  "useDefaultConstraints": true
+}

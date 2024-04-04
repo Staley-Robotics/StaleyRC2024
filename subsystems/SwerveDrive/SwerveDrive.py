@@ -76,11 +76,11 @@ class SwerveDrive(Subsystem):
         self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController, persistent=True )
         self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController, persistent=True )
-        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 0.40, self.updateHolonomicDriveController, persistent=True )
         self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController, persistent=True )
-        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.008, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.04, self.updateHolonomicDriveController, persistent=True )
 
         # Gyro and Modules
         self.gyro = gyro
@@ -251,7 +251,7 @@ class SwerveDrive(Subsystem):
             self.pidT_kD.get(),
             TrapezoidProfileRadians.Constraints(
                 self.maxAngVelocCode.get(),
-                self.maxAngVelocCode.get() * 2
+                self.maxAngVelocCode.get() * 4
             )
         )
         theta.enableContinuousInput( -math.pi, math.pi )

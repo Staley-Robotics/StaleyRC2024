@@ -12,6 +12,7 @@ from util.NTTunableBoolean import NTTunableBoolean
 
 class LaunchCalc(Subsystem):
     class Targets(Enum):
+        NONE = -1
         SPEAKER = 0
         AMP = 1
         TRAP1 = 2

@@ -5,7 +5,6 @@ from .Indexer.Indexer import *
 from .Indexer.IndexerIO import *
 from .Indexer.IndexerIONeo import *
 from .Indexer.IndexerIOSim import *
-from .Indexer.IndexerIOTalon import *
 from .Intake.Intake import *
 from .Intake.IntakeIO import *
 from .Intake.IntakeIOFalcon import *

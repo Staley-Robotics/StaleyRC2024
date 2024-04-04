@@ -15,7 +15,7 @@ class Pivot(Subsystem):
         Source = NTTunableFloat( "/Config/PivotPositions/Source", -45.0, persistent=True )
         Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -52.031, persistent=True )
         Toss = NTTunableFloat( "/Config/PivotPositions/Toss", 45.0, persistent=True )
-        Eject = NTTunableFloat( "/Config/PivotPositions/Eject", 0.0, persistent=True )
+        Eject = NTTunableFloat( "/Config/PivotPositions/Eject", 32.168, persistent=True )
 
     def __init__(self, pivot:PivotIO):
         self.pivot = pivot
@@ -54,17 +54,35 @@ class Pivot(Subsystem):
     def stop(self):
         self.set( self.pivot.getPosition() )
 
-    # def handoff(self):
-    #     self.set( self.PivotPositions.Handoff )
+    def atSetpoint(self, errorRange:float = 0.5) -> bool:
+        return self.pivot.atSetpoint( errorRange )
 
-    # def amp(self):
-    #     self.set( self.PivotPositions.Amp )
-    
-    # def trap(self):
-    #     self.set( self.PivotPositions.Trap )
+    def atPosition(self, position:float) -> bool:
+        if self.pivot.getSetpoint() == position:
+            return self.atSetpoint()
+        else:
+            return False
 
-    def atSetpoint(self) -> bool:
-        return self.pivot.atSetpoint( 0.5 )
+    def atPositionSpeaker(self) -> bool:
+        return self.atPosition( Pivot.PivotPositions.Speaker.get() )
     
+    def atPositionHandoff(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Handoff.get() )
+
+    def atPositionAmp(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Amp.get() )
+
+    def atPositionTrap(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Trap.get() )
+
+    def atPositionSource(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Source.get() )
+
+    def atPositionToss(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Toss.get() )
+
+    def atPositionEject(self) -> bool: 
+        return self.atPosition( Pivot.PivotPositions.Eject.get() )
+
     def syncEncoder(self):
         self.pivot.syncEncoder()

@@ -3,32 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5,
-        "y": 6.5
+        "x": 11.15,
+        "y": 7.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.4392310120488325,
-        "y": 7.19459271066772
+        "x": 14.65,
+        "y": 7.0
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Fly-ToSource-A"
     },
     {
       "anchor": {
-        "x": 14.5,
-        "y": 2.5
+        "x": 14.65,
+        "y": 1.5
       },
       "prevControl": {
-        "x": 14.5,
-        "y": 9.5
+        "x": 14.65,
+        "y": 5.0
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Fly-ToSource-BGoal"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.0,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -39,13 +45,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
-    "rotateFast": true
+    "rotation": -60.0,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "Teleop",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 0.0,
     "velocity": 0.0
   },
   "useDefaultConstraints": true

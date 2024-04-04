@@ -38,7 +38,7 @@ class RobotContainer:
         ssIntakeIO = None
         ssLauncherIO = None
         ssPivotIO = None
-        ssLedIO = None
+        ssLedIO = Led2IOPwm( 9 )
         ssClimberIOLeft = None
         ssClimberIORight = None
         ppCommands = {}
@@ -52,11 +52,10 @@ class RobotContainer:
                 SwerveModuleIOSim("BR", -0.25, -0.25 ) 
             ]
             ssGyroIO = GyroIOPigeon2( 9 )
-            ssIntakeIO = IntakeIOSim()
-            ssIndexerIO = IndexerIOSim()
+            ssIntakeIO = IntakeIO()
+            ssIndexerIO = IndexerIO()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssLedIO = Led2IOPwm( 0 )
             ssClimberIOLeft = ClimberIO()
             ssClimberIORight = ClimberIO()
         else:
@@ -75,13 +74,12 @@ class RobotContainer:
                     SwerveModuleIONeo("BR", 3, 4, 14, -0.2667, -0.2667,  60.557 )  #65.654)
                 ]
             ssGyroIO = GyroIOPigeon2( 9 )
-            ssIntakeIO = IntakeIOFalcon( 20, 21, 0, 9 )
+            ssIntakeIO = IntakeIOFalcon( 20, 21, 0, 5 )
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
-            ssPivotIO = PivotIOFalcon( 25, 26, -77.520+1.318 )
-            ssLedIO = Led2IOPwm( 0 )
-            ssClimberIOLeft = ClimberIOTalon( 27, 5, 6 )
-            ssClimberIORight = ClimberIOTalon( 28, 7, 8, True )
+            ssPivotIO = PivotIOFalcon( 25, 26, -76.993 )
+            ssClimberIOLeft = ClimberIOTalon( 27, 9, 8 )
+            ssClimberIORight = ClimberIOTalon( 28, 7, 6 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -102,20 +100,44 @@ class RobotContainer:
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
         self.led = Led2( ssLedIO )
 
+        ### Triggers (Autonomous Helpers)
+        self.autonomousLaunchTrigger = NTTunableBoolean( "/Logging/Game/AutonomousLaunch", False )
+        commands2.button.Trigger( RobotState.isAutonomous
+            ).and_( self.autonomousLaunchTrigger.get
+            ).toggleOnTrue( IndexerLaunch( self.feeder, lambda: self.launcher.atSpeed() and self.pivot.atPosition() )
+        )
+        commands2.button.Trigger( RobotState.isAutonomous
+            ).and_( self.launcher.hasLaunched
+            ).toggleOnTrue( lambda: self.autonomousLaunchTrigger.set(False) 
+        )
+
         # Register Pathplanner Commands
         if wpilib.RobotBase.isSimulation():
             ppCommands = {
+                "AutoAmp": commands2.cmd.waitSeconds( 0.50 ), 
                 "AutoPivot": commands2.cmd.waitSeconds( 0.50 ),
                 "AutoLaunch": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(False) )),
-                "AutoPickup": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(True) ))
+                "AutoPickup": commands2.cmd.waitSeconds( 0.50 ).andThen(commands2.cmd.runOnce( lambda: self.feeder.setHasNote(True) )),
+                "AutoToss": commands2.cmd.waitSeconds( 0.50 )
             }
         else:
             ppCommands = {
-                "AutoPivot": PivotAim(self.pivot, self.launchCalc.getLaunchAngle),
-                "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
-                "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot)
+                # "AutoAmp": NoteLaunchAmp(self.feeder, self.launcher, self.pivot),
+                # "AutoPivot": PivotAim(self.pivot, self.launchCalc.getLaunchAngle),
+                # "AutoLaunch": NoteLaunchSpeakerAuto(self.feeder, self.launcher, self.pivot, self.launchCalc),
+                # "AutoPickup": NoteLoadGround(self.intake, self.feeder, self.pivot),
+                # "AutoToss": NoteToss( self.feeder, self.launcher, self.pivot )
+                "AutoAmp": commands2.cmd.none(),
+                "AutoPivot": commands2.cmd.none(),
+                "AutoLaunch": commands2.cmd.runOnce(
+                        lambda: self.autonomousLaunchTrigger.set(True)
+                    ).andThen( commands2.cmd.waitUntil(
+                        lambda: not self.autonomousLaunchTrigger.get()
+                    ) ),
+                "AutoPickup": commands2.cmd.none(),
+                "AutoToss": commands2.cmd.none()
             }
-        self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc, self.feeder )   
+        self.pathPlanner = SwervePath( self.drivetrain, self.launchCalc.getRotateAngle, self.feeder.hasNote )   
         self.pathPlanner.setNamedCommands( ppCommands )
 
         # Add Subsystems to SmartDashboard
@@ -145,61 +167,89 @@ class RobotContainer:
         self.station = wpilib.Joystick(2)
         self.stationCmd = commands2.button.CommandJoystick(2)
 
-        ## Driving
-        self.m_driver1.a().whileTrue(
-            self.pathPlanner.getFlyCommand()
-        )
-        # self.m_driver1.a().whileTrue(
-        #     DriveAimSpeaker(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
-        self.m_driver2.a().whileTrue(
-            DriveAimSpeaker(
-                self.drivetrain,
-                self.m_driver1.getLeftY,
-                self.m_driver1.getLeftX
-            )
-        )
+        # Operator Switches
+        if RobotBase.isSimulation():
+            self.swIntakeAuto:bool = False
+            self.swLaunchStartAuto:bool = False
+            self.swLaunchScoreAuto:bool = False
+            self.swPivotAuto:bool = False
+            self.swPivotManual:bool = False
+            self.swClimb:bool = False
 
-        # self.m_driver1.b().whileTrue(
-        #     DriveAimAmp(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
-        # self.m_driver2.back().whileTrue(
-        #     DriveAimAmp(
-        #         self.drivetrain,
-        #         self.m_driver1.getLeftY,
-        #         self.m_driver1.getLeftX
-        #     )
-        # )
+            def getSwitchIntakeAuto() -> bool: return self.swIntakeAuto
+            def getSwitchPivotAuto() -> bool: return self.swPivotAuto
+            def getSwitchPivotManual() -> bool: return self.swPivotManual 
+            def getSwitchLaunchStartAuto() -> bool: return self.swLaunchStartAuto
+            def getSwitchLaunchScoreAuto() -> bool: return self.swLaunchScoreAuto
+            def getSwitchClimb() -> bool: return self.swClimb
 
-        ## Controller Configs for testing
-        # Note Action
-        self.m_driver1.b().onTrue(
-            commands2.cmd.runOnce(
-                lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER )
-            ).ignoringDisable(True)
-        )
-        self.m_driver1.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.m_driver1.y().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
-        self.m_driver1.leftBumper().whileTrue( ClimberExtend( self.climber ) )
-        self.m_driver1.rightBumper().onTrue( ToggleHalfSpeed() )
-        self.m_driver1.back().onTrue( ToggleFieldRelative() )
-        self.m_driver1.start().onTrue( commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
-        
+            def updateNtLogging():
+                ntTbl = NetworkTableInstance.getDefault().getTable("/Logging/Switches")
+                ntTbl.putBoolean( "IntakeAuto", getSwitchIntakeAuto() )
+                ntTbl.putBoolean( "PivotAuto", getSwitchPivotAuto() )
+                ntTbl.putBoolean( "PivotManual", getSwitchPivotManual() )
+                ntTbl.putBoolean( "LaunchStartAuto", getSwitchLaunchStartAuto() )
+                ntTbl.putBoolean( "LaunchScoreuto", getSwitchLaunchScoreAuto() )
+                #ntTbl.putBoolean( "Climb", getSwitchClimb() )
+            
+            def toggleSwitchIntakeAuto(): self.swIntakeAuto = not self.swIntakeAuto; updateNtLogging()
+            def toggleSwitchLaunchStartAuto(): self.swLaunchStartAuto = not self.swLaunchStartAuto; updateNtLogging()
+            def toggleSwitchLaunchScoreAuto(): self.swLaunchScoreAuto = not self.swLaunchScoreAuto; updateNtLogging()
+            def toggleSwitchPivotAuto(): self.swPivotAuto = not self.swPivotAuto; updateNtLogging()
+            def toggleSwitchPivotManual(): self.swPivotManual = not self.swPivotManual; updateNtLogging()
+            def toggleSwitchClimb(): self.swClimb = not self.swClimb; updateNtLogging()
+
+            updateNtLogging()
+            #self.stationCmd.button(5).onTrue( commands2.cmd.runOnce( toggleSwitchIntakeAuto ).ignoringDisable(True) )
+            self.stationCmd.button(9).onTrue( commands2.cmd.runOnce( toggleSwitchIntakeAuto ).ignoringDisable(True) )
+            self.stationCmd.button(5).onTrue( commands2.cmd.runOnce( toggleSwitchLaunchScoreAuto ).ignoringDisable(True) )
+            self.stationCmd.button(6).onTrue( commands2.cmd.runOnce( toggleSwitchLaunchStartAuto ).ignoringDisable(True) )
+            self.stationCmd.button(7).onTrue( commands2.cmd.runOnce( toggleSwitchPivotAuto ).ignoringDisable(True) )
+            self.stationCmd.button(8).onTrue( commands2.cmd.runOnce( toggleSwitchPivotManual ).ignoringDisable(True) )
+            #self.stationCmd.button(9).onTrue( commands2.cmd.runOnce( toggleSwitchClimb ).ignoringDisable(True) )
+        else:
+            #def getSwitchIntakeAuto() -> bool: return self.station.getRawButton(5)
+            def getSwitchIntakeAuto() -> bool: return self.station.getRawButton(9)
+            def toggleSwitchLaunchScoreAuto() -> bool: return self.station.getRawButton(5)
+            def getSwitchLaunchStartAuto() -> bool: return self.station.getRawButton(6)
+            def getSwitchPivotAuto() -> bool: return self.station.getRawButton(7)
+            def getSwitchPivotManual() -> bool: return self.station.getRawButton(8)
+            #def getSwitchClimb() -> bool: return self.station.getRawButton(9)
+
+        ### Controller Configs
+        # Driver 1
+        self.m_driver1.leftBumper().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
+        self.m_driver1.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
+        self.m_driver1.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
+        self.m_driver1.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
+        self.m_driver1.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetSpeaker
+            ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
+            ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) )
+        self.m_driver1.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetAmp
+            ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherAmp"
+            ).toggleOnTrue( LauncherAmp( self.launcher ) )  
+        self.m_driver1.x().and_( self.feeder.hasNote ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+        # self.m_driver1.y().onTrue()
+        # self.m_driver1.leftBumper().toggleOnTrue( ToggleHalfSpeed() )  # Toggle Half Speed
+        self.m_driver1.rightBumper().toggleOnTrue( ToggleTurboOn() )  # Toggle Turbo On
+        self.m_driver1.rightBumper().toggleOnFalse( ToggleTurboOff() )  # Toggle Turbo Off
+        self.m_driver1.back().onTrue( ToggleFieldRelative() ) # Toggle Field Relative
+        self.m_driver1.start().onTrue( LedAction( self.led ) ) # LEDs
+
         #  Driver 2
-        self.m_driver2.x().onTrue( NoteAction( self.intake, self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.m_driver2.b().whileTrue( AllRealign( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) )
-        self.m_driver2.leftBumper().onTrue( NoteLaunchAmp( self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.rightBumper().onTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.m_driver2.start().onTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
+        self.m_driver2.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
+        self.m_driver2.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
+        self.m_driver2.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetSpeaker
+            ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
+            ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) )
+        self.m_driver2.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetAmp
+            ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherAmp"
+            ).toggleOnTrue( LauncherAmp( self.launcher ) ) 
+        self.m_driver2.x().and_( self.feeder.hasNote ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
+        # self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
+        self.m_driver2.rightBumper().whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
+        self.m_driver2.start().onTrue( LedAction( self.led ) )
 
         self.m_driver2.povUp().onTrue(
             commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( 0.5 ) ).ignoringDisable(True)
@@ -208,59 +258,25 @@ class RobotContainer:
             commands2.cmd.runOnce( lambda: self.launchCalc.modifyAimAdjust( -0.5 ) ).ignoringDisable(True)
         )
         
-        # Operator Station Buttons
-        #self.stationCmd.button(6).whileTrue( NoteLoadGround( self.intake, self.feeder, self.pivot ) )
-        self.stationCmd.button(12).toggleOnTrue( IntakeLoad(self.intake) ) # whileTrue( IntakeLoad( self.intake ) )
-        self.stationCmd.button(11).whileTrue( NoteLoadSource( self.feeder, self.pivot, self.launcher ) )
-        self.stationCmd.button(2).whileTrue( NoteToss( self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(1).whileTrue( NoteLaunchSpeaker( self.feeder, self.launcher, self.pivot, self.launchCalc ) )
-        self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
-        self.stationCmd.button(4).whileTrue( LedAction(self.led) )
+        ### Operator Station Buttons 
+        self.stationCmd.button(12).toggleOnTrue( IntakeLoad( self.intake ) ) # Intake
+        #self.stationCmd.button(11).toggleOnTrue( LauncherSource( self.launcher ) ) # Source
+        self.stationCmd.button(11).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherToss"
+            ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
+        #self.stationCmd.button(11).and_
+        self.stationCmd.button(11).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Toss
+        self.stationCmd.button(2).and_( lambda: self.launcher.getCurrentCommand() != None or self.launcher.getCurrentCommand().getName() != "LauncherAmp"
+            ).toggleOnTrue( LauncherAmp( self.launcher ) ) # LauncherToss
+        self.stationCmd.button(2).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Toss
+        self.stationCmd.button(1).and_( lambda: self.launcher.getCurrentCommand() != None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
+            ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) ) # Launch Speaker/Amp
+        self.stationCmd.button(1).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Launch
+        # Eject
+        self.stationCmd.button(10).whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) ) #Eject
+        self.stationCmd.button(3).whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) ) #ALl Stop
+        self.stationCmd.button(4).whileTrue( LedAction( self.led ) )
 
-        # Operator Switches
-        if RobotBase.isSimulation():
-            self.swIntakeAuto:bool = False
-            self.swLaunchSpinAuto:bool = False
-            self.swPivotAuto:bool = False
-            self.swPivotManual:bool = False
-            self.swClimb:bool = False
-
-            def getSwitchIntakeAuto() -> bool: return self.swIntakeAuto
-            def getSwitchPivotAuto() -> bool: return self.swPivotAuto
-            def getSwitchPivotManual() -> bool: return self.swPivotManual 
-            def getSwitchLaunchSpinAuto() -> bool: return self.swLaunchSpinAuto
-            def getSwitchClimb() -> bool: return self.swClimb
-
-            def updateNtLogging():
-                ntTbl = NetworkTableInstance.getDefault().getTable("/Logging/Switches")
-                ntTbl.putBoolean( "IntakeAuto", getSwitchIntakeAuto() )
-                ntTbl.putBoolean( "PivotAuto", getSwitchPivotAuto() )
-                ntTbl.putBoolean( "PivotManual", getSwitchPivotManual() )
-                ntTbl.putBoolean( "LaunchSpinAuto", getSwitchLaunchSpinAuto() )
-                ntTbl.putBoolean( "Climb", getSwitchClimb() )
-            
-            def toggleSwitchIntakeAuto(): self.swIntakeAuto = not self.swIntakeAuto; updateNtLogging()
-            def toggleSwitchLaunchSpinAuto(): self.swLaunchSpinAuto = not self.swLaunchSpinAuto; updateNtLogging()
-            def toggleSwitchPivotAuto(): self.swPivotAuto = not self.swPivotAuto; updateNtLogging()
-            def toggleSwitchPivotManual(): self.swPivotManual = not self.swPivotManual; updateNtLogging()
-            def toggleSwitchClimb(): self.swClimb = not self.swClimb; updateNtLogging()
-
-            updateNtLogging()
-
-            self.stationCmd.button(5).onTrue( commands2.cmd.runOnce( toggleSwitchIntakeAuto ).ignoringDisable(True) )
-            self.stationCmd.button(6).onTrue( commands2.cmd.runOnce( toggleSwitchLaunchSpinAuto ).ignoringDisable(True) )
-            self.stationCmd.button(7).onTrue( commands2.cmd.runOnce( toggleSwitchPivotAuto ).ignoringDisable(True) )
-            self.stationCmd.button(8).onTrue( commands2.cmd.runOnce( toggleSwitchPivotManual ).ignoringDisable(True) )
-            self.stationCmd.button(9).onTrue( commands2.cmd.runOnce( toggleSwitchClimb ).ignoringDisable(True) )
-        else:
-            def getSwitchIntakeAuto() -> bool: return self.station.getRawButton(5)
-            def getSwitchLaunchSpinAuto() -> bool: return self.station.getRawButton(6)
-            def getSwitchPivotAuto() -> bool: return self.station.getRawButton(7)
-            def getSwitchPivotManual() -> bool: return self.station.getRawButton(8)
-            def getSwitchClimb() -> bool: return self.station.getRawButton(9)
-        
-        # Configure Default Commands (with Operatory Station Toggles integrated)
+        ### Configure Default Commands (with Operatory Station Toggles integrated)
         self.drivetrain.setDefaultCommand(
             DriveByStick(
                 self.drivetrain,
@@ -275,7 +291,7 @@ class RobotContainer:
             IntakeDefault(
                 self.intake,
                 self.feeder.hasNote,
-                self.pivot.atSetpoint,
+                pivotAtHandoff = self.pivot.atPositionHandoff,
                 useAutoStart = getSwitchIntakeAuto
             )
         )
@@ -284,9 +300,9 @@ class RobotContainer:
                 self.pivot,
                 self.feeder.hasNote,
                 self.launchCalc.getLaunchAngle,
-                self.m_driver2.getLeftY,
+                getAdjustAxis = lambda: ( self.m_driver2.getLeftY() + self.station.getRawAxis(0) ),
                 isTargetAmp = self.launchCalc.isTargetAmp,
-                isIntakeWaiting = self.intake.isWaiting,
+                isIntakeQueued = lambda: (self.intake.isRunning() or self.intake.hasNote()),
                 useAutoCalculate = getSwitchPivotAuto,
                 useManualAdjust = getSwitchPivotManual
             )
@@ -295,7 +311,7 @@ class RobotContainer:
             IndexerDefault(
                 self.feeder,
                 self.intake.hasNote,
-                self.pivot.atSetpoint,
+                self.pivot.atPositionHandoff,
                 self.launchCalc.isAutoLaunchApproved
             )
         )
@@ -303,20 +319,20 @@ class RobotContainer:
             LauncherDefault(
                 self.launcher,
                 self.launchCalc.getDistance,
-                self.feeder.hasNote,
+                isIndexerReady = lambda: ( self.feeder.hasNote() and not self.feeder.isRunning() ),
                 isTargetAmp = self.launchCalc.isTargetAmp,
-                useAutoStart = getSwitchLaunchSpinAuto
+                useAutoStart = getSwitchLaunchStartAuto
             )
         )
         self.climber.setDefaultCommand(
             ClimberDefault(
                 self.climber,
-                lambda: self.station.getRawAxis(1),
-                getSwitchClimb
+                lambda: -( self.station.getRawAxis(1) + self.m_driver2.getRightY() ),
+                lambda: True #getSwitchClimb
             )
         )
 
-        # LED Configuration
+        ### LED Configuration
         self.led.setIntakeIsRunning( self.intake.isRunning )
         self.led.setIntakeHasNote( self.intake.hasNote )
         self.led.setIndexerHasNote( self.feeder.hasNote )
@@ -328,7 +344,7 @@ class RobotContainer:
         self.led.setLaunchRangeAuto( self.launchCalc.inAutoRange )
         self.led.setIsEndgame( self.notifier.get )
 
-        # End Game Notifications
+        ### End Game Notifications
         self.setEndgameNotification( self.endgameTimer1.get, 1.0, 1, 0.5 ) # First Notice
         self.setEndgameNotification( self.endgameTimer2.get, 0.5, 2, 0.5 ) # Second Notice
 
