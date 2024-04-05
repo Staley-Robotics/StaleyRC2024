@@ -14,7 +14,7 @@ class Pivot(Subsystem):
         Trap = NTTunableFloat( "/Config/PivotPositions/Trap", -45.0, persistent=True )
         Source = NTTunableFloat( "/Config/PivotPositions/Source", -45.0, persistent=True )
         Downward = NTTunableFloat( "/Config/PivotPositions/Downward", -52.031, persistent=True )
-        Toss = NTTunableFloat( "/Config/PivotPositions/Toss", 45.0, persistent=True )
+        Toss = NTTunableFloat( "/Config/PivotPositions/Toss", 10.0, persistent=True )
         Eject = NTTunableFloat( "/Config/PivotPositions/Eject", 32.168, persistent=True )
 
     def __init__(self, pivot:PivotIO):
