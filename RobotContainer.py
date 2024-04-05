@@ -104,6 +104,7 @@ class RobotContainer:
         self.autonomousLaunchTrigger = NTTunableBoolean( "/Logging/Game/AutonomousLaunch", False )
         commands2.button.Trigger( RobotState.isAutonomous ).and_( self.autonomousLaunchTrigger.get ).onTrue( IndexerLaunch( self.feeder, lambda: self.launcher.atSpeed() and self.pivot.atSetpoint() ) )
         commands2.button.Trigger( RobotState.isAutonomous ).and_( self.launcher.hasLaunched ).onTrue( commands2.cmd.runOnce( lambda: self.autonomousLaunchTrigger.set(False) ) )
+        commands2.button.Trigger( lambda: not RobotState.isAutonomous() ).and_( self.autonomousLaunchTrigger.get ).onTrue( commands2.cmd.runOnce( lambda: self.autonomousLaunchTrigger.set(False) ) )
 
         # Register Pathplanner Commands
         if wpilib.RobotBase.isSimulation():
@@ -259,10 +260,10 @@ class RobotContainer:
             ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
         #self.stationCmd.button(11).and_
         self.stationCmd.button(11).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Toss
-        self.stationCmd.button(2).and_( lambda: self.launcher.getCurrentCommand() != None or self.launcher.getCurrentCommand().getName() != "LauncherAmp"
-            ).toggleOnTrue( LauncherAmp( self.launcher ) ) # LauncherToss
+        self.stationCmd.button(2).and_( lambda: self.launcher.getCurrentCommand() == None or ( self.launcher.getCurrentCommand() != None and self.launcher.getCurrentCommand().getName() != "LauncherAmp" )
+            ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
         self.stationCmd.button(2).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Toss
-        self.stationCmd.button(1).and_( lambda: self.launcher.getCurrentCommand() != None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
+        self.stationCmd.button(1).and_( lambda: self.launcher.getCurrentCommand() == None or ( self.launcher.getCurrentCommand() != None and self.launcher.getCurrentCommand().getName() != "LauncherSpeaker" )
             ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) ) # Launch Speaker/Amp
         self.stationCmd.button(1).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Launch
         # Eject
