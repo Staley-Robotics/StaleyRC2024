@@ -256,16 +256,14 @@ class RobotContainer:
         ### Operator Station Buttons 
         self.stationCmd.button(12).toggleOnTrue( IntakeLoad( self.intake ) ) # Intake
         #self.stationCmd.button(11).toggleOnTrue( LauncherSource( self.launcher ) ) # Source
-        self.stationCmd.button(11).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherToss"
-            ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
+        #self.stationCmd.button(11).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherToss"
+        #    ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
         #self.stationCmd.button(11).and_
         self.stationCmd.button(11).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Toss
-        self.stationCmd.button(2).and_( lambda: self.pivot.getCurrentCommand() == None or ( self.pivot.getCurrentCommand() != None and self.pivot.getCurrentCommand().getName() != "PivotToss" )
-            ).toggleOnTrue( PivotToss( self.pivot, self.launcher.hasLaunched ) ) # LauncherToss
-
-        self.stationCmd.button(2).and_( lambda: self.launcher.getCurrentCommand() == None or ( self.launcher.getCurrentCommand() != None and self.launcher.getCurrentCommand().getName() != "LauncherAmp" )
-            ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
-        self.stationCmd.button(2).toggleOnTrue( IndexerLaunch( self.feeder, lambda: ( self.launcher.atSpeed() and self.pivot.atSetpoint() ) ) ) # Toss
+        self.stationCmd.button(2).toggleOnTrue( NoteToss( self.feeder, self.launcher, self.pivot ) ) # LauncherToss
+        # self.stationCmd.button(2).and_( lambda: self.launcher.getCurrentCommand() == None or ( self.launcher.getCurrentCommand() != None and self.launcher.getCurrentCommand().getName() != "LauncherAmp" )
+        #     ).toggleOnTrue( LauncherToss( self.launcher ) ) # LauncherToss
+        # self.stationCmd.button(2).toggleOnTrue( IndexerLaunch( self.feeder, lambda: ( self.launcher.atSpeed() and self.pivot.atSetpoint() ) ) ) # Toss
         self.stationCmd.button(1).and_( lambda: self.launcher.getCurrentCommand() == None or ( self.launcher.getCurrentCommand() != None and self.launcher.getCurrentCommand().getName() != "LauncherSpeaker" )
             ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) ) # Launch Speaker/Amp
         self.stationCmd.button(1).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) ) # Launch

@@ -37,9 +37,9 @@ class DriveByStick(Command):
 
         self.velocLinearTurbo = NTTunableFloat( "/Config/Driver1/TubroLinear", 3.5, persistent=True )
         self.velocAngularTurbo = NTTunableFloat( "/Config/Driver1/TubroAngular", 2 * math.pi, persistent=True )
-        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 1.75, persistent=True )
+        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 2.0, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
-        self.accelAngular = NTTunableFloat( "/Config/Driver1/AccelerationAngular", 1 * math.pi, persistent=True )
+        self.accelAngular = NTTunableFloat( "/Config/Driver1/AccelerationAngular", 4 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
         self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
         self.srl = NTTunableFloat( "/Config/Driver1/SlewRateLimiter", 3.0, self.updateSlewRateLimiter, persistent=True )
@@ -147,7 +147,7 @@ class DriveByStick(Command):
             goalAngle:float = Rotation2d( x=hX, y=hY ).radians()
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
-            r = min( max( r, -1.0), 1.0 )
+            r = min( max( r, -1.0), 1.0 ) * 3
         else:
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
         

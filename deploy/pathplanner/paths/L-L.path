@@ -39,8 +39,8 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 48.19848154039779,
-    "rotateFast": false
+    "rotation": 48.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": "Self Contained Starting Zones",

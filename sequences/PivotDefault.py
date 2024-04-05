@@ -31,7 +31,7 @@ class PivotDefault(SelectCommand):
                 "aim": PivotAim(pivot, getAngle),
                 "amp": PivotAmp(pivot),
                 "fixed": PivotSpeaker(pivot),
-                "toss": PivotToss(pivot, lambda: not self.indexerHasNote() ),
+                "toss": PivotToss(pivot),
                 "adjust": PivotByStick(pivot, getAdjustAxis),
                 "wait": commands2.cmd.none().withName("PivotWait")
             },

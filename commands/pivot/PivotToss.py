@@ -12,13 +12,12 @@ from util import *
 # Intake Load Command
 class PivotToss(Command):
     def __init__( self,
-                  pivot:Pivot,
-                  hasLaunched:typing.Callable[[],bool]
+                  pivot:Pivot
                 ):
         # CommandBase Initiation Configurations
         super().__init__()
         self.pivot = pivot
-        self.hasLaunched = hasLaunched
+        #self.hasLaunched = hasLaunched
 
         self.setName( "PivotToss" )
         self.addRequirements( pivot )
@@ -32,7 +31,7 @@ class PivotToss(Command):
         pass # May be set to zero in future, but for now: assuming hold position
 
     def isFinished(self) -> bool:
-        return self.hasLaunched()
-        #return self.pivot.atSetpoint()
+        #return self.hasLaunched()
+        return self.pivot.atSetpoint()
     
     def runsWhenDisabled(self) -> bool: return False
