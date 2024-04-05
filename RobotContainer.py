@@ -102,14 +102,8 @@ class RobotContainer:
 
         ### Triggers (Autonomous Helpers)
         self.autonomousLaunchTrigger = NTTunableBoolean( "/Logging/Game/AutonomousLaunch", False )
-        commands2.button.Trigger( RobotState.isAutonomous
-            ).and_( self.autonomousLaunchTrigger.get
-            ).toggleOnTrue( IndexerLaunch( self.feeder, lambda: self.launcher.atSpeed() and self.pivot.atPosition() )
-        )
-        commands2.button.Trigger( RobotState.isAutonomous
-            ).and_( self.launcher.hasLaunched
-            ).toggleOnTrue( lambda: self.autonomousLaunchTrigger.set(False) 
-        )
+        commands2.button.Trigger( RobotState.isAutonomous ).and_( self.autonomousLaunchTrigger.get ).onTrue( IndexerLaunch( self.feeder, lambda: self.launcher.atSpeed() and self.pivot.atSetpoint() ) )
+        commands2.button.Trigger( RobotState.isAutonomous ).and_( self.launcher.hasLaunched ).onTrue( commands2.cmd.runOnce( lambda: self.autonomousLaunchTrigger.set(False) ) )
 
         # Register Pathplanner Commands
         if wpilib.RobotBase.isSimulation():
@@ -220,7 +214,7 @@ class RobotContainer:
         # Driver 1
         self.m_driver1.leftBumper().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
         self.m_driver1.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
-        self.m_driver1.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
+        #self.m_driver1.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
         self.m_driver1.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
         self.m_driver1.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetSpeaker
             ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
@@ -238,7 +232,7 @@ class RobotContainer:
 
         #  Driver 2
         self.m_driver2.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
-        self.m_driver2.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
+        self.m_driver2.back().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
         self.m_driver2.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
         self.m_driver2.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetSpeaker
             ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherSpeaker"
@@ -247,7 +241,7 @@ class RobotContainer:
             ).and_( lambda: self.launcher.getCurrentCommand() == None or self.launcher.getCurrentCommand().getName() != "LauncherAmp"
             ).toggleOnTrue( LauncherAmp( self.launcher ) ) 
         self.m_driver2.x().and_( self.feeder.hasNote ).toggleOnTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
-        # self.m_driver2.y().whileTrue( PivotBottom( self.pivot ) ) # Pivot Down
+        self.m_driver2.y().toggleOnTrue( PivotBottom( self.pivot ) ) # Pivot Down
         self.m_driver2.rightBumper().whileTrue( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
         self.m_driver2.start().onTrue( LedAction( self.led ) )
 

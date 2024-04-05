@@ -27,7 +27,7 @@ class Launcher(Subsystem):
         TossRight = NTTunableFloat( "/Config/LauncherSpeeds/Toss/Right", 12000.0, persistent=True )
 
         TimeDelay = NTTunableFloat( "/Config/LauncherSpeeds/Other/TimeDelay", 20.00, persistent=True )
-        Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 1000.0, persistent=True )
+        Eject = NTTunableFloat( "/Config/LauncherSpeeds/Other/Eject", 2500.0, persistent=True )
         Stop = NTTunableFloat( "/Config/LauncherSpeeds/Other/Stop", 0.0, persistent=True )
         ErrorRange = NTTunableFloat( "/Config/LauncherSpeeds/Other/ErrorRange", 350.0, persistent=True )
 

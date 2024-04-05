@@ -40,8 +40,8 @@ class LauncherSpeaker(Command):
 
 
     def end(self, interrupted:bool) -> None:
-        if not RobotState.isAutonomous():
-            self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        #if not RobotState.isAutonomous():
+        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
         return self.launcher.hasLaunched()

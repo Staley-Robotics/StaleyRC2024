@@ -2,7 +2,7 @@ import typing
 
 from commands2 import SelectCommand
 import commands2.cmd
-from wpilib import RobotBase
+from wpilib import RobotState
 
 from commands import IndexerHandoff, IndexerLoad, IndexerLaunch, IndexerSafeHandoff
 from subsystems import Indexer
@@ -34,7 +34,7 @@ class IndexerDefault(SelectCommand):
         if self.indexer.hasNote() and self.useAutoLaunch():
             return "launch"
         elif self.intakeHasNote() and self.pivotAtPosition():
-            if RobotBase.isAutonomous():
+            if RobotState.isAutonomous():
                 return "safehandoff"
             return "handoff"
         elif self.indexer.hasHalfNote() != 0:

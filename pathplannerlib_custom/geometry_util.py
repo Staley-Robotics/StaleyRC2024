@@ -2,7 +2,7 @@ from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 import math
 
 FIELD_LENGTH = 16.54
-FIELD_WIDTH = 8.31
+FIELD_WIDTH = 8.17
 
 
 def flipFieldPos(pos: Translation2d) -> Translation2d:

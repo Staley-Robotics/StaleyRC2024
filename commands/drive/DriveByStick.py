@@ -36,8 +36,10 @@ class DriveByStick(Command):
         self.deadband = NTTunableFloat( "/Config/Driver1/Deadband", 0.04, persistent=True )
 
         self.velocLinearTurbo = NTTunableFloat( "/Config/Driver1/TubroLinear", 3.5, persistent=True )
+        self.velocAngularTurbo = NTTunableFloat( "/Config/Driver1/TubroAngular", 2 * math.pi, persistent=True )
         self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 1.75, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
+        self.accelAngular = NTTunableFloat( "/Config/Driver1/AccelerationAngular", 1 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
         self.halfSpeedAngular = NTTunableFloat( "/Config/Driver1/HalfSpeedAngular", 0.5, persistent=True )
         self.srl = NTTunableFloat( "/Config/Driver1/SlewRateLimiter", 3.0, self.updateSlewRateLimiter, persistent=True )
@@ -72,13 +74,16 @@ class DriveByStick(Command):
         self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
 
         # Verify Max Speeds
-        linear, angular = self.drive.getVelocityConfig()
+        linear, angular, angularAccel = self.drive.getVelocityConfig()
         velocLinear = min( max( self.velocLinear.get(), 0.0 ), linear )
         velocAngular = min( max( self.velocAngular.get(), 0.0 ), angular )
+        accelAngular = min( max( self.accelAngular.get(), 0.0,), angularAccel )
         if self.velocLinear.get() != velocLinear:
             self.velocLinear.set( velocLinear )
         if self.velocAngular.get() != velocAngular:
             self.velocAngular.set( velocAngular )
+        if self.accelAngular.get() != angularAccel:
+            self.accelAngular.set( accelAngular )
         
         # Verify Half Speeds
         halfLinear = min( max( self.halfSpeedLinear.get(), 0.0 ), 1.0 )
@@ -149,7 +154,7 @@ class DriveByStick(Command):
         # Determine Velocities
         veloc_x = x * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
         veloc_y = y * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
-        veloc_r = r * self.velocAngular.get()
+        veloc_r = r * ( self.velocAngularTurbo.get() if self.isTurbo.get() else self.velocAngular.get() )
 
         # Determine when ChassisSpeeds capability to use
         if self.isFieldRelative.get():
