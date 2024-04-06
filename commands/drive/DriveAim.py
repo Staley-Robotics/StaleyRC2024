@@ -5,6 +5,7 @@ import commands2.cmd
 
 from commands.drive.DriveAimAmp import DriveAimAmp
 from commands.drive.DriveAimSpeaker import DriveAimSpeaker
+from commands.drive.DriveAimSpeaker2 import DriveAimSpeaker2
 from subsystems import SwerveDrive
 from util import LaunchCalc
 
@@ -18,7 +19,7 @@ class DriveAim(SelectCommand):
         self.getTarget = getTarget
         super().__init__(
             {
-                LaunchCalc.Targets.SPEAKER: DriveAimSpeaker(
+                LaunchCalc.Targets.SPEAKER: DriveAimSpeaker2(
                     swerveDrive,
                     velocityX,
                     velocityY

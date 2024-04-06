@@ -8,11 +8,11 @@ from util import *
 class LauncherIOFalcon(LauncherIO):
     def __init__( self, leftCanId:int, rightCanId:int, sensorId:int ):
         # Tunable Settings
-        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.0450, updater=self.resetPid, persistent=True)
+        self.launcher_kP = NTTunableFloat('/Config/Launcher/Falcon/PID/kP', 0.20, updater=self.resetPid, persistent=True)
         self.launcher_kI = NTTunableFloat('/Config/Launcher/Falcon/PID/kI', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_Iz = NTTunableFloat('/Config/Launcher/Falcon/PID/Izone', 0.0, updater=self.resetPid, persistent=True)
         self.launcher_kD = NTTunableFloat('/Config/Launcher/Falcon/PID/kD', 0.0, updater=self.resetPid, persistent=True)
-        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.065, updater=self.resetPid, persistent=True)
+        self.launcher_kF = NTTunableFloat('/Config/Launcher/Falcon/PID/kFF', 0.067, updater=self.resetPid, persistent=True)
         self.brakeMode = NTTunableBoolean('/Config/Launcher/Falcon/BrakeMode', True, updater=lambda: self.setBrake( self.brakeMode.get() ), persistent=True)
         self.voltageComp = NTTunableFloat('/Config/Launcher/Falcon/VoltageComp', 9.0, updater=self.updateVoltageComp, persistent=True)
 

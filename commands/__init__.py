@@ -5,6 +5,7 @@ from .climber.ClimberExtend import *
 from .drive.DriveAim import *
 from .drive.DriveAimAmp import *
 from .drive.DriveAimSpeaker import *
+from .drive.DriveAimSpeaker2 import *
 from .drive.DriveByStick import *
 from .drive.DriveDistance import *
 from .drive.DriveFlyByPath import *

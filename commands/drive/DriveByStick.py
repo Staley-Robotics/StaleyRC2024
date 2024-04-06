@@ -106,7 +106,7 @@ class DriveByStick(Command):
         y = applyDeadband( y, self.deadband.get() )
         hX = applyDeadband( hX, self.deadband.get(), 100.0 )
         hY = applyDeadband( hY, self.deadband.get(), 100.0 )
-        r = applyDeadband( r, self.deadband.get() )
+        #r = applyDeadband( r, self.deadband.get() )
 
         # Apply Clamped Values
         x = min( max( x, -1.0), 1.0 )
@@ -148,7 +148,7 @@ class DriveByStick(Command):
             target = self.tPid.calculate(robotAngle, goalAngle)
             r = target * mag
             r = min( max( r, -1.0), 1.0 ) * 3
-        else:
+        elif abs(r) < 0.00001:
             self.tPid.reset( self.drive.getRobotAngle().radians(), self.drive.getRotationVelocity() )
         
         # Determine Velocities

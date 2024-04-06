@@ -37,6 +37,7 @@ class Launcher(Subsystem):
         self.detectVeloc = NTTunableBoolean( "/Config/Launcher/LaunchDetection/B-Veloc", True, persistent=True )
         self.detectVelocCount = NTTunableInt( "/Config/Launcher/LaunchDetection/B-VelocCount", 2, persistent=True )
         self.detectTimer = NTTunableFloat( "/Config/Launcher/LaunchDetection/C-Timer", 30.0, persistent=True )
+        self.autoDetectTimer = NTTunableFloat( "/Config/Launcher/LaunchDetection/C-Timer", 3.0, persistent=True )
 
         self.launcher = launcher
         self.launcherInputs = launcher.LauncherIOInputs
@@ -116,7 +117,10 @@ class Launcher(Subsystem):
         elif self.detectVeloc.get() and self.launchDetected:
             return True
         else:
-            return self.launchTimer.hasElapsed( self.detectTimer.get() )
+            if not RobotBase.isAutonomous():
+                return self.launchTimer.hasElapsed( self.detectTimer.get() )
+            else:
+                return self.launchTimer.hasElapsed( self.autoDetectTimer.get() )
 
     def atSpeed(self, errorRange:float = 250.00) -> bool:
         spL, spR = self.launcher.getSetpoint()
