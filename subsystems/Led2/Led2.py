@@ -54,7 +54,7 @@ class Led2(Subsystem):
         self.allianceColor = Color.kBlack
         self.allianceColorDark = Color.kBlack
         self.intakeRunColors = Color.kYellow
-        self.hasNoteColors = Color.kOrange
+        self.hasNoteColors = Color(255,45,0) #Color.kDarkOrange
         self.launchFarColors = Color.kGreen
         self.launchNearColors = Color.kPurple
         self.endGameColors = Color.kWhite
@@ -81,10 +81,10 @@ class Led2(Subsystem):
         match DriverStation.getAlliance():
             case DriverStation.Alliance.kBlue:
                 self.allianceColor = Color.kBlue
-                self.allianceColorDark = Color.kWhiteSmoke
+                self.allianceColorDark = Color.kWhite
             case DriverStation.Alliance.kRed:
                 self.allianceColor = Color.kRed
-                self.allianceColorDark = Color.kWhiteSmoke
+                self.allianceColorDark = Color.kWhite
             case _:
                 self.allianceColor = Color.kLightYellow
                 self.allianceColorDark = Color.kYellow

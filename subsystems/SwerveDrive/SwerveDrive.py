@@ -60,15 +60,19 @@ class SwerveDrive(Subsystem):
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/SwerveDrive", False, persistent=True )
         
-        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", True, persistent=True )
+        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", False, persistent=True )
 
         self.maxVelocPhysical = NTTunableFloat( "SwerveDrive/Velocity/Physical", 4.50, persistent=True )
         self.maxVelocDriver = NTTunableFloat( "SwerveDrive/Velocity/Driver", 3.50, persistent=True )
         self.maxVelocCode = NTTunableFloat( "SwerveDrive/Velocity/Code", 4.25, persistent=True )
 
-        self.maxAngVelocPhysical = NTTunableFloat( "SwerveDrive/AngularVelocity/Physical", 2 * math.pi, persistent=True )
+        self.maxAngVelocPhysical = NTTunableFloat( "SwerveDrive/AngularVelocity/Physical", 8 * math.pi, persistent=True )
         self.maxAngVelocDriver = NTTunableFloat( "SwerveDrive/AngularVelocity/Driver", 2 * math.pi, persistent=True )
-        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 2 * math.pi, self.updateHolonomicDriveController, persistent=True )
+        self.maxAngVelocCode = NTTunableFloat( "SwerveDrive/AngularVelocity/Code", 4 * math.pi, self.updateHolonomicDriveController, persistent=True )
+
+        self.maxAngAccelPhysical = NTTunableFloat( "SwerveDrive/AngularAccel/Physical", 2 * math.pi, persistent=True )
+        self.maxAngAccelDriver = NTTunableFloat( "SwerveDrive/AngularAccel/Driver", 2 * math.pi, persistent=True )
+        self.maxAngAccelCode = NTTunableFloat( "SwerveDrive/AngularAccel/Code", 8 * math.pi, self.updateHolonomicDriveController, persistent=True )
 
         self.pidX_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kP", 1, self.updateHolonomicDriveController, persistent=True )
         self.pidX_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/x/kI", 0, self.updateHolonomicDriveController, persistent=True )
@@ -76,11 +80,11 @@ class SwerveDrive(Subsystem):
         self.pidY_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kP", 1, self.updateHolonomicDriveController, persistent=True )
         self.pidY_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kI", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidY_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/y/kD", 0, self.updateHolonomicDriveController, persistent=True )
-        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 0.40, self.updateHolonomicDriveController, persistent=True )
+        self.pidT_kP = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kP", 1.5, self.updateHolonomicDriveController, persistent=True )
         self.pidT_kI = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kI", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidT_kD = NTTunableFloat( "SwerveDrive/holonomicDriveController/theta/kD", 0, self.updateHolonomicDriveController, persistent=True )
         self.pidH_tDistance = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/distance", 0.0254, self.updateHolonomicDriveController, persistent=True )
-        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.04, self.updateHolonomicDriveController, persistent=True )
+        self.pidH_tRotation = NTTunableFloat( "SwerveDrive/holonomicDriveController/tolerance/rotation", 0.0004, self.updateHolonomicDriveController, persistent=True )
 
         # Gyro and Modules
         self.gyro = gyro
@@ -251,7 +255,7 @@ class SwerveDrive(Subsystem):
             self.pidT_kD.get(),
             TrapezoidProfileRadians.Constraints(
                 self.maxAngVelocCode.get(),
-                self.maxAngVelocCode.get() * 4
+                self.maxAngAccelCode.get()
             )
         )
         theta.enableContinuousInput( -math.pi, math.pi )
@@ -389,8 +393,8 @@ class SwerveDrive(Subsystem):
         self.charSettingsVolts.set(volts)
         self.charSettingsRotation.set(rotation)
 
-    def getVelocityConfig(self) -> [float,float]:
-        return [ self.maxVelocCode.get(), self.maxAngVelocCode.get() ]
+    def getVelocityConfig(self) -> [float,float,float]:
+        return [ self.maxVelocCode.get(), self.maxAngVelocCode.get(), self.maxAngAccelCode.get() ]
 
     """
     DriveTime Functions

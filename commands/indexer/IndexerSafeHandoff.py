@@ -18,21 +18,21 @@ class IndexerSafeHandoff(Command):
         # CommandBase Initiation Configurations
         super().__init__()
         self.indexer = indexer
-        self.intakeHasNote = intakeHasNote()
+        self.intakeHasNote = intakeHasNote
 
-        self.setName( "IndexerHandoff" )
+        self.setName( "IndexerSafeHandoff" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
         self.indexer.setBrake(True)
 
     def execute(self) -> None:
-        self.indexer.set(Indexer.IndexerSpeeds.Handoff.get())
+        self.indexer.set(Indexer.IndexerSpeeds.SafeHandoff.get())
     
     def end(self, interrupted:bool) -> None:
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool: 
-        return self.indexer.hasNote() and not self.intakeHasNote()
+        return self.indexer.hasNote() #and not self.intakeHasNote()
     
     def runsWhenDisabled(self) -> bool: return False

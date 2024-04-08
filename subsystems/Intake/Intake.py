@@ -14,7 +14,7 @@ class Intake(Subsystem):
         #}
         Stop = NTTunableFloat( "/Config/IntakeSpeeds/Stop", 0.0, persistent=True )
         Load = NTTunableFloat( "/Config/IntakeSpeeds/Load", 0.35, persistent=True )
-        Handoff = NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.50, persistent=True )
+        Handoff = NTTunableFloat( "/Config/IntakeSpeeds/Handoff", 0.35, persistent=True )
         Eject = NTTunableFloat( "/Config/IntakeSpeeds/Eject", -1.0, persistent=True )
 
     def __init__( self, intake:IntakeIO ):

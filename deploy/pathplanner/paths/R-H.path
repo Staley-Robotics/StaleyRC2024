@@ -3,16 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.45,
-        "y": 4.1
+        "x": 0.9867919735839472,
+        "y": 3.9569650567872565
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.037071341069766,
-        "y": -0.7495638335026672
+        "x": 0.7854058565259988,
+        "y": 2.077361297579739
       },
       "isLocked": false,
       "linkedName": "R"
+    },
+    {
+      "anchor": {
+        "x": 2.2622373816176204,
+        "y": 1.7887078631300122
+      },
+      "prevControl": {
+        "x": 1.7537111545150723,
+        "y": 1.9336723532090194
+      },
+      "nextControl": {
+        "x": 3.74578177727784,
+        "y": 1.3657970173083194
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -20,8 +36,8 @@
         "y": 0.77
       },
       "prevControl": {
-        "x": 6.262929055806029,
-        "y": 1.6651359781514206
+        "x": 6.310098334482383,
+        "y": 0.7683515367030734
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +50,7 @@
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 2.125,
-    "maxAngularVelocity": 360.0,
+    "maxAngularVelocity": 720.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
@@ -45,5 +61,5 @@
   "reversed": false,
   "folder": "Zone Transfer",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -34,10 +34,11 @@ class LauncherDefault(SelectCommand):
             return "wait"
         elif self.isTargetAmp():
             return "amp"
-        elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
-            return "speaker"
+        #elif self.getDistance() < Launcher.LauncherSpeeds.SpeakerDistanceHigh.get():
         else:
-            return "toss"
+            return "speaker"
+        #else:
+        #    return "toss"
 
     def initialize(self):
         super().initialize()

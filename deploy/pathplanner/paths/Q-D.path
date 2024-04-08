@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.283917123451807,
-        "y": 6.238890903191033
+        "x": 3.3161580608875503,
+        "y": 5.950687615660946
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.5374932578362195,
-        "y": 6.677277188259734
+        "x": 4.569734195271963,
+        "y": 6.389073900729647
       },
       "isLocked": false,
       "linkedName": "Q"
@@ -34,7 +34,7 @@
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 2.125,
-    "maxAngularVelocity": 360.0,
+    "maxAngularVelocity": 720.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
@@ -45,5 +45,5 @@
   "reversed": false,
   "folder": "Shooting Zones",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

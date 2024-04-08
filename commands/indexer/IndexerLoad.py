@@ -18,7 +18,7 @@ class IndexerLoad(Command):
         super().__init__()
         self.indexer = indexer
 
-        self.setName( "IndexerLoad" )
+        self.setName( "IndexerStaging" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
