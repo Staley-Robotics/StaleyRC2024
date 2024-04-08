@@ -60,7 +60,7 @@ class SwerveDrive(Subsystem):
         
         self.offline = NTTunableBoolean( "/DisableSubsystem/SwerveDrive", False, persistent=True )
         
-        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", True, persistent=True )
+        self.usePoseRobotAngle = NTTunableBoolean( "/Config/SwerveDrive/RobotAngle/UsePose", False, persistent=True )
 
         self.maxVelocPhysical = NTTunableFloat( "SwerveDrive/Velocity/Physical", 4.50, persistent=True )
         self.maxVelocDriver = NTTunableFloat( "SwerveDrive/Velocity/Driver", 3.50, persistent=True )

@@ -145,8 +145,8 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "LED", self.led )
 
         # Add Commands to SmartDashboard
-        wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
-        wpilib.SmartDashboard.putData( "Set Gyro Offset", commands2.cmd.runOnce( self.drivetrain.syncGyro ).ignoringDisable(True) )
+        #wpilib.SmartDashboard.putData( "Zero Odometry", commands2.cmd.runOnce( self.drivetrain.resetOdometry ).ignoringDisable(True) )
+        wpilib.SmartDashboard.putData( "Set Gyro Offset", commands2.cmd.runOnce( lambda: self.drivetrain.syncGyro() ).ignoringDisable(True) )
         wpilib.SmartDashboard.putData( "LauncherSpeaker", LauncherSpeaker(self.launcher) )
         wpilib.SmartDashboard.putData( "LedButton", LedAction(self.led))
 
@@ -214,7 +214,11 @@ class RobotContainer:
         ### Controller Configs
         # Driver 1
         self.m_driver1.leftBumper().whileTrue( DriveFlyByPath( self.drivetrain, self.feeder.hasNote, self.launchCalc.getTarget, lambda: not getSwitchPivotAuto() ) ) # Drive - FlyByPath
+        
+        self.m_driver1.a().and_( lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() == "DriveAimAuto"
+            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() ) )
         self.m_driver1.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
+
         #self.m_driver1.b().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
         self.m_driver1.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
         self.m_driver1.x().and_( self.feeder.hasNote ).and_( self.launchCalc.isTargetSpeaker
@@ -232,6 +236,8 @@ class RobotContainer:
         self.m_driver1.start().onTrue( LedAction( self.led ) ) # LEDs
 
         #  Driver 2
+        self.m_driver2.a().and_( lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() == "DriveAimAuto"
+            ).toggleOnTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() ) )
         self.m_driver2.a().whileTrue( DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ) )
         self.m_driver2.back().toggleOnTrue( commands2.cmd.runOnce( lambda: self.launchCalc.setTarget( LaunchCalc.Targets.AMP if self.launchCalc.getTarget() == LaunchCalc.Targets.SPEAKER else LaunchCalc.Targets.SPEAKER ) ) )
         self.m_driver2.x().and_( lambda: not self.feeder.hasNote() and not self.launcher.isRunning() ).toggleOnTrue( IntakeLoad( self.intake ) )
@@ -273,6 +279,15 @@ class RobotContainer:
         self.stationCmd.button(4).whileTrue( LedAction( self.led ) )
 
         ### Configure Default Commands (with Operatory Station Toggles integrated)
+        # Auto Aim while holding note
+        commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( self.feeder.hasNote ).onTrue(
+            DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ).withName( "DriveAimAuto" )
+        )
+        commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( lambda: not self.feeder.hasNote() ).and_(
+            lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() != "DriveByStick"
+            ).onTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() )
+        )
+
         self.drivetrain.setDefaultCommand(
             DriveByStick(
                 self.drivetrain,
