@@ -17,8 +17,7 @@ class NoteLaunchTrap(commands2.SequentialCommandGroup):
                     LauncherTrap(launcher),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
-                        commands2.WaitUntilCommand( condition = launcher.atSpeed ),
-                        IndexerLaunch(indexer)
+                        IndexerLaunch(indexer, launcher.atSpeed )
                     )
                 )
             )

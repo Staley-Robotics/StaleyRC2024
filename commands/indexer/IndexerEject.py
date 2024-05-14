@@ -36,7 +36,7 @@ class IndexerEject(Command):
         self.indexer.set(Indexer.IndexerSpeeds.Stop.get())
 
     def isFinished(self) -> bool:
-        return self.timer.hasElapsed(2.0)
+        return self.timer.hasElapsed(5.0)
     
     def runsWhenDisabled(self) -> bool: return False
 

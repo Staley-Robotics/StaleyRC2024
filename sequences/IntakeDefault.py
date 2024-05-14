@@ -1,19 +1,22 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+from wpilib import RobotState
+
+from commands import IntakeHandoff, IntakeLoad
 from subsystems import Intake
-from util import *
 
-class IntakeDefault(commands2.SelectCommand):
+class IntakeDefault(SelectCommand):
     def __init__( self,
                   intake:Intake,
                   indexerHasNote:typing.Callable[[],bool],
-                  pivotAtPosition:typing.Callable[[],bool],
+                  pivotAtHandoff:typing.Callable[[],bool],
                   useAutoStart:typing.Callable[[],bool]
                 ):
         self.intake = intake
         self.indexerHasNote = indexerHasNote
-        self.pivotAtPosition = pivotAtPosition
+        self.pivotAtPosition = pivotAtHandoff
         self.useAutoStart = useAutoStart
 
         super().__init__(
@@ -28,8 +31,13 @@ class IntakeDefault(commands2.SelectCommand):
     def getState(self) -> str:
         if self.useAutoStart() and self.intake.foundNote() and not self.indexerHasNote() and not self.intake.hasNote():
             return "load"
-        elif self.intake.hasNote() and self.pivotAtPosition():
-            return "handoff"
+        elif self.intake.hasNote():
+            if self.pivotAtPosition():
+                return "handoff"
+            else:
+                return "wait"
+        elif RobotState.isAutonomous():
+            return "load"
         else:
             return "wait"
 

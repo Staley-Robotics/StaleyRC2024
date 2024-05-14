@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.5,
-        "y": 1.4996173928359764
+        "x": 2.6784353568707138,
+        "y": 3.097717624006677
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.020958987044463,
-        "y": 1.4658694849383747
+        "x": 6.783911501044728,
+        "y": 3.1216584475579663
       },
       "isLocked": false,
       "linkedName": "S"
@@ -20,8 +20,8 @@
         "y": 4.1
       },
       "prevControl": {
-        "x": 7.437087036562467,
-        "y": 4.0836879702033215
+        "x": 6.046404017101189,
+        "y": 4.08061123785938
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 2.125,
-    "maxAngularVelocity": 360.0,
+    "maxAngularVelocity": 720.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
@@ -45,5 +45,5 @@
   "reversed": false,
   "folder": "Shooting Zones",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

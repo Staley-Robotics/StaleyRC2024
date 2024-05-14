@@ -9,6 +9,26 @@ from subsystems import SwerveDrive
 from util import *
 # Constants
 
+# Toggle: Turbo
+class ToggleTurboOn(InstantCommand):
+    turbo = NTTunableBoolean( "/Driver1/isTurbo", False )
+
+    def __init__(self) -> None:
+        super().__init__(
+            toRun=lambda: self.turbo.set( True )
+        )
+
+    def runsWhenDisabled(self) -> bool: return True
+
+class ToggleTurboOff(InstantCommand):
+    turbo = NTTunableBoolean( "/Driver1/isTurbo", False )
+
+    def __init__(self) -> None:
+        super().__init__(
+            toRun=lambda: self.turbo.set( False )
+        )
+
+    def runsWhenDisabled(self) -> bool: return True
 
 # Toggle: Half Speed
 class ToggleHalfSpeed(InstantCommand):

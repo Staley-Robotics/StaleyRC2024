@@ -1,17 +1,19 @@
-import commands2
+import typing
 
-from commands import *
+from commands2 import SelectCommand
+import commands2.cmd
+
+from commands import PivotHandoff, PivotAim, PivotAmp, PivotSpeaker, PivotToss, PivotByStick
 from subsystems import Pivot
-from util import *
 
-class PivotDefault(commands2.SelectCommand):
+class PivotDefault(SelectCommand):
     def __init__( self,
                   pivot:Pivot,
                   hasNote:typing.Callable[[],bool],
                   getAngle:typing.Callable[[],float],
                   getAdjustAxis:typing.Callable[[],float] = lambda: 0.0,
                   isTargetAmp:typing.Callable[[],bool] = lambda: False,
-                  isIntakeWaiting:typing.Callable[[],bool] = lambda: False,
+                  isIntakeQueued:typing.Callable[[],bool] = lambda: False,
                   useAutoCalculate:typing.Callable[[],bool] = lambda: True,
                   useManualAdjust:typing.Callable[[],bool] = lambda: False
                 ):
@@ -19,7 +21,7 @@ class PivotDefault(commands2.SelectCommand):
         self.launchAngle = getAngle
         self.getAdjustAxis = getAdjustAxis
         self.isTargetAmp = isTargetAmp
-        self.isIntakeWaiting = isIntakeWaiting
+        self.isIntakeQueued = isIntakeQueued
         self.useAutoCalculate = useAutoCalculate
         self.useManualAdjust = useManualAdjust
 
@@ -39,7 +41,7 @@ class PivotDefault(commands2.SelectCommand):
     def getState(self):
         if self.useAutoCalculate():
             if self.indexerHasNote():
-                if self.launchAngle() < 10.0:
+                if self.launchAngle() < 15.5:
                     return "toss"
                 elif self.isTargetAmp():
                     return "amp"
@@ -50,14 +52,14 @@ class PivotDefault(commands2.SelectCommand):
         elif self.useManualAdjust():
             if self.indexerHasNote():
                 return "adjust"
-            elif self.isIntakeWaiting():
+            elif self.isIntakeQueued():
                 return "handoff"
             else:
                 return "wait"
         else:
             if self.indexerHasNote():
                 return "fixed"
-            elif self.isIntakeWaiting():
+            elif self.isIntakeQueued():
                 return "handoff"
             else:
                 return "wait"

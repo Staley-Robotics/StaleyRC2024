@@ -5,7 +5,7 @@ from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 
 from .NTTunableFloat import NTTunableFloat
 
-fieldWidth = NTTunableFloat( "Crescendo/FieldWidth", 8.31, persistent=True )
+fieldWidth = NTTunableFloat( "Crescendo/FieldWidth", 8.17, persistent=True )
 speakerTargetX = NTTunableFloat( "Crescendo/Speaker/X", 0.00, persistent=True )
 speakerTargetY = NTTunableFloat( "Crescendo/Speaker/Y", 5.55, persistent=True )
 speakerTargetH = NTTunableFloat( "Crescendo/Speaker/H", 2.0431, persistent=True )

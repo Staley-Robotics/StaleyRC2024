@@ -31,6 +31,9 @@ class LauncherIO:
     def run(self) -> None:
         pass
 
+    def setBrake(self, brake:bool) -> None:
+        pass
+
     def setVelocity(self, leftVelocity:float, rightVelocity:float) -> None:
         pass
 

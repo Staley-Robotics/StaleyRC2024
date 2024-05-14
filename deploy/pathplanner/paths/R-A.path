@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.45,
-        "y": 4.1
+        "x": 0.9867919735839472,
+        "y": 3.9569650567872565
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.45,
-        "y": 3.5999999999999996
+        "x": 1.9867919735839472,
+        "y": 3.4569650567872565
       },
       "isLocked": false,
       "linkedName": "R"
@@ -34,7 +34,7 @@
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 2.125,
-    "maxAngularVelocity": 360.0,
+    "maxAngularVelocity": 720.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
@@ -45,5 +45,5 @@
   "reversed": false,
   "folder": "Zone Transfer",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

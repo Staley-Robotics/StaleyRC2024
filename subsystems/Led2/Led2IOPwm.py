@@ -21,7 +21,7 @@ class Led2IOPwm(Led2IO):
 
         ## init LED
         self.m_led = AddressableLED( PWMPort )
-        self.m_buffer = []
+        self.m_buffer = [AddressableLED.LEDData(0,0,0)]
         self.configureBuffer()
 
     def updateInputs(self, inputs:Led2IO.Led2IOInputs): pass
@@ -37,9 +37,8 @@ class Led2IOPwm(Led2IO):
             self.ledLength.set( length )
 
         # Configure LED Buffer
-        self.m_led.stop()
         self.m_led.setLength( length )
-        self.m_buffer = [AddressableLED.LEDData() for i in range(length)]
+        self.m_buffer = [AddressableLED.LEDData(0,0,0) for i in range(length)]
         self.m_led.setData( self.m_buffer )
         self.m_led.start()
 

@@ -14,7 +14,11 @@
         {
           "type": "path",
           "data": {
+<<<<<<<< HEAD:deploy/pathplanner/autos/M-B.auto
             "pathName": "M-B"
+========
+            "pathName": "R-C"
+>>>>>>>> main:deploy/pathplanner/autos/R-C.auto
           }
         },
         {

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.335984840573016,
-        "y": 4.1
+        "x": 6.30811856210766,
+        "y": 4.092437427806403
       },
       "isLocked": false,
       "linkedName": "F"
     },
     {
       "anchor": {
-        "x": 4.5,
-        "y": 1.4996173928359764
+        "x": 2.6784353568707138,
+        "y": 3.097717624006677
       },
       "prevControl": {
-        "x": 7.147095516475257,
-        "y": 1.5164913467847767
+        "x": 6.777709962413973,
+        "y": 3.1144473561268553
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 2.125,
-    "maxAngularVelocity": 360.0,
+    "maxAngularVelocity": 720.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
@@ -45,5 +45,5 @@
   "reversed": false,
   "folder": "Shooting Zones",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -18,7 +18,7 @@ class IndexerLoad(Command):
         super().__init__()
         self.indexer = indexer
 
-        self.setName( "IndexerLoad" )
+        self.setName( "IndexerStaging" )
         self.addRequirements( indexer )
 
     def initialize(self) -> None:
@@ -26,9 +26,9 @@ class IndexerLoad(Command):
 
     def execute(self) -> None:
         halfNote = self.indexer.hasHalfNote()
-        if halfNote == 1:
+        if halfNote == -1:
             self.indexer.set( Indexer.IndexerSpeeds.SelfIn.get() )
-        elif halfNote == -1:
+        elif halfNote == 1:
             self.indexer.set( Indexer.IndexerSpeeds.SelfOut.get() )
     
     def end(self, interrupted:bool) -> None:

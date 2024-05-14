@@ -11,8 +11,8 @@ class Led2(Subsystem):
         # NT Tunables
         self.offline = NTTunableBoolean( "/DisableSubsystem/Led", False, persistent=True )
 
-        self.strobeDurationFast = NTTunableFloat( "/Config/LedEffects/Strobe/FastDuration", 0.1, persistent=True )
-        self.strobeDurationSlow = NTTunableFloat( "/Config/LedEffects/Strobe/SlowDuration", 0.2, persistent=True )
+        self.strobeDurationFast = NTTunableFloat( "/Config/LedEffects/Strobe/FastDuration", 0.25, persistent=True )
+        self.strobeDurationSlow = NTTunableFloat( "/Config/LedEffects/Strobe/SlowDuration", 0.50, persistent=True )
         self.strobeDurationEStop = NTTunableFloat( "/Config/LedEffects/Strobe/EStopDuration", 1.5, persistent=True )
         
         self.breatheDurationFast = NTTunableFloat( "/Config/LedEffects/Breathe/FastDuration", 0.75, persistent=True )
@@ -54,7 +54,7 @@ class Led2(Subsystem):
         self.allianceColor = Color.kBlack
         self.allianceColorDark = Color.kBlack
         self.intakeRunColors = Color.kYellow
-        self.hasNoteColors = Color.kOrange
+        self.hasNoteColors = Color(255,45,0) #Color.kDarkOrange
         self.launchFarColors = Color.kGreen
         self.launchNearColors = Color.kPurple
         self.endGameColors = Color.kWhite
@@ -81,10 +81,10 @@ class Led2(Subsystem):
         match DriverStation.getAlliance():
             case DriverStation.Alliance.kBlue:
                 self.allianceColor = Color.kBlue
-                self.allianceColorDark = Color.kDarkBlue
+                self.allianceColorDark = Color.kWhite
             case DriverStation.Alliance.kRed:
                 self.allianceColor = Color.kRed
-                self.allianceColorDark = Color.kDarkRed
+                self.allianceColorDark = Color.kWhite
             case _:
                 self.allianceColor = Color.kLightYellow
                 self.allianceColorDark = Color.kYellow
@@ -106,12 +106,16 @@ class Led2(Subsystem):
             color = self.allianceColor
 
             # Determine State    
-            if self.indexerHasNote() and self.launchAimGood():
-                blink = True
-                slow = False
+            if self.indexerHasNote():
+                if self.launchAimGood():
+                    if self.launchRangeFar():
+                        blink = True
+                    if self.launchRangeNear():
+                        slow = False
             elif self.intakeHasNote():
                 blink = True
-                slow = False
+                if not self.intakeIsRunning():
+                    slow = False
             elif self.intakeIsRunning():
                 blink = True
 

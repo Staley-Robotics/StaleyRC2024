@@ -31,8 +31,9 @@ class LauncherToss(Command):
         self.launcher.set(Launcher.LauncherSpeeds.TossLeft.get(), Launcher.LauncherSpeeds.TossRight.get())
 
     def end(self, interrupted:bool) -> None:
-        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
         self.timer.stop()
+        self.launcher.set(Launcher.LauncherSpeeds.Stop.get(), Launcher.LauncherSpeeds.Stop.get())
+        
 
     def isFinished(self) -> bool:
         return self.timer.hasElapsed( Launcher.LauncherSpeeds.TimeDelay.get() ) or self.launcher.hasLaunched()

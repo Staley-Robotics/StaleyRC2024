@@ -18,8 +18,8 @@ class DriveAimAmp(DriveByStick):
         super().__init__( swerveDrive,
             velocityX = velocityX,
             velocityY = velocityY,
-            holonomicX = self.getHolonomicX,
-            holonomicY = lambda: 0,
+            holonomicX = lambda: 0,
+            holonomicY = self.getHolonomicY,
             rotate = lambda: 0.0
         )
 
@@ -27,7 +27,7 @@ class DriveAimAmp(DriveByStick):
         self.setName( "DriveAimAmp" )
         self.holdFieldRelative = False
 
-    def getHolonomicX(self) -> float:
+    def getHolonomicY(self) -> float:
         returnMe = 0
 
         if DriverStation.getAlliance() == DriverStation.Alliance.kRed:

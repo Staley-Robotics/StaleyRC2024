@@ -26,8 +26,7 @@ class NoteLaunchSpeakerAuto(commands2.SequentialCommandGroup):
                     LauncherSpeaker(launcher, launchCalc.getDistance),
                     commands2.SequentialCommandGroup(
                         commands2.WaitCommand( 0.025 ),
-                        commands2.WaitUntilCommand( condition = lambda: launcher.atSpeed(1000) ),
-                        IndexerLaunch(indexer)
+                        IndexerLaunch(indexer, launcher.atSpeed)
                     )
                 )
             )

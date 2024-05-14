@@ -30,6 +30,7 @@ class PivotBottom(Command):
         pass # May be set to zero in future, but for now: assuming hold position
 
     def isFinished(self) -> bool:
-        return self.pivot.atSetpoint()
+        return False
+        #return self.pivot.atSetpoint()
     
     def runsWhenDisabled(self) -> bool: return False

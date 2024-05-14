@@ -6,6 +6,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunch"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -18,7 +24,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoLaunch"
+                  "name": "AutoPickup"
                 }
               }
             ]
@@ -27,7 +33,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoPickup"
+            "name": "AutoLaunch"
           }
         },
         {
@@ -43,16 +49,10 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoLaunch"
+                  "name": "AutoPickup"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoPickup"
           }
         },
         {
@@ -68,15 +68,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "S-G"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoPickup"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "S-G"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoPickup"
+                }
+              }
+            ]
           }
         },
         {
