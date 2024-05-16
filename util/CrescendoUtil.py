@@ -14,6 +14,15 @@ ampTargetX = NTTunableFloat( "Crescendo/Amp/X", 1.80, persistent=True )
 ampTargetY = NTTunableFloat( "Crescendo/Amp/Y", 7.90, persistent=True )
 ampTargetH = NTTunableFloat( "Crescendo/Amp/H", 4.0, persistent=True )
 ampTargetR = NTTunableFloat( "Crescendo/Amp/Rotation", -90.0, persistent=True)
+trap1TargetX = NTTunableFloat( "Crescendo/Trap1/X", 5.50, persistent=True )
+trap1TargetY = NTTunableFloat( "Crescendo/Trap1/Y", 4.085, persistent=True )
+trap1TargetR = NTTunableFloat( "Crescendo/Trap1/R", 180.00, persistent=True )
+trap2TargetX = NTTunableFloat( "Crescendo/Trap2/X", 4.250, persistent=True )
+trap2TargetY = NTTunableFloat( "Crescendo/Trap2/Y", 3.250, persistent=True )
+trap2TargetR = NTTunableFloat( "Crescendo/Trap2/R", 60.00, persistent=True )
+trap3TargetX = NTTunableFloat( "Crescendo/Trap3/X", 4.250, persistent=True )
+trap3TargetY = NTTunableFloat( "Crescendo/Trap3/Y", 4.835, persistent=True )
+trap3TargetR = NTTunableFloat( "Crescendo/Trap3/R", -60.00, persistent=True )
 
 class CrescendoUtil:
     @staticmethod
@@ -68,6 +77,30 @@ class CrescendoUtil:
     @staticmethod
     def getAmpHeight():
         return ampTargetH.get()
+
+    @staticmethod
+    def getTrap1Pose():
+        pose = Pose2d(
+            Translation2d( trap1TargetX.get(), trap1TargetY.get() ),
+            Rotation2d(0).fromDegrees( trap1TargetR.get() )
+        )
+        return pose
+
+    @staticmethod
+    def getTrap2Pose():
+        pose = Pose2d(
+            Translation2d( trap2TargetX.get(), trap2TargetY.get() ),
+            Rotation2d(0).fromDegrees( trap2TargetR.get() )
+        )
+        return pose
+
+    @staticmethod
+    def getTrap3Pose():
+        pose = Pose2d(
+            Translation2d( trap3TargetX.get(), trap3TargetY.get() ),
+            Rotation2d(0).fromDegrees( trap3TargetR.get() )
+        )
+        return pose
 
     @staticmethod
     def getStageTarget():

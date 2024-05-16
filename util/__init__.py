@@ -1,4 +1,6 @@
+from .CrescendoConsole import *
 from .CrescendoUtil import *
+from .DoublePressTrigger import *
 from .LaunchCalc import *
 from .LoggedConsole import *
 from .LoggedPDP import *

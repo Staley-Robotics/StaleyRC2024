@@ -18,6 +18,7 @@ class LaunchCalc(Subsystem):
         TRAP1 = 2
         TRAP2 = 3
         TRAP3 = 4
+        CLIMB = 5
 
     def __init__(self, getPose:typing.Callable[[], Pose2d]):
         self.autoLaunch = NTTunableBoolean( "/Config/LaunchCalc/AutoLaunch", False, persistent=True )
@@ -49,13 +50,30 @@ class LaunchCalc(Subsystem):
         # Get Target Pose Data
         targetPose = Pose2d()
         targetH = 0
-        match self.getTarget():
-            case LaunchCalc.Targets.SPEAKER:
-                targetPose = CrescendoUtil.getSpeakerPose()
-                targetH = CrescendoUtil.getSpeakerHeight()
-            case LaunchCalc.Targets.AMP:
-                targetPose = CrescendoUtil.getAmpPose()
-                targetH = CrescendoUtil.getAmpHeight()
+        
+        curTarget = self.getTarget()
+        if self.getTarget() == LaunchCalc.Targets.SPEAKER:
+            targetPose = CrescendoUtil.getSpeakerPose()
+            targetH = CrescendoUtil.getSpeakerHeight()
+        elif self.getTarget() == LaunchCalc.Targets.AMP:
+            targetPose = CrescendoUtil.getAmpPose()
+            targetH = CrescendoUtil.getAmpHeight()
+        else:
+            relPose = CrescendoUtil.getTrap1Pose()
+            newTarget = self.getTarget()
+
+            if robotPose.X() > relPose.X():
+                newTarget = LaunchCalc.Targets.TRAP1
+                targetPose = CrescendoUtil.getTrap1Pose()
+            elif robotPose.Y() < relPose.Y():
+                newTarget = LaunchCalc.Targets.TRAP2
+                targetPose = CrescendoUtil.getTrap2Pose()
+            elif robotPose.Y() > relPose.Y():
+                newTarget = LaunchCalc.Targets.TRAP3
+                targetPose = CrescendoUtil.getTrap3Pose()
+
+            if curTarget != newTarget:
+                self.setTarget( newTarget )
         
         # Relative Pose Data
         relativePose:Pose2d = robotPose.relativeTo( targetPose )
@@ -64,18 +82,22 @@ class LaunchCalc(Subsystem):
         self.distance = relativePose.translation().norm()
         
         # Get Rotation to Target
-        self.rotation = relativePose.translation().angle()
-        match self.getTarget():
-            case LaunchCalc.Targets.AMP:
-                self.rotation = targetPose.rotation()
-
-        # Calculations
+        if self.getTarget() == LaunchCalc.Targets.SPEAKER:
+            self.rotation = relativePose.translation().angle()
+            self.launchAngle = math.degrees( math.atan( ( targetH - pivotH ) / self.distance ) )
+            self.launchAngleAdj = self.launchAngle + self.aimAdjust.get()
+        else:
+            self.rotation = targetPose.rotation()
+            self.launchAngle = 0.0
+            self.launchAngleAdj = 0.0
         self.rotationVariance = abs( robotPose.rotation().degrees() - self.rotation.degrees() )
-        self.launchAngle = math.degrees( math.atan( ( targetH - pivotH ) / self.distance ) )
-        self.launchAngleAdj = self.launchAngle + self.aimAdjust.get()
 
         # Logging
         self.ntLoggerState.putBoolean( "isTargetSpeaker", self.isTarget( LaunchCalc.Targets.SPEAKER ) )
+        self.ntLoggerState.putBoolean( "isTargetAmp", self.isTarget( LaunchCalc.Targets.AMP ) )
+        self.ntLoggerState.putBoolean( "isTargetTrap1", self.isTarget( LaunchCalc.Targets.TRAP1 ) )
+        self.ntLoggerState.putBoolean( "isTargetTrap2", self.isTarget( LaunchCalc.Targets.TRAP2 ) )
+        self.ntLoggerState.putBoolean( "isTargetTrap3", self.isTarget( LaunchCalc.Targets.TRAP3 ) )
         self.ntLoggerState.putBoolean( "inRangeFar", self.inFarRange() )
         self.ntLoggerState.putBoolean( "inRangeNear", self.inNearRange() )
         self.ntLoggerState.putBoolean( "inRangeAuto", self.inAutoRange() )

@@ -41,9 +41,9 @@ class PivotDefault(SelectCommand):
     def getState(self):
         if self.useAutoCalculate():
             if self.indexerHasNote():
-                if self.launchAngle() < 15.5:
-                    return "toss"
-                elif self.isTargetAmp():
+                # if self.launchAngle() < 15.5:
+                #     return "toss"
+                if self.isTargetAmp():
                     return "amp"
                 else:
                     return "aim"
@@ -58,7 +58,10 @@ class PivotDefault(SelectCommand):
                 return "wait"
         else:
             if self.indexerHasNote():
-                return "fixed"
+                if self.isTargetAmp():
+                    return "amp"
+                else:
+                    return "fixed"
             elif self.isIntakeQueued():
                 return "handoff"
             else:

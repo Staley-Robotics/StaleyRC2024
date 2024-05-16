@@ -2,6 +2,7 @@ from .AllRealign import *
 from .AllStop import *
 from .ClimberDefault import *
 from .EjectAll import *
+from .ForceFeed import *
 from .IndexerDefault import *
 from .IntakeDefault import *
 from .LauncherDefault import *

@@ -72,6 +72,6 @@ class SwervePath:
         for e1 in os.scandir( p ):
             if not e1.is_dir() and e1.name.endswith(".auto"):
                 f = e1.name.removesuffix(".auto")
-                print( f"Loading Auto: {f}" )
+                #print( f"Loading Auto: {f}" )
                 chooser.addOption( f, AutoBuilder.buildAuto( f ) )
     

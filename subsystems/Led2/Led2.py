@@ -48,6 +48,7 @@ class Led2(Subsystem):
         self.setLaunchRangeNear()
         self.setLaunchRangeAuto()
         self.setIsEndgame()
+        self.setIsClimb()
         
         # Color Sets
         self.offColors = Color.kBlack
@@ -57,6 +58,7 @@ class Led2(Subsystem):
         self.hasNoteColors = Color(255,45,0) #Color.kDarkOrange
         self.launchFarColors = Color.kGreen
         self.launchNearColors = Color.kPurple
+        self.climbColors = Color.kWhite
         self.endGameColors = Color.kWhite
         self.staleyColors = [Color.kDarkGreen, Color.kSilver, Color.kGreen, Color.kWhite]
         self.distractionColors = [Color.kWhite, Color.kBlack, Color.kHotPink, Color.kBlack]
@@ -120,7 +122,9 @@ class Led2(Subsystem):
                 blink = True
 
             # Determine Color
-            if self.indexerHasNote():
+            if self.isClimb():
+                color = self.climbColors
+            elif self.indexerHasNote():
                 if self.launchRangeNear():
                     color = self.launchNearColors
                 elif self.launchRangeFar():
@@ -167,6 +171,9 @@ class Led2(Subsystem):
 
     def setLaunchRangeAuto(self, function:typing.Callable[[],bool] = lambda: False):
         self.launchRangeAuto = function
+
+    def setIsClimb(self, function:typing.Callable[[],bool] = lambda: False):
+        self.isClimb = function
 
     def setIsEndgame(self, function:typing.Callable[[],bool] = lambda: False):
         self.isEndgame = function

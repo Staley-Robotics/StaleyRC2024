@@ -10,6 +10,7 @@ class Indexer(Subsystem):
         Stop = NTTunableFloat( "/Config/IndexerSpeeds/Stop", 0.0, persistent=True )
         SafeHandoff = NTTunableFloat( "/Config/IndexerSpeeds/SafeHandoff", 0.35, persistent=True )
         Handoff = NTTunableFloat( "/Config/IndexerSpeeds/Handoff", 0.50, persistent=True )
+        Max = NTTunableFloat( "/Config/IndexerSpeeds/Max", 1.00, persistent=True )
         Launch = NTTunableFloat( "/Config/IndexerSpeeds/Launch", 0.50, persistent=True )
         Source = NTTunableFloat( "/Config/IndexerSpeeds/Source", -0.35, persistent=True )
         Eject = NTTunableFloat( "/Config/IndexerSpeeds/Eject", 0.50, persistent=True )
