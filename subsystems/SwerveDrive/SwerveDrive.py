@@ -395,6 +395,9 @@ class SwerveDrive(Subsystem):
 
     def getVelocityConfig(self) -> [float,float,float]:
         return [ self.maxVelocCode.get(), self.maxAngVelocCode.get(), self.maxAngAccelCode.get() ]
+    
+    def getVelocityConfigCode(self) -> [float,float,float]:
+        return [ self.maxVelocCode.get(), self.maxAngVelocCode.get(), self.maxAngAccelCode.get() ]
 
     """
     DriveTime Functions

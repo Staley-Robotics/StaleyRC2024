@@ -27,6 +27,7 @@ class RobotContainer:
         Initialization
         """
         ### Tunable Variables
+        self.driveAutoRotate = NTTunableBoolean( "/Config/Game/AutoRotate", True, persistent=True )
         self.endgameTimer1 = NTTunableFloat( "/Config/Game/EndGameNotifications/1", 30.0, persistent=True )
         self.endgameTimer2 = NTTunableFloat( "/Config/Game/EndGameNotifications/2", 15.0, persistent=True )
        
@@ -323,8 +324,8 @@ class RobotContainer:
             self.driver.rightTrigger().and_( triggerHasNote.getAsBoolean ).onTrue( IndexerLaunch( self.feeder, triggerLaunchReady.getAsBoolean ) )
             #self.driver.leftStick()
             #self.driver.rightStick()
-            self.driver.start( ToggleFieldRelative() )
-            #self.driver.back()
+            self.driver.start().onTrue( ToggleFieldRelative() )
+            DoublePressTrigger.doublePress( self.driver.back() ).onTrue( commands2.cmd.runOnce( lambda: self.driveAutoRotate.set( not self.driveAutoRotate.get() ) ).ignoringDisable(True) )
 
             # Operator
             self.operator.a( AllStop( self.intake, self.feeder, self.launcher, self.pivot ) )
@@ -383,7 +384,7 @@ class RobotContainer:
                 )
             )
         elif self.controllerConfig == "State":           
-            triggerTeleop.and_( triggerTrapOrNote.getAsBoolean ).and_( triggerDriveByStick.getAsBoolean ).onTrue(
+            triggerTeleop.and_( triggerTrapOrNote.getAsBoolean ).and_( triggerDriveByStick.getAsBoolean ).and_( self.driveAutoRotate.get ).onTrue(
                 DriveToRotation( self.drivetrain, self.driver.getLeftY, self.driver.getLeftX, self.launchCalc.getRotateAngle ).withName( "DriveAimAuto" )
             )
             triggerTeleop.and_( triggerTrapOrNote.not_().getAsBoolean ).and_( triggerDriveByStick.not_().getAsBoolean ).and_( lambda: self.drivetrain.getCurrentCommand() != None ).onTrue(

@@ -77,13 +77,16 @@ class DriveByStick(Command):
         linear, angular, angularAccel = self.drive.getVelocityConfig()
         velocLinear = min( max( self.velocLinear.get(), 0.0 ), linear )
         velocAngular = min( max( self.velocAngular.get(), 0.0 ), angular )
-        accelAngular = min( max( self.accelAngular.get(), 0.0,), angularAccel )
+        accelAngular = min( max( self.accelAngular.get(), 0.0 ), angularAccel )
+        
         if self.velocLinear.get() != velocLinear:
             self.velocLinear.set( velocLinear )
         if self.velocAngular.get() != velocAngular:
             self.velocAngular.set( velocAngular )
         if self.accelAngular.get() != angularAccel:
             self.accelAngular.set( accelAngular )
+        
+        self.velocAngularCode = angular
         
         # Verify Half Speeds
         halfLinear = min( max( self.halfSpeedLinear.get(), 0.0 ), 1.0 )
@@ -154,7 +157,7 @@ class DriveByStick(Command):
         # Determine Velocities
         veloc_x = x * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
         veloc_y = y * ( self.velocLinearTurbo.get() if self.isTurbo.get() else self.velocLinear.get() )
-        veloc_r = r * ( self.velocAngularTurbo.get() if self.isTurbo.get() else self.velocAngular.get() )
+        veloc_r = r * ( self.velocAngularTurbo.get() if self.isTurbo.get() else ( self.velocAngular.get() if self.getName() == "DriveByStick" else self.velocAngularCode ) )
 
         # Determine when ChassisSpeeds capability to use
         if self.isFieldRelative.get():
