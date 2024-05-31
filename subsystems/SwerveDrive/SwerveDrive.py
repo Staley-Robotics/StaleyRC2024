@@ -210,6 +210,8 @@ class SwerveDrive(Subsystem):
         offset = pose.rotation() - self.gyro.getRotation2d()
         self.gyroOffset = offset.degrees()
         self.ntRobotGyroOffset.putNumber( "GyroOffset", self.gyroOffset )
+
+        #self.gyro.setYaw( pose.rotation().degrees() )
         
         self.odometry.resetPosition(
             self.gyro.getRotation2d(),
@@ -311,7 +313,7 @@ class SwerveDrive(Subsystem):
         if self.usePoseRobotAngle.get():
             return self.getOdometry().getEstimatedPosition().rotation()
         else:
-            return self.gyro.getRotation2d().rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
+            return self.gyro.getRotation2d() #.rotateBy( Rotation2d(0).fromDegrees(self.gyroOffset) )
 
     def getRotationVelocity(self, fieldRelative:bool = False) -> float:
         """

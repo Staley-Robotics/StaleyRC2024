@@ -387,9 +387,18 @@ class RobotContainer:
                     lambda: self.driver.getLeftTriggerAxis() - self.driver.getRightTriggerAxis()
                 )
             )
-        elif self.controllerConfig == "State":           
+        elif self.controllerConfig == "State":   
+            # commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( self.feeder.hasNote ).onTrue(
+            #     DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ).withName( "DriveAimAuto" )
+            # )
+            # commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( lambda: not self.feeder.hasNote() ).and_(
+            #     lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() != "DriveByStick"
+            #     ).onTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() )
+            # )
+
             triggerTeleop.and_( triggerTrapOrNote.getAsBoolean ).and_( triggerDriveByStick.getAsBoolean ).and_( self.driveAutoRotate.get ).onTrue(
-                DriveToRotation( self.drivetrain, self.driver.getLeftY, self.driver.getLeftX, self.launchCalc.getRotateAngle ).withName( "DriveAimAuto" )
+                DriveAim( self.drivetrain, self.driver.getLeftY, self.driver.getLeftX, self.launchCalc.getTarget ).withName( "DriveAimAuto" )
+                #DriveToRotation( self.drivetrain, self.driver.getLeftY, self.driver.getLeftX, self.launchCalc.getRotateAngle ).withName( "DriveAimAuto" )
             )
             triggerTeleop.and_( triggerTrapOrNote.not_().getAsBoolean ).and_( triggerDriveByStick.not_().getAsBoolean ).and_( lambda: self.drivetrain.getCurrentCommand() != None ).onTrue(
                 commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() )
