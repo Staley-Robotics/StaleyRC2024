@@ -321,7 +321,11 @@ class RobotContainer:
             self.driver.leftBumper().whileTrue( EjectAll( self.intake, self.feeder, self.launcher, self.pivot ) )
             self.driver.leftTrigger().and_( triggerHasNote.not_().getAsBoolean ).toggleOnTrue( IntakeLoad( self.intake ) )
             self.driver.rightBumper().whileTrue( ForceFeed( self.intake, self.feeder, self.launcher, self.pivot ) )
-            self.driver.rightTrigger().and_( triggerHasNote.getAsBoolean ).onTrue( IndexerLaunch( self.feeder, triggerLaunchReady.getAsBoolean ) )
+            self.driver.rightTrigger().and_( triggerHasNote.getAsBoolean ).and_( triggerLauncherRunning.not_().getAsBoolean
+                ).and_( self.launchCalc.isTargetSpeaker ).toggleOnTrue( LauncherSpeaker( self.launcher, self.launchCalc.getDistance ) )
+            self.driver.rightTrigger().and_( triggerHasNote.getAsBoolean ).and_( triggerLauncherRunning.not_().getAsBoolean
+                ).and_( self.launchCalc.isTargetAmp ).toggleOnTrue( LauncherAmp( self.launcher ) )
+            self.driver.rightTrigger().and_( triggerHasNote.getAsBoolean ).onTrue( IndexerLaunch( self.feeder, self.launcher.atSpeed ) )
             #self.driver.leftStick()
             #self.driver.rightStick()
             self.driver.start().onTrue( ToggleFieldRelative() )

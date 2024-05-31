@@ -109,7 +109,7 @@ class DriveByStick(Command):
         y = applyDeadband( y, self.deadband.get() )
         hX = applyDeadband( hX, self.deadband.get(), 100.0 )
         hY = applyDeadband( hY, self.deadband.get(), 100.0 )
-        #r = applyDeadband( r, self.deadband.get() )
+        r = applyDeadband( r, self.deadband.get() )
 
         # Apply Clamped Values
         x = min( max( x, -1.0), 1.0 )
