@@ -122,7 +122,7 @@ class Launcher(Subsystem):
             else:
                 return self.launchTimer.hasElapsed( self.autoDetectTimer.get() )
 
-    def atSpeed(self, errorRange:float = 250.00) -> bool:
+    def atSpeed(self, errorRange:float = 200.00) -> bool:
         spL, spR = self.launcher.getSetpoint()
         if spL == 0.0 and spR == 0.0:
             return False

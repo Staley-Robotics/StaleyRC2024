@@ -30,6 +30,7 @@ class LaunchCalc(Subsystem):
         self.ampDistanceNear = NTTunableFloat( "/Config/LaunchCalc/Amp/RangeNear", 0.75, persistent=True )
         self.ampDistanceAuto = NTTunableFloat( "/Config/LaunchCalc/Amp/RangeAuto", 0.25, persistent=True )
         self.aimAdjust = NTTunableFloat( "/Config/LaunchCalc/AimAdjust", 0.0, persistent=True )
+        self.aimAdjustDist = NTTunableFloat( "/Config/LaunchCalc/AimAdjustDist", 0.0, persistent=True )
         
         self.getPose = getPose
         
@@ -73,6 +74,7 @@ class LaunchCalc(Subsystem):
         self.rotationVariance = abs( robotPose.rotation().degrees() - self.rotation.degrees() )
         self.launchAngle = math.degrees( math.atan( ( targetH - pivotH ) / self.distance ) )
         self.launchAngleAdj = self.launchAngle + self.aimAdjust.get()
+        self.launchAngleAdjDist = self.launchAngleAdj + self.aimAdjustDist.get() * self.distance
 
         # Logging
         self.ntLoggerState.putBoolean( "isTargetSpeaker", self.isTarget( LaunchCalc.Targets.SPEAKER ) )
@@ -88,6 +90,7 @@ class LaunchCalc(Subsystem):
         self.ntLoggerData.putNumber( "RotationDegrees", self.rotation.degrees() )
         self.ntLoggerData.putNumber( "LaunchAngle", self.launchAngle )
         self.ntLoggerData.putNumber( "LaunchAngleAdj", self.launchAngleAdj )
+        self.ntLoggerData.putNumber( "LaunchAngleAdjDist", self.launchAngleAdjDist )
         
     def getTarget(self) -> Targets:
         return self.target
@@ -121,7 +124,8 @@ class LaunchCalc(Subsystem):
         return self.rotationVariance
 
     def getLaunchAngle(self) -> float:
-        return self.launchAngleAdj
+        return self.launchAngleAdjDist
+        # return self.launchAngleAdj
 
     def getDistance(self) -> float:
         return self.distance

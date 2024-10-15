@@ -293,8 +293,8 @@ class RobotContainer:
                 self.drivetrain,
                 self.m_driver1.getLeftY,
                 self.m_driver1.getLeftX,
-                self.m_driver1.getRightY,
-                self.m_driver1.getRightX,
+                lambda: 0.0,#self.m_driver1.getRightY(),
+                lambda: 0.0,#self.m_driver1.getRightX(),
                 lambda: self.m_driver1.getLeftTriggerAxis() - self.m_driver1.getRightTriggerAxis()
             )
         )
