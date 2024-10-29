@@ -26,7 +26,7 @@ loopTime = 0.02
 # Class: SwerveModule
 class SwerveModuleIOSim(SwerveModuleIO):
     """
-    Custom SwerveModuleSim used to simulation the NEO motor without a live robot
+    Custom SwerveModuleSim used to simulate the NEO motor without a live robot
     """
 
     def __init__(self, subsystemName:str, posX:float, posY:float): #, turnOffset:float):
