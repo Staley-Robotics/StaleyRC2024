@@ -19,11 +19,11 @@ class LedIOActual(LedIO):
         # init color sequences
         self.color_sqncs = {
             'default': [AddressableLED.LEDData(0, 200, 200) for i in range(self.m_ledLength)], #alliance - red or blue
-            'has note': [AddressableLED.LEDData(255, 127, 0) for i in range(self.m_ledLength)],
-            '75-89 chance': [AddressableLED.LEDData(255, 255, 0) for i in range(self.m_ledLength)],
-            '90-100 chance': [AddressableLED.LEDData(0, 255, 0) for i in range(self.m_ledLength)],
-            'designate amp': [AddressableLED.LEDData(255, 0, 255) for i in range(self.m_ledLength)],
-            'endgame': [AddressableLED.LEDData(255, 255, 255) for i in range(self.m_ledLength)],
+            'has note': [AddressableLED.LEDData(255, 127, 0) for i in range(self.m_ledLength)], #orange
+            '75-89 chance': [AddressableLED.LEDData(255, 255, 0) for i in range(self.m_ledLength)], #yellow
+            '90-100 chance': [AddressableLED.LEDData(0, 255, 0) for i in range(self.m_ledLength)], #green
+            'designate amp': [AddressableLED.LEDData(255, 0, 255) for i in range(self.m_ledLength)], #purple
+            'endgame': [AddressableLED.LEDData(255, 255, 255) for i in range(self.m_ledLength)], #white
         }
 
         self.m_led.setData(self.currentColor)
