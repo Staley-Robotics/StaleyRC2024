@@ -37,7 +37,7 @@ class DriveByStick(Command):
 
         self.velocLinearTurbo = NTTunableFloat( "/Config/Driver1/TubroLinear", 3.5, persistent=True )
         self.velocAngularTurbo = NTTunableFloat( "/Config/Driver1/TubroAngular", 2 * math.pi, persistent=True )
-        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 2.0, persistent=True )
+        self.velocLinear = NTTunableFloat( "/Config/Driver1/VelocityLinear", 3.0, persistent=True )
         self.velocAngular = NTTunableFloat( "/Config/Driver1/VelocityAngular", 1 * math.pi, persistent=True )
         self.accelAngular = NTTunableFloat( "/Config/Driver1/AccelerationAngular", 4 * math.pi, persistent=True )
         self.halfSpeedLinear = NTTunableFloat( "/Config/Driver1/HalfSpeedLinear", 0.5, persistent=True )
