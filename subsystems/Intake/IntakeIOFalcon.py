@@ -1,5 +1,8 @@
 from wpilib import DigitalInput
-from phoenix5 import WPI_TalonFX, NeutralMode
+# from phoenix5 import WPI_TalonFX, NeutralMode
+from phoenix6.hardware import TalonFX
+from phoenix6.signals import NeutralModeValue
+# from phoenix6.configs import TalonFXConfiguration, TalonFXConfigurator
 
 from .IntakeIO import IntakeIO
 
@@ -12,18 +15,16 @@ class IntakeIOFalcon(IntakeIO):
         self.desiredVelocity = [ 0.0, 0.0 ]
         
         # Upper Motor
-        self.upperMotor = WPI_TalonFX( upperCanId, "canivore1" )
-        self.upperMotor.clearStickyFaults()
-        self.upperMotor.configFactoryDefault()
-        self.upperMotor.setNeutralMode( NeutralMode.Coast )
-        self.upperMotor.setInverted( False )
+        self.upperMotor = TalonFX( upperCanId, "canivore1" )
+        self.upperMotor.clear_sticky_faults()
+        self.upperMotor.setNeutralMode( NeutralModeValue.COAST )
+        self.upperMotor.setInverted( False ) #??
 
         # Lower Motor
-        self.lowerMotor = WPI_TalonFX( lowerCanId, "canivore1" )
-        self.lowerMotor.clearStickyFaults()
-        self.lowerMotor.configFactoryDefault()
-        self.lowerMotor.setNeutralMode( NeutralMode.Coast )
-        self.lowerMotor.setInverted( False )
+        self.lowerMotor = TalonFX( lowerCanId, "canivore1" )
+        self.lowerMotor.clear_sticky_faults()
+        self.lowerMotor.setNeutralMode( NeutralModeValue.COAST )
+        self.lowerMotor.setInverted( False ) # ??
 
         # IR sensor
         self.irSensor = DigitalInput(upperSensorId)

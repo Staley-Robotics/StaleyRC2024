@@ -1,5 +1,6 @@
 from wpilib import DigitalInput
-from phoenix5 import *
+from phoenix6.hardware import TalonFX
+from phoenix6.signals import NeutralModeValue, ControlModeValue as ControlMode
 
 from .LauncherIO import LauncherIO
 
@@ -21,10 +22,10 @@ class LauncherIOFalcon(LauncherIO):
         self.desiredVelocity = [ 0.0, 0.0 ]
 
         # Left Motor
-        self.leftMotor = WPI_TalonFX( leftCanId, "canivore1" )
-        self.leftMotor.clearStickyFaults( 250 )
-        self.leftMotor.configFactoryDefault( 250 )
-        self.leftMotor.setInverted( False )
+        self.leftMotor = TalonFX( leftCanId, "canivore1" )
+        self.leftMotor.clear_sticky_faults( 250 )
+        self.leftMotor.configFactoryDefault( 250 )#??
+        self.leftMotor.setInverted( False )#??
 
         # Falcon Current Limit???
         #supplyCurrentCfg = SupplyCurrentLimitConfiguration( True, 40, 40, 1.0 )
@@ -33,8 +34,8 @@ class LauncherIOFalcon(LauncherIO):
         #self.leftMotor.configStatorCurrentLimit( statorCurrentCfg, 250 )
 
         # Right Motor
-        self.rightMotor = WPI_TalonFX( rightCanId, "canivore1" )
-        self.rightMotor.clearStickyFaults( 250 )
+        self.rightMotor = TalonFX( rightCanId, "canivore1" )
+        self.rightMotor.clear_sticky_faults( 250 )
         self.rightMotor.configFactoryDefault( 250 )
         self.rightMotor.setInverted( True )
 
@@ -87,7 +88,7 @@ class LauncherIOFalcon(LauncherIO):
         self.rightMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
 
     def setBrake(self, brake:bool):
-        mode = NeutralMode.Brake if brake else NeutralMode.Coast
+        mode = NeutralModeValue.BRAKE if brake else NeutralModeValue.COAST
         self.leftMotor.setNeutralMode( mode )
         self.rightMotor.setNeutralMode( mode )
 
@@ -107,9 +108,9 @@ class LauncherIOFalcon(LauncherIO):
 
     def run(self):
         # Control Mode
-        controlMode = ControlMode.Velocity
-        if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
-            controlMode = ControlMode.PercentOutput
+        # controlMode = ControlMode.Velocity
+        # if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
+        #     controlMode = ControlMode.PercentOutput
 
         # Launch Sensor Detection
         if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
@@ -124,8 +125,10 @@ class LauncherIOFalcon(LauncherIO):
         self.lastSensor = self.irSensor.get()
 
         # Set Motor
-        self.leftMotor.set( controlMode, self.desiredVelocity[0] )
-        self.rightMotor.set( controlMode, self.desiredVelocity[1] )
+        self.leftMotor.set( self.desiredVelocity[0] )
+        self.rightMotor.set( self.desiredVelocity[1] )
+        # self.leftMotor.set( controlMode, self.desiredVelocity[0] )
+        # self.rightMotor.set( controlMode, self.desiredVelocity[1] )
 
     def getSensorCount(self) -> int:
         return self.sensorCount

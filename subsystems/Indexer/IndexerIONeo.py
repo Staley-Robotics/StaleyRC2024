@@ -12,15 +12,18 @@ class IndexerIONeo(IndexerIO):
         self.desiredVelocity = 0.0
 
         # Left Motor
-        self.idxMotor = CANSparkMax( idxCanId, CANSparkMax.MotorType.kBrushless )
-        self.idxMotor.clearFaults()
-        self.idxMotor.restoreFactoryDefaults()
-        self.idxMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.idxMotor.setInverted( True )
-        self.idxMotor.enableVoltageCompensation( 12.0 )
-        self.idxMotor.setSmartCurrentLimit( 20 )
-        self.idxMotor.setClosedLoopRampRate( 0.05 )
-        self.idxMotor.burnFlash()
+        self.idxMotor = SparkMax( idxCanId, SparkMax.MotorType.kBrushless )
+        idxMotorConfig = SparkMaxConfig()
+        idxMotorConfig.setIdleMode( SparkMax.IdleMode.kCoast ).inverted( True ).voltageCompensation( 12.0 ).smartCurrentLimit( 20 ).closedLoopRampRate( 0.05 )
+        self.idxMotor.configure(idxMotorConfig, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters)
+        # self.idxMotor.clearFaults()
+        # self.idxMotor.restoreFactoryDefaults()
+        # self.idxMotor.setIdleMode( SparkMax.IdleMode.kCoast )
+        # self.idxMotor.setInverted( True )
+        # self.idxMotor.enableVoltageCompensation( 12.0 )
+        # self.idxMotor.setSmartCurrentLimit( 20 )
+        # self.idxMotor.setClosedLoopRampRate( 0.05 )
+        # self.idxMotor.burnFlash()
 
         self.idxEncoder = self.idxMotor.getEncoder()
 
@@ -43,7 +46,7 @@ class IndexerIONeo(IndexerIO):
         self.idxMotor.set( self.desiredVelocity )
     
     def setBrake(self, brake:bool) -> None:
-        mode = CANSparkMax.IdleMode.kBrake if brake else CANSparkMax.IdleMode.kCoast
+        mode = SparkMax.IdleMode.kBrake if brake else SparkMax.IdleMode.kCoast
         self.idxMotor.setIdleMode( mode )
 
     def setVelocity(self, velocity: float) -> None:

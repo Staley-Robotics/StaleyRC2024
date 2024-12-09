@@ -16,8 +16,10 @@ Turn:  Closed Loop (SparkMAX Integrated)
 import math
 
 # FRC Component Imports
-from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
-from rev import * #CANSparkMax, SparkMaxPIDController, SparkMaxAlternateEncoder, SparkMaxAbsoluteEncoder, AbsoluteEncoder, RelativeEncoder
+# from phoenix5.sensors import WPI_CANCoder, SensorInitializationStrategy, AbsoluteSensorRange
+from phoenix6.hardware import CANcoder
+from phoenix6.configs import CANcoderConfiguration, MagnetSensorConfigs
+from rev import * #SparkMax, SparkMaxPIDController, SparkMaxAlternateEncoder, SparkMaxAbsoluteEncoder, AbsoluteEncoder, RelativeEncoder
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
@@ -36,9 +38,9 @@ class SwerveModuleIONeo(SwerveModuleIO):
     CTRE CANCoders are used for Absolute position on the turn motor.
     """
 
-    driveMotor:CANSparkMax = None
-    turnMotor:CANSparkMax = None
-    turnSensor:WPI_CANCoder = None
+    driveMotor:SparkMax = None
+    turnMotor:SparkMax = None
+    turnSensor:CANcoder = None
 
     referencePosition:Translation2d = None
     moduleState:SwerveModuleState = None
@@ -59,25 +61,25 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.turn_kSlotIdx = NTTunableInt( "SwerveModule/TurnPID/kSlotIdx", 0, self.updateTurnPIDController, persistent=True )
 
         ### Turn Sensor
-        self.turnSensor = WPI_CANCoder( sensorId, "canivore1" )
-        self.turnSensor.configFactoryDefault(250)
-        self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, 250)
-        self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360, 250)
+        self.turnSensor = CANcoder( sensorId, "canivore1" )
+        turnSensorConfig = CANcoderConfiguration().magnet_sensor.with_sensor_direction( False )
+        # self.turnSensor.configSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, 250)
+        # self.turnSensor.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360, 250)
         self.turnSensor.configSensorDirection(False, 250)
         if not RobotBase.isSimulation():
             absPos = self.turnSensor.getAbsolutePosition()
             self.turnSensor.setPosition(absPos - turnOffset, 250)
 
         ### Turn Motor
-        self.turnMotor = CANSparkMax( turnId, CANSparkMax.MotorType.kBrushless )
+        self.turnMotor = SparkMax( turnId, SparkMax.MotorType.kBrushless )
         self.turnMotor.setCANTimeout( 250 )
         self.turnMotor.restoreFactoryDefaults() 
         self.turnMotor.setInverted( True )  
-        self.turnMotor.setIdleMode( CANSparkMax.IdleMode.kCoast ) 
+        self.turnMotor.setIdleMode( SparkMax.IdleMode.kCoast ) 
         self.turnMotor.enableVoltageCompensation( 12.00 )
         self.turnMotor.setSmartCurrentLimit( 15 )
         self.turnMotor.setClosedLoopRampRate( 0.20 )
-        self.turnMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
+        self.turnMotor.setPeriodicFramePeriod( SparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.turnMotorEncoder = self.turnMotor.getEncoder()
         self.turnMotorEncoder.setMeasurementPeriod(10)
@@ -93,21 +95,22 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.updateTurnPIDController()     
 
         # Save Turn Motor Config
-        self.turnMotor.burnFlash()
+        # self.turnMotor.burnFlash()
         self.turnMotor.setCANTimeout(0)
 
         ### Drive Motor
-        self.driveMotor = CANSparkMax( driveId, CANSparkMax.MotorType.kBrushless )
+        self.driveMotor = SparkMax( driveId, SparkMax.MotorType.kBrushless )
+        driveMotorConfig = SparkMaxConfig().
         self.driveMotor.setCANTimeout( 250 )
         self.driveMotor.restoreFactoryDefaults()
         self.driveMotor.setInverted( True )
-        self.driveMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
+        self.driveMotor.setIdleMode( SparkMax.IdleMode.kCoast )
         self.driveMotor.enableVoltageCompensation( 12.00 )
         self.driveMotor.setSmartCurrentLimit( 30 )
         self.driveMotor.setClosedLoopRampRate( 0.20 )
-        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus0, 20 )
-        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus1, 20 )
-        self.driveMotor.setPeriodicFramePeriod( CANSparkMax.PeriodicFrame.kStatus2, 20 )
+        self.driveMotor.setPeriodicFramePeriod( SparkMax.PeriodicFrame.kStatus0, 20 )
+        self.driveMotor.setPeriodicFramePeriod( SparkMax.PeriodicFrame.kStatus1, 20 )
+        self.driveMotor.setPeriodicFramePeriod( SparkMax.PeriodicFrame.kStatus2, 20 )
         
         self.driveMotorEncoder = self.driveMotor.getEncoder()
         self.driveMotorEncoder.setMeasurementPeriod(10)
@@ -120,7 +123,7 @@ class SwerveModuleIONeo(SwerveModuleIO):
         self.updateDrivePIDController()
 
         # Save Drive Motor Config
-        self.driveMotor.burnFlash()
+        # self.driveMotor.burnFlash()
         self.driveMotor.setCANTimeout(0)
 
         ### Swerve Module Information
@@ -220,7 +223,7 @@ class SwerveModuleIONeo(SwerveModuleIO):
         :param velocity: velocity (meters per second)
         """
         # Set Velocity
-        velocMode = CANSparkMax.ControlType.kVelocity #if not self.driveSmart.get() else CANSparkMax.ControlType.kSmartVelocity
+        velocMode = SparkMax.ControlType.kVelocity #if not self.driveSmart.get() else SparkMax.ControlType.kSmartVelocity
         self.driveMotorPid.setReference( velocity, velocMode, self.drive_kSlotIdx.get() )
 
     def setTurnPosition(self, rotation:Rotation2d = Rotation2d) -> None:
@@ -230,5 +233,5 @@ class SwerveModuleIONeo(SwerveModuleIO):
         :param rotation: rotation (Rotation2d)
         """
         # Set Angle
-        turnMode = CANSparkMax.ControlType.kPosition #if not self.turnSmart.get() else CANSparkMax.ControlType.kSmartMotion
+        turnMode = SparkMax.ControlType.kPosition #if not self.turnSmart.get() else SparkMax.ControlType.kSmartMotion
         self.turnMotorPid.setReference( rotation.degrees(), turnMode, self.turn_kSlotIdx.get() )

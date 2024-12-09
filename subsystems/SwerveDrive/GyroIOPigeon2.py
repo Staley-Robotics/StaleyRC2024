@@ -7,8 +7,8 @@ Date:  2024-01-09
 import typing
 
 # FRC Imports
-from phoenix5 import ErrorCode
-from phoenix5.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
+from phoenix6.hardware import Pigeon2
+from phoenix6.configs import Pigeon2Configuration
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath import units
@@ -17,7 +17,7 @@ from wpimath import units
 from .GyroIO import GyroIO
 from util import *
 
-class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
+class GyroIOPigeon2(Pigeon2, GyroIO):
     """
     Custom Pigeon Class extends WPI_Pigeon2 with logging capabilities
     """
@@ -35,10 +35,11 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         super().__init__( deviceNumber, "canivore1" )
 
         # Configure Default / Start Settings
-        self.configFactoryDefault()
-        self.zeroGyroBiasNow()
+        self.configurator.apply( Pigeon2Configuration() )
+        # Pigeon2Configuration.with_gyro_trim
+        # self.zeroGyroBiasNow()
         self.setYaw( startYaw )
-        self.setStatusFramePeriod(PigeonIMU_StatusFrame.PigeonIMU_BiasedStatus_2_Gyro, 20)
+        # self.setStatusFramePeriod(PigeonIMU_StatusFrame.PigeonIMU_BiasedStatus_2_Gyro, 20)
 
         # Update the Sim Collection (if running in Simulator)
         if RobotBase.isSimulation():
@@ -52,7 +53,7 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         yprDegrees = self.getYawPitchRoll()[1]
         xyzDps = self.getRawGyro()[1]
 
-        inputs.connected = self.getLastError() == ErrorCode.OK
+        # inputs.connected = self.getLastError() == ErrorCode.OK
         inputs.rollPositionRad = units.degreesToRadians( yprDegrees[1] )
         inputs.pitchPositionRad = units.degreesToRadians( -yprDegrees[2] )
         inputs.yawPositionRad = units.degreesToRadians( yprDegrees[0] )
