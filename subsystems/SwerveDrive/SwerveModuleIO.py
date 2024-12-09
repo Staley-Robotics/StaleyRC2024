@@ -149,8 +149,9 @@ class SwerveModuleIO:
                 desiredState,
                 self.getModuleState().angle
             )
-        if desiredState.speed == 0:
-            desiredState = SwerveModuleState( desiredState.speed, self.getModulePosition().angle )
+        if desiredState is None or desiredState.speed == 0:
+            #desiredState = SwerveModuleState( desiredState.speed, self.getModulePosition().angle )
+            desiredState = SwerveModuleState( 0.0, self.getModulePosition().angle )
         self.moduleSetpoint = desiredState # Save SwerveModuleState Globally
 
     def getModuleState(self) -> SwerveModuleState:

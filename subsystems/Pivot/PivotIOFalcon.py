@@ -29,7 +29,7 @@ class PivotIOFalcon(PivotIO):
         #self.pivotEncoder.configSensorDirection( True, 250 )
         #self.pivotEncoder.configMagnetOffset( encoderOffset, 250 )
         pivotEncoderCfg = CANcoderConfiguration()
-        pivotEncoderCfg.magnet_sensor.sensor_direction = SensorDirectionValue.COUNTER_CLOCKWISE_POSITIVE
+        pivotEncoderCfg.magnet_sensor.sensor_direction = SensorDirectionValue.CLOCKWISE_POSITIVE
         pivotEncoderCfg.magnet_sensor.absolute_sensor_discontinuity_point = 0.5
         pivotEncoderCfg.magnet_sensor.magnet_offset = encoderOffset / 360.0
         self.pivotEncoder.configurator.apply( pivotEncoderCfg )

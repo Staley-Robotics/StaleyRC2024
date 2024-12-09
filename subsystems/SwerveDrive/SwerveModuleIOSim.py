@@ -14,7 +14,7 @@ from wpilib.simulation import FlywheelSim
 from wpimath.controller import PIDController, SimpleMotorFeedforwardMeters
 from wpimath.kinematics import SwerveModulePosition, SwerveModuleState
 from wpimath.geometry import Translation2d, Rotation2d
-from wpimath.system.plant import DCMotor
+from wpimath.system.plant import DCMotor, LinearSystemId
 from wpimath import units, applyDeadband
 
 # Our Imports
@@ -42,8 +42,11 @@ class SwerveModuleIOSim(SwerveModuleIO):
         self.drive_kA = NTTunableFloat( "SwerveModule/DrivePID/kA", 0, self.updateDrivePIDController ) #0.065
 
         # Create Motors
-        self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.060 )
-        self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
+        #self.driveSim = FlywheelSim( DCMotor.NEO(1), 1 / self.driveGearRatio.get(), 0.060 )
+        #self.turnSim = FlywheelSim( DCMotor.NEO(1), 1 / self.turnGearRatio.get(), 0.004 )
+
+        self.driveSim = FlywheelSim( LinearSystemId.flywheelSystem( DCMotor.NEO(1), 0.06, 1 ), DCMotor.NEO(1), [0] )
+        self.turnSim = FlywheelSim( LinearSystemId.flywheelSystem( DCMotor.NEO(1), 0.004, 1 ), DCMotor.NEO(1), [0] )
 
         # Set Drive Motor Sensor Data 
         self.driveRelativePosition = 0.0

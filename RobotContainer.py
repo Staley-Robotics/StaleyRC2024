@@ -17,7 +17,7 @@ class RobotContainer:
     """
     Constructs a RobotContainer for the {Game}
     """
-    testing:bool = False
+    testing:bool = True #False
 
     def __init__(self):
         """
@@ -169,14 +169,14 @@ class RobotContainer:
             self.swLaunchScoreAuto:bool = False
             self.swPivotAuto:bool = False
             self.swPivotManual:bool = False
-            self.swClimb:bool = False
+            #self.swClimb:bool = False
 
             def getSwitchIntakeAuto() -> bool: return self.swIntakeAuto
             def getSwitchPivotAuto() -> bool: return self.swPivotAuto
             def getSwitchPivotManual() -> bool: return self.swPivotManual 
             def getSwitchLaunchStartAuto() -> bool: return self.swLaunchStartAuto
             def getSwitchLaunchScoreAuto() -> bool: return self.swLaunchScoreAuto
-            def getSwitchClimb() -> bool: return self.swClimb
+            #def getSwitchClimb() -> bool: return self.swClimb
 
             def updateNtLogging():
                 ntTbl = NetworkTableInstance.getDefault().getTable("/Logging/Switches")
@@ -192,7 +192,7 @@ class RobotContainer:
             def toggleSwitchLaunchScoreAuto(): self.swLaunchScoreAuto = not self.swLaunchScoreAuto; updateNtLogging()
             def toggleSwitchPivotAuto(): self.swPivotAuto = not self.swPivotAuto; updateNtLogging()
             def toggleSwitchPivotManual(): self.swPivotManual = not self.swPivotManual; updateNtLogging()
-            def toggleSwitchClimb(): self.swClimb = not self.swClimb; updateNtLogging()
+            #def toggleSwitchClimb(): self.swClimb = not self.swClimb; updateNtLogging()
 
             updateNtLogging()
             #self.stationCmd.button(5).onTrue( commands2.cmd.runOnce( toggleSwitchIntakeAuto ).ignoringDisable(True) )
@@ -280,13 +280,13 @@ class RobotContainer:
 
         ### Configure Default Commands (with Operatory Station Toggles integrated)
         # Auto Aim while holding note
-        commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( self.feeder.hasNote ).onTrue(
-            DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ).withName( "DriveAimAuto" )
-        )
-        commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( lambda: not self.feeder.hasNote() ).and_(
-            lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() != "DriveByStick"
-            ).onTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() )
-        )
+        # commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( self.feeder.hasNote ).onTrue(
+        #     DriveAim( self.drivetrain, self.m_driver1.getLeftY, self.m_driver1.getLeftX, self.launchCalc.getTarget ).withName( "DriveAimAuto" )
+        # )
+        # commands2.button.Trigger( RobotState.isEnabled ).and_( RobotState.isTeleop ).and_( lambda: not self.feeder.hasNote() ).and_(
+        #     lambda: self.drivetrain.getCurrentCommand() != None ).and_( lambda: self.drivetrain.getCurrentCommand().getName() != "DriveByStick"
+        #     ).onTrue( commands2.cmd.runOnce( lambda: self.drivetrain.getCurrentCommand().cancel() )
+        # )
 
         self.drivetrain.setDefaultCommand(
             DriveByStick(

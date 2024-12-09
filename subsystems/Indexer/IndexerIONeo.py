@@ -1,3 +1,5 @@
+from threading import Thread
+
 from wpilib import DigitalInput
 from rev import *
 
@@ -12,15 +14,22 @@ class IndexerIONeo(IndexerIO):
         self.desiredVelocity = 0.0
 
         # Left Motor
-        self.idxMotor = CANSparkMax( idxCanId, CANSparkMax.MotorType.kBrushless )
-        self.idxMotor.clearFaults()
-        self.idxMotor.restoreFactoryDefaults()
-        self.idxMotor.setIdleMode( CANSparkMax.IdleMode.kCoast )
-        self.idxMotor.setInverted( True )
-        self.idxMotor.enableVoltageCompensation( 12.0 )
-        self.idxMotor.setSmartCurrentLimit( 20 )
-        self.idxMotor.setClosedLoopRampRate( 0.05 )
-        self.idxMotor.burnFlash()
+        self.idxMotor = SparkMax( idxCanId, SparkMax.MotorType.kBrushless )
+        # self.idxMotor.clearFaults()
+        # self.idxMotor.restoreFactoryDefaults()
+        # self.idxMotor.setIdleMode( SparkMax.IdleMode.kCoast )
+        # self.idxMotor.setInverted( True )
+        # self.idxMotor.enableVoltageCompensation( 12.0 )
+        # self.idxMotor.setSmartCurrentLimit( 20 )
+        # self.idxMotor.setClosedLoopRampRate( 0.05 )
+        # self.idxMotor.burnFlash()
+        idxCfg = SparkMaxConfig()
+        idxCfg = idxCfg.setIdleMode( SparkBaseConfig.IdleMode.kCoast )
+        idxCfg = idxCfg.inverted( True )
+        idxCfg = idxCfg.voltageCompensation( 12.0 )
+        idxCfg = idxCfg.smartCurrentLimit( 20 )
+        idxCfg = idxCfg.closedLoopRampRate( 0.05 )
+        self.idxMotor.configure( idxCfg, SparkMax.ResetMode.kResetSafeParameters, SparkMax.PersistMode.kPersistParameters )
 
         self.idxEncoder = self.idxMotor.getEncoder()
 
@@ -43,8 +52,13 @@ class IndexerIONeo(IndexerIO):
         self.idxMotor.set( self.desiredVelocity )
     
     def setBrake(self, brake:bool) -> None:
-        mode = CANSparkMax.IdleMode.kBrake if brake else CANSparkMax.IdleMode.kCoast
-        self.idxMotor.setIdleMode( mode )
+        def setBrakeThread(brake:bool) -> None:
+            mode = SparkMaxConfig.IdleMode.kBrake if brake else SparkMaxConfig.IdleMode.kCoast
+            cfg = SparkMaxConfig()
+            cfg = cfg.setIdleMode( mode )
+            self.idxMotor.configure( cfg, SparkMax.ResetMode.kNoResetSafeParameters, SparkMax.PersistMode.kNoPersistParameters )
+
+        Thread( target = lambda: setBrakeThread(brake) ).start()
 
     def setVelocity(self, velocity: float) -> None:
         self.desiredVelocity = velocity

@@ -70,8 +70,8 @@ class GyroIOPigeon2(Pigeon2, GyroIO):
         velocDegPer20ms = velocDegPerSec * 0.02 # Rio Loop Cycle
         self.sim_state.add_yaw( velocDegPer20ms ) #getSimCollection().addHeading( velocDegPer20ms )
         #newYaw = self.getYaw()
-        while self.get_yaw() < 0:
+        while self.get_yaw().value < 0:
             self.sim_state.set_raw_yaw( self.get_yaw().value + 360 ) #getSimCollection().setRawHeading( self.getYaw() + 360 )
-        while self.get_yaw() >= 360.0: 
-            self.sim_state.set_raw_yaw( self.get_ywaw().value - 360 ) #getSimCollection().setRawHeading( self.getYaw() - 360 )
+        while self.get_yaw().value >= 360.0: 
+            self.sim_state.set_raw_yaw( self.get_yaw().value - 360 ) #getSimCollection().setRawHeading( self.getYaw() - 360 )
 
