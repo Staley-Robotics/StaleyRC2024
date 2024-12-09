@@ -1,5 +1,10 @@
+from threading import Thread
+
 from wpilib import DigitalInput
-from phoenix5 import *
+from phoenix6.hardware import TalonFX
+from phoenix6.configs import TalonFXConfiguration, Slot0Configs, VoltageConfigs
+from phoenix6.controls import * #DutyCycleOut, VelocityDutyCycle
+from phoenix6.signals.spn_enums import NeutralModeValue, InvertedValue
 
 from .LauncherIO import LauncherIO
 
@@ -21,10 +26,13 @@ class LauncherIOFalcon(LauncherIO):
         self.desiredVelocity = [ 0.0, 0.0 ]
 
         # Left Motor
-        self.leftMotor = WPI_TalonFX( leftCanId, "canivore1" )
-        self.leftMotor.clearStickyFaults( 250 )
-        self.leftMotor.configFactoryDefault( 250 )
-        self.leftMotor.setInverted( False )
+        self.leftMotor = TalonFX( leftCanId, "canivore1" )
+        # self.leftMotor.clearStickyFaults( 250 )
+        # self.leftMotor.configFactoryDefault( 250 )
+        # self.leftMotor.setInverted( False )
+        leftCfg = TalonFXConfiguration()
+        leftCfg.motor_output.inverted = InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        self.leftMotor.configurator.apply( leftCfg )
 
         # Falcon Current Limit???
         #supplyCurrentCfg = SupplyCurrentLimitConfiguration( True, 40, 40, 1.0 )
@@ -33,10 +41,13 @@ class LauncherIOFalcon(LauncherIO):
         #self.leftMotor.configStatorCurrentLimit( statorCurrentCfg, 250 )
 
         # Right Motor
-        self.rightMotor = WPI_TalonFX( rightCanId, "canivore1" )
-        self.rightMotor.clearStickyFaults( 250 )
-        self.rightMotor.configFactoryDefault( 250 )
-        self.rightMotor.setInverted( True )
+        self.rightMotor = TalonFX( rightCanId, "canivore1" )
+        # self.rightMotor.clearStickyFaults( 250 )
+        # self.rightMotor.configFactoryDefault( 250 )
+        # self.rightMotor.setInverted( True )
+        rightCfg = TalonFXConfiguration()
+        rightCfg.motor_output.inverted = InvertedValue.CLOCKWISE_POSITIVE
+        self.rightMotor.configurator.apply( rightCfg )
 
         self.setBrake( self.brakeMode.get() )
         self.updateVoltageComp()
@@ -57,41 +68,57 @@ class LauncherIOFalcon(LauncherIO):
         self.sensorDetected = False
 
     def updateInputs(self, inputs: LauncherIO.LauncherIOInputs) -> None:
-        inputs.leftAppliedVolts = self.leftMotor.getMotorOutputVoltage()
-        inputs.leftCurrentAmps = self.leftMotor.getOutputCurrent()
-        inputs.leftPosition = self.leftMotor.getSelectedSensorPosition()
-        inputs.leftVelocity = self.leftMotor.getSelectedSensorVelocity()
-        inputs.leftTempCelcius = self.leftMotor.getTemperature()
+        inputs.leftAppliedVolts = self.leftMotor.get_motor_voltage().value #getMotorOutputVoltage()
+        inputs.leftCurrentAmps = self.leftMotor.get_supply_current().value #getOutputCurrent()
+        inputs.leftPosition = self.leftMotor.get_position().value #getSelectedSensorPosition()
+        inputs.leftVelocity = self.leftMotor.get_velocity().value #getSelectedSensorVelocity()
+        inputs.leftTempCelcius = self.leftMotor.get_device_temp().value #getTemperature()
 
-        inputs.rightAppliedVolts = self.rightMotor.getMotorOutputVoltage()
-        inputs.rightCurrentAmps = self.rightMotor.getOutputCurrent()
-        inputs.rightPosition = self.rightMotor.getSelectedSensorPosition()
-        inputs.rightVelocity = self.rightMotor.getSelectedSensorVelocity()
-        inputs.rightTempCelcius = self.rightMotor.getTemperature()
+        inputs.rightAppliedVolts = self.rightMotor.get_motor_voltage().value #getMotorOutputVoltage()
+        inputs.rightCurrentAmps = self.rightMotor.get_supply_current().value #getOutputCurrent()
+        inputs.rightPosition = self.rightMotor.get_position().value #getSelectedSensorPosition()
+        inputs.rightVelocity = self.rightMotor.get_velocity().value #getSelectedSensorVelocity()
+        inputs.rightTempCelcius = self.rightMotor.get_device_temp().value #getTemperature()
 
         inputs.sensor = self.irSensor.get()
 
         self.actualVelocity = [ inputs.leftVelocity, inputs.rightVelocity ]
 
     def resetPid(self):
-        self.leftMotor.config_kP( 0, self.launcher_kP.get(), 250 )
-        self.leftMotor.config_kI( 0, self.launcher_kI.get(), 250 )
-        self.leftMotor.config_kD( 0, self.launcher_kD.get(), 250 )
-        self.leftMotor.config_kF( 0, self.launcher_kF.get(), 250 )
-        self.leftMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
+        # self.leftMotor.config_kP( 0, self.launcher_kP.get(), 250 )
+        # self.leftMotor.config_kI( 0, self.launcher_kI.get(), 250 )
+        # self.leftMotor.config_kD( 0, self.launcher_kD.get(), 250 )
+        # self.leftMotor.config_kF( 0, self.launcher_kF.get(), 250 )
+        # self.leftMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
 
-        self.rightMotor.config_kP( 0, self.launcher_kP.get(), 250 )
-        self.rightMotor.config_kI( 0, self.launcher_kI.get(), 250 )
-        self.rightMotor.config_kD( 0, self.launcher_kD.get(), 250 )
-        self.rightMotor.config_kF( 0, self.launcher_kF.get(), 250 )
-        self.rightMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
+        # self.rightMotor.config_kP( 0, self.launcher_kP.get(), 250 )
+        # self.rightMotor.config_kI( 0, self.launcher_kI.get(), 250 )
+        # self.rightMotor.config_kD( 0, self.launcher_kD.get(), 250 )
+        # self.rightMotor.config_kF( 0, self.launcher_kF.get(), 250 )
+        # self.rightMotor.config_IntegralZone( 0, self.launcher_Iz.get(), 250 )
+
+        slot0Cfg = Slot0Configs()
+        slot0Cfg.k_p = self.launcher_kP.get() #self.leftMotor.config_kP( 0, self.launcher_kP.get(), 250 )
+        slot0Cfg.k_i = self.launcher_kI.get() #self.leftMotor.config_kI( 0, self.launcher_kI.get(), 250 )
+        slot0Cfg.k_d = self.launcher_kD.get() #self.leftMotor.config_kD( 0, self.launcher_kD.get(), 250 )
+        slot0Cfg.k_v = self.launcher_kF.get() #self.leftMotor.config_kF( 0, self.launcher_kF.get(), 250 )
+        self.leftMotor.configurator.apply( slot0Cfg )
+        self.rightMotor.configurator.apply( slot0Cfg )
 
     def setBrake(self, brake:bool):
-        mode = NeutralMode.Brake if brake else NeutralMode.Coast
-        self.leftMotor.setNeutralMode( mode )
-        self.rightMotor.setNeutralMode( mode )
+        # mode = NeutralMode.Brake if brake else NeutralMode.Coast
+        # self.leftMotor.setNeutralMode( mode )
+        # self.rightMotor.setNeutralMode( mode )
+
+        def setBrakeThread(brake:bool):
+            mode = NeutralModeValue.BRAKE if brake else NeutralModeValue.COAST
+            self.leftMotor.setNeutralMode( mode )
+            self.rightMotor.setNeutralMode( mode )
+
+        Thread( target = lambda: setBrakeThread(brake) ).start()
 
     def updateVoltageComp(self):
+        return 
         value = self.voltageComp.get()
         if value != abs( value ):
             self.voltageComp.set( abs(value) )
@@ -107,9 +134,9 @@ class LauncherIOFalcon(LauncherIO):
 
     def run(self):
         # Control Mode
-        controlMode = ControlMode.Velocity
-        if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
-            controlMode = ControlMode.PercentOutput
+        # controlMode = ControlMode.Velocity
+        # if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
+        #     controlMode = ControlMode.PercentOutput
 
         # Launch Sensor Detection
         if self.desiredVelocity[0] == 0.0 and self.desiredVelocity[1] == 0.0:
@@ -124,8 +151,13 @@ class LauncherIOFalcon(LauncherIO):
         self.lastSensor = self.irSensor.get()
 
         # Set Motor
-        self.leftMotor.set( controlMode, self.desiredVelocity[0] )
-        self.rightMotor.set( controlMode, self.desiredVelocity[1] )
+        # self.leftMotor.set( controlMode, self.desiredVelocity[0] )
+        # self.rightMotor.set( controlMode, self.desiredVelocity[1] )
+        outLeft = VelocityDutyCycle( self.desiredVelocity[0] ) if self.desiredVelocity[0] == 0.0 else DutyCycleOut( 0.0 )
+        outRight = VelocityDutyCycle( self.desiredVelocity[1] ) if self.desiredVelocity[1] == 0.0 else DutyCycleOut( 0.0 )
+        
+        self.leftMotor.set_control( outLeft )
+        self.rightMotor.set_control( outRight )
 
     def getSensorCount(self) -> int:
         return self.sensorCount

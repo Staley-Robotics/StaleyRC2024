@@ -1,6 +1,6 @@
-from .Climber.Climber import *
-from .Climber.ClimberIO import *
-from .Climber.ClimberIOTalon import *
+# from .Climber.Climber import *
+# from .Climber.ClimberIO import *
+# from .Climber.ClimberIOTalon import *
 from .Indexer.Indexer import *
 from .Indexer.IndexerIO import *
 from .Indexer.IndexerIONeo import *
@@ -13,9 +13,9 @@ from .Launcher.Launcher import *
 from .Launcher.LauncherIO import *
 from .Launcher.LauncherIOFalcon import *
 from .Launcher.LauncherIOSim import *
-from .Led.Led import *
-from .Led.LedIO import *
-from .Led.LedIOActual import *
+from .LED.Led import *
+from .LED.LedIO import *
+from .LED.LedIOActual import *
 from .Led2.Led2 import *
 from .Led2.Led2IO import *
 from .Led2.Led2IOPwm import *

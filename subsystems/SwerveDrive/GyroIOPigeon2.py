@@ -7,8 +7,9 @@ Date:  2024-01-09
 import typing
 
 # FRC Imports
-from phoenix5 import ErrorCode
-from phoenix5.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
+# from phoenix5 import ErrorCode
+# from phoenix5.sensors import WPI_Pigeon2, PigeonIMU_StatusFrame
+from phoenix6.hardware import Pigeon2
 from ntcore import NetworkTableInstance
 from wpilib import RobotBase
 from wpimath import units
@@ -17,7 +18,7 @@ from wpimath import units
 from .GyroIO import GyroIO
 from util import *
 
-class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
+class GyroIOPigeon2(Pigeon2, GyroIO):
     """
     Custom Pigeon Class extends WPI_Pigeon2 with logging capabilities
     """
@@ -35,30 +36,30 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         super().__init__( deviceNumber, "canivore1" )
 
         # Configure Default / Start Settings
-        self.configFactoryDefault()
-        self.zeroGyroBiasNow()
+        # self.configFactoryDefault()
+        # self.zeroGyroBiasNow()
         self.setYaw( startYaw )
-        self.setStatusFramePeriod(PigeonIMU_StatusFrame.PigeonIMU_BiasedStatus_2_Gyro, 20)
+        #self.setStatusFramePeriod(PigeonIMU_StatusFrame.PigeonIMU_BiasedStatus_2_Gyro, 20)
 
         # Update the Sim Collection (if running in Simulator)
         if RobotBase.isSimulation():
-            self.getSimCollection().setRawHeading( startYaw )
+            self.sim_state.set_raw_yaw( startYaw ) #getSimCollection().setRawHeading( startYaw )
 
     def updateInputs(self, inputs:GyroIO.GyroIOInputs):
         """
         Update GyroInputs Values for Logging Purposes
         :param inputs: GyroInputs objects that need to be updated
         """
-        yprDegrees = self.getYawPitchRoll()[1]
-        xyzDps = self.getRawGyro()[1]
+        # yprDegrees = self.getYawPitchRoll()[1]
+        # xyzDps = self.getRawGyro()[1]
 
-        inputs.connected = self.getLastError() == ErrorCode.OK
-        inputs.rollPositionRad = units.degreesToRadians( yprDegrees[1] )
-        inputs.pitchPositionRad = units.degreesToRadians( -yprDegrees[2] )
-        inputs.yawPositionRad = units.degreesToRadians( yprDegrees[0] )
-        inputs.rollVelocityRadPerSec = units.degreesToRadians( xyzDps[1] )
-        inputs.pitchVelocityRadPerSec = units.degreesToRadians( -xyzDps[0] )
-        inputs.yawVelocityRadPerSec = units.degreesToRadians( xyzDps[2] )
+        # inputs.connected = self.getLastError() == ErrorCode.OK
+        inputs.rollPositionRad = units.degreesToRadians( self.get_roll().value ) # yprDegrees[1] )
+        inputs.pitchPositionRad = units.degreesToRadians( -self.get_pitch().value ) # -yprDegrees[2] )
+        inputs.yawPositionRad = units.degreesToRadians( self.get_yaw().value ) # yprDegrees[0] )
+        inputs.rollVelocityRadPerSec = units.degreesToRadians( self.get_angular_velocity_y_device().value ) # xyzDps[1] )
+        inputs.pitchVelocityRadPerSec = units.degreesToRadians( -self.get_angular_velocity_x_device().value ) # -xyzDps[0] )
+        inputs.yawVelocityRadPerSec = units.degreesToRadians( self.get_angular_velocity_z_device().value ) # xyzDps[2] )
 
     def simulationPeriodic(self, velocity:float) -> None:
         """
@@ -67,10 +68,10 @@ class GyroIOPigeon2(WPI_Pigeon2, GyroIO):
         """
         velocDegPerSec = units.radiansToDegrees( velocity )
         velocDegPer20ms = velocDegPerSec * 0.02 # Rio Loop Cycle
-        self.getSimCollection().addHeading( velocDegPer20ms )
+        self.sim_state.add_yaw( velocDegPer20ms ) #getSimCollection().addHeading( velocDegPer20ms )
         #newYaw = self.getYaw()
-        while self.getYaw() < 0:
-            self.getSimCollection().setRawHeading( self.getYaw() + 360 )
-        while self.getYaw() >= 360.0: 
-            self.getSimCollection().setRawHeading( self.getYaw() - 360 )
+        while self.get_yaw() < 0:
+            self.sim_state.set_raw_yaw( self.get_yaw().value + 360 ) #getSimCollection().setRawHeading( self.getYaw() + 360 )
+        while self.get_yaw() >= 360.0: 
+            self.sim_state.set_raw_yaw( self.get_ywaw().value - 360 ) #getSimCollection().setRawHeading( self.getYaw() - 360 )
 

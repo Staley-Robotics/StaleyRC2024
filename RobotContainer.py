@@ -39,8 +39,8 @@ class RobotContainer:
         ssLauncherIO = None
         ssPivotIO = None
         ssLedIO = Led2IOPwm( 9 )
-        ssClimberIOLeft = None
-        ssClimberIORight = None
+        #ssClimberIOLeft = None
+        #ssClimberIORight = None
         ppCommands = {}
 
         # Create IO Systems
@@ -56,8 +56,8 @@ class RobotContainer:
             ssIndexerIO = IndexerIO()
             ssLauncherIO = LauncherIOSim()
             ssPivotIO = PivotIOSim()
-            ssClimberIOLeft = ClimberIO()
-            ssClimberIORight = ClimberIO()
+            # ssClimberIOLeft = ClimberIO()
+            # ssClimberIORight = ClimberIO()
         else:
             if wpilib.RobotBase.isSimulation():
                 ssModulesIO = [
@@ -78,8 +78,8 @@ class RobotContainer:
             ssIndexerIO = IndexerIONeo( 22, 2, 1 )
             ssLauncherIO = LauncherIOFalcon( 23, 24 , 3 )
             ssPivotIO = PivotIOFalcon( 25, 26, -76.993 )
-            ssClimberIOLeft = ClimberIOTalon( 27, 9, 8 )
-            ssClimberIORight = ClimberIOTalon( 28, 7, 6 )
+            # ssClimberIOLeft = ClimberIOTalon( 27, 9, 8 )
+            # ssClimberIORight = ClimberIOTalon( 28, 7, 6 )
 
         # Vision
         ssCamerasIO:typing.Tuple[VisionCamera] = [
@@ -96,7 +96,7 @@ class RobotContainer:
         self.feeder:Indexer = Indexer( ssIndexerIO )
         self.pivot:Pivot = Pivot( ssPivotIO )
         self.launcher:Launcher = Launcher( ssLauncherIO )
-        self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
+        # self.climber = Climber( ssClimberIOLeft, ssClimberIORight )
         self.launchCalc = LaunchCalc( self.drivetrain.getPose )
         self.led = Led2( ssLedIO )
 
@@ -141,7 +141,7 @@ class RobotContainer:
         wpilib.SmartDashboard.putData( "Indexer", self.feeder )
         wpilib.SmartDashboard.putData( "Pivot", self.pivot )
         wpilib.SmartDashboard.putData( "Launcher", self.launcher )
-        wpilib.SmartDashboard.putData( "Climber", self.climber )
+        # wpilib.SmartDashboard.putData( "Climber", self.climber )
         wpilib.SmartDashboard.putData( "LED", self.led )
 
         # Add Commands to SmartDashboard
@@ -335,13 +335,13 @@ class RobotContainer:
                 useAutoStart = getSwitchLaunchStartAuto
             )
         )
-        self.climber.setDefaultCommand(
-            ClimberDefault(
-                self.climber,
-                lambda: -( self.station.getRawAxis(1) + self.m_driver2.getRightY() ),
-                lambda: True #getSwitchClimb
-            )
-        )
+        # self.climber.setDefaultCommand(
+        #     ClimberDefault(
+        #         self.climber,
+        #         lambda: -( self.station.getRawAxis(1) + self.m_driver2.getRightY() ),
+        #         lambda: True #getSwitchClimb
+        #     )
+        # )
 
         ### LED Configuration
         self.led.setIntakeIsRunning( self.intake.isRunning )

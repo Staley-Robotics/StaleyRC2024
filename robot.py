@@ -3,7 +3,7 @@ from pathlib import Path
 
 import wpilib
 import wpiutil.log
-from urcl import URCL
+#from urcl import URCL
 import hal
 import commands2
 import ntcore
@@ -32,7 +32,7 @@ class MyRobot(wpilib.TimedRobot):
         wpilib.Watchdog( 0.05, lambda: None ).suppressTimeoutMessage(True)
 
         # Rev Raw Logging
-        URCL.start()
+        #URCL.start()
 
         # Setup Console Logging
         loggedConsole:LoggedConsole = None
